@@ -1,0 +1,63 @@
+# --- .NET ---
+bin/
+obj/
+.vs/
+*.user
+*.suo
+[Dd]ebug/
+[Rr]elease/
+appsettings.Development.json
+*.ncrunch*
+*.vspscc
+*.vssscc
+*.pdb
+*.mdb
+*.opendb
+*.cache
+*.dbmdl
+*.bak
+*.swp
+
+# --- SQLite ---
+*.db
+*.db-shm
+*.db-wal
+
+# --- Node / Frontend ---
+node_modules/
+dist/
+build/
+.env.local
+.DS_Store
+npm-debug.log*
+yarn-debug.log*
+*.tgz
+.env
+
+# --- Test & Coverage ---
+TestResults/
+*.log
+*.coverage
+*.coveragexml
+coverage/
+
+# --- Editor/OS ---
+.idea/
+.vscode/
+Thumbs.db
+*.orig
+
+# --- Misc ---
+*.tmp
+*.temp
+*.sublime-workspace
+*.sublime-project
+
+# --- API/HTTP ---
+*.http
+
+# --- User/Secrets ---
+secrets.json
+*.key
+*.pem
+*.crt
