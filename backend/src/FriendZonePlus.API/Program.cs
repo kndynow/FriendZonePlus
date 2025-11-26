@@ -4,12 +4,11 @@ using FriendZonePlus.Infrastructure.Repositories;
 using FriendZonePlus.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using FriendZonePlus.API.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=friendzoneplus.db";
@@ -31,8 +30,8 @@ if (app.Environment.IsDevelopment())
 
 // app.UseHttpsRedirection();
 
-app.UseAuthorization();
+// app.UseAuthorization();
 
-app.MapControllers();
+app.MapUserEnpoints();
 
 app.Run();

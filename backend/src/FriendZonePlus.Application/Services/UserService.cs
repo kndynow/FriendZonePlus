@@ -13,6 +13,13 @@ public class UserService
     _userRepository = userRepository;
   }
 
+  //Get User by Id
+  public async Task<User?> GetUserByIdAsync(int id)
+  {
+    return await _userRepository.GetByIdAsync(id);
+  }
+
+  //Register
   public async Task<int> RegisterUserAsync(RegisterUserDto dto)
   {
     if (string.IsNullOrWhiteSpace(dto.Username))
@@ -30,6 +37,16 @@ public class UserService
     var createdUser = await _userRepository.AddAsync(newUser);
 
     return createdUser.Id;
+  }
+
+  //Delete
+  public async Task<bool> DeleteUserAsync(int id)
+  {
+    var user = await _userRepository.GetByIdAsync(id);
+    if (user == null) return false;
+
+    await _userRepository.DeleteAsync(user);
+    return true;
   }
 
 }

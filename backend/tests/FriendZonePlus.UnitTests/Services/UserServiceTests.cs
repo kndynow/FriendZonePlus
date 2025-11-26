@@ -29,7 +29,6 @@ public class UserServiceTests
     var result = await service.RegisterUserAsync(dto);
 
     //Assert
-    //Should get ID 1 back
     Assert.Equal(1, result);
 
     //Check if AddAsync was called one time
