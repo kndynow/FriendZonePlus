@@ -16,8 +16,12 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 //Config for EF Core with SQLite
 builder.Services.AddDbContext<FriendZonePlusContext>(options => options.UseSqlite(connectionString));
 
+// Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IPostRepository, PostRepository>();
+// Services
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<PostService>();
 
 var app = builder.Build();
 
@@ -33,5 +37,6 @@ if (app.Environment.IsDevelopment())
 // app.UseAuthorization();
 
 app.MapUserEnpoints();
+app.MapPostEndpoints();
 
 app.Run();
