@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using FriendZonePlus.API.Endpoints;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -38,5 +39,21 @@ if (app.Environment.IsDevelopment())
 
 app.MapUserEnpoints();
 app.MapPostEndpoints();
+
+// Create or update database on every run
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<FriendZonePlusContext>();
+        context.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occured while migrating the database");
+    }
+}
 
 app.Run();
