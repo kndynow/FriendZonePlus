@@ -23,7 +23,8 @@ public class UserService
     var newUser = new User
     {
       Username = dto.Username,
-      Email = dto.Email
+      Email = dto.Email,
+      CreatedAt = DateTime.Now
     };
 
     var createdUser = await _userRepository.AddAsync(newUser);
