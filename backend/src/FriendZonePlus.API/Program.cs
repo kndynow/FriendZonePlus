@@ -1,3 +1,6 @@
+using FriendZonePlus.Application.Services;
+using FriendZonePlus.Core.Interfaces;
+using FriendZonePlus.Infrastructure.Repositories;
 using FriendZonePlus.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +16,9 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 //Config for EF Core with SQLite
 builder.Services.AddDbContext<FriendZonePlusContext>(options => options.UseSqlite(connectionString));
 
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<UserService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -21,7 +27,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
