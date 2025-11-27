@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FriendZonePlus.Infrastructure.Migrations
 {
     [DbContext(typeof(FriendZonePlusContext))]
-    [Migration("20251126214108_AddPostsTable")]
-    partial class AddPostsTable
+    [Migration("20251127100619_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -20,7 +20,29 @@ namespace FriendZonePlus.Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.0");
 
-            modelBuilder.Entity("FriendZonePlus.Core.Entities.Post", b =>
+            modelBuilder.Entity("FriendZonePlus.Core.Entities.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("FriendZonePlus.Core.Entities.WallPost", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -45,32 +67,10 @@ namespace FriendZonePlus.Infrastructure.Migrations
 
                     b.HasIndex("TargetUserId");
 
-                    b.ToTable("Posts");
+                    b.ToTable("WallPosts");
                 });
 
-            modelBuilder.Entity("FriendZonePlus.Core.Entities.User", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("FriendZonePlus.Core.Entities.Post", b =>
+            modelBuilder.Entity("FriendZonePlus.Core.Entities.WallPost", b =>
                 {
                     b.HasOne("FriendZonePlus.Core.Entities.User", "Author")
                         .WithMany()

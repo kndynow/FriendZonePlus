@@ -6,25 +6,25 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FriendZonePlus.Infrastructure.Repositories;
 
-public class PostRepository : IPostRepository
+public class WallPostRepository : IWallPostRepository
 {
   private readonly FriendZonePlusContext _context;
 
-  public PostRepository(FriendZonePlusContext context)
+  public WallPostRepository(FriendZonePlusContext context)
   {
     _context = context;
   }
 
-  public async Task<Post> AddAsync(Post post)
+  public async Task<WallPost> AddAsync(WallPost wallPost)
   {
-    _context.Add(post);
+    _context.Add(wallPost);
     await _context.SaveChangesAsync();
-    return post;
+    return wallPost;
   }
 
-  public async Task<IEnumerable<Post>> GetByTargetUserIdAsync(int targetUserId)
+  public async Task<IEnumerable<WallPost>> GetByTargetUserIdAsync(int targetUserId)
   {
-    return await _context.Posts.Where(p => p.TargetUserId == targetUserId)
+    return await _context.WallPosts.Where(p => p.TargetUserId == targetUserId)
     .OrderByDescending(p => p.CreatedAt)
     .ToListAsync();
   }

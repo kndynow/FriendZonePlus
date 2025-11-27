@@ -23,7 +23,7 @@ public class UserServiceTests
   public async Task RegisterUser_ShouldCallRepository_WhenDataIsValid()
   {
     //Arrange
-    var dto = new RegisterUserDto("TestUser", "test@test.com");
+    var dto = new CreateUserDto("TestUser", "test@test.com");
 
     //If trying to create, return a User with ID 1
     _userRepoMock.Setup(repo => repo.AddAsync(It.IsAny<User>()))
@@ -33,7 +33,7 @@ public class UserServiceTests
 
 
     //Act
-    var result = await _sut.RegisterUserAsync(dto);
+    var result = await _sut.CreateUserAsync(dto);
 
     //Assert
     Assert.Equal(1, result);
@@ -49,10 +49,10 @@ public class UserServiceTests
   public async Task RegisterUser_ShouldThrowException_WhenUsernameIsEmpty()
   {
     //Arrange
-    var invalidDto = new RegisterUserDto("", "test@test.com");
+    var invalidDto = new CreateUserDto("", "test@test.com");
 
     //Act & Assert
-    await Assert.ThrowsAsync<ArgumentException>(() => _sut.RegisterUserAsync(invalidDto));
+    await Assert.ThrowsAsync<ArgumentException>(() => _sut.CreateUserAsync(invalidDto));
 
     //Verify that database never was called
     _userRepoMock.Verify(repo => repo.AddAsync(It.IsAny<User>()), Times.Never);

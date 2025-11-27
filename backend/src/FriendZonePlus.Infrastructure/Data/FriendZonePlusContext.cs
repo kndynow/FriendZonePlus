@@ -11,7 +11,7 @@ public class FriendZonePlusContext : DbContext
   }
 
   public DbSet<User> Users { get; set; }
-  public DbSet<Post> Posts { get; set; }
+  public DbSet<WallPost> WallPosts { get; set; }
 
   // Configurate relations between models
   protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -19,14 +19,14 @@ public class FriendZonePlusContext : DbContext
     base.OnModelCreating(modelBuilder);
 
     // Configure Post -> Author relation
-    modelBuilder.Entity<Post>()
+    modelBuilder.Entity<WallPost>()
     .HasOne(p => p.Author)
     .WithMany()
     .HasForeignKey(p => p.AuthorId)
     .OnDelete(DeleteBehavior.Restrict);
 
     // Configure Post -> TargetUser relation
-    modelBuilder.Entity<Post>()
+    modelBuilder.Entity<WallPost>()
     .HasOne(p => p.TargetUser)
     .WithMany()
     .HasForeignKey(p => p.TargetUserId)

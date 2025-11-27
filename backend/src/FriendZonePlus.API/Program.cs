@@ -19,10 +19,10 @@ builder.Services.AddDbContext<FriendZonePlusContext>(options => options.UseSqlit
 
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IPostRepository, PostRepository>();
+builder.Services.AddScoped<IWallPostRepository, WallPostRepository>();
 // Services
 builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<PostService>();
+builder.Services.AddScoped<WallPostService>();
 
 var app = builder.Build();
 
@@ -37,8 +37,8 @@ if (app.Environment.IsDevelopment())
 
 // app.UseAuthorization();
 
-app.MapUserEnpoints();
-app.MapPostEndpoints();
+app.MapWallPostEndpoints();
+app.MapUserEndpoints();
 
 // Create or update database on every run
 using (var scope = app.Services.CreateScope())

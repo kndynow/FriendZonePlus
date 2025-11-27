@@ -20,10 +20,7 @@ public class UserService
   }
 
   //Register
-  // TODO: 
-  // - Rename to CreateUserAsync for coherens
-  // - Refactor UserDto to use one file for all DTOs
-  public async Task<int> RegisterUserAsync(RegisterUserDto dto)
+  public async Task<int> CreateUserAsync(CreateUserDto dto)
   {
     if (string.IsNullOrWhiteSpace(dto.Username))
     {

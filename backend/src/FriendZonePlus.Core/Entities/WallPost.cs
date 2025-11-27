@@ -1,6 +1,6 @@
 namespace FriendZonePlus.Core.Entities;
 
-public class Post
+public class WallPost
 {
   public int Id { get; set; }
 

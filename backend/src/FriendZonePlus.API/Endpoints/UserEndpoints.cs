@@ -7,23 +7,23 @@ namespace FriendZonePlus.API.Endpoints;
 
 public static class UserEndpoints
 {
-  public static void MapUserEnpoints(this IEndpointRouteBuilder app)
+  public static void MapUserEndpoints(this IEndpointRouteBuilder app)
   {
-    var group = app.MapGroup("/api/users")
+    var group = app.MapGroup("/api/Users")
                     .WithTags("Users");
 
-    group.MapPost("/register", RegisterUser);
+    group.MapPost("/register", CreateUser);
     group.MapGet("/{id}", GetUserById);
     group.MapDelete("/{id}", DeleteUser);
   }
 
-  private static async Task<Results<Ok<object>, BadRequest<object>>> RegisterUser(
+  private static async Task<Results<Ok<object>, BadRequest<object>>> CreateUser(
           UserService userService,
-          RegisterUserDto dto)
+          [FromBody] CreateUserDto dto)
   {
     try
     {
-      var userId = await userService.RegisterUserAsync(dto);
+      var userId = await userService.CreateUserAsync(dto);
       return TypedResults.Ok<object>(new { Id = userId, Message = "Created" });
     }
     catch (ArgumentException ex)
