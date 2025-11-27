@@ -29,8 +29,6 @@ public class UserServiceTests
     _userRepoMock.Setup(repo => repo.AddAsync(It.IsAny<User>()))
             .ReturnsAsync(new User { Id = 1 });
 
-    // Create service and send mock database
-
 
     //Act
     var result = await _sut.CreateUserAsync(dto);
@@ -56,6 +54,21 @@ public class UserServiceTests
 
     //Verify that database never was called
     _userRepoMock.Verify(repo => repo.AddAsync(It.IsAny<User>()), Times.Never);
+  }
+
+  [Fact]
+  public async Task DeleteUser_ShouldCallRepository_UserExists()
+  {
+    //Arrange
+    var userId = 1;
+    _userRepoMock.Setup(repo => repo.GetByIdAsync(userId)).ReturnsAsync(new User { Id = userId });
+    //Act
+    var result = await _sut.DeleteUserAsync(userId);
+
+    //Assert
+    Assert.True(result);
+
+    _userRepoMock.Verify(repo => repo.DeleteAsync(It.Is<User>(u => u.Id == userId)), Times.Once);
   }
 
 }

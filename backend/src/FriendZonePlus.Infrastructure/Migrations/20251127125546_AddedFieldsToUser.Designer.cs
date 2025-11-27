@@ -3,6 +3,7 @@ using System;
 using FriendZonePlus.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,63 +11,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FriendZonePlus.Infrastructure.Migrations
 {
     [DbContext(typeof(FriendZonePlusContext))]
-    partial class FriendZonePlusContextModelSnapshot : ModelSnapshot
+    [Migration("20251127125546_AddedFieldsToUser")]
+    partial class AddedFieldsToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.0");
-
-            modelBuilder.Entity("FriendZonePlus.Core.Entities.Follows", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("FolloweeId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("FollowerId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FolloweeId");
-
-                    b.HasIndex("FollowerId");
-
-                    b.ToTable("Follows");
-                });
-
-            modelBuilder.Entity("FriendZonePlus.Core.Entities.Message", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ReceiverId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("SenderId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Messages");
-                });
 
             modelBuilder.Entity("FriendZonePlus.Core.Entities.User", b =>
                 {
@@ -132,25 +84,6 @@ namespace FriendZonePlus.Infrastructure.Migrations
                     b.HasIndex("TargetUserId");
 
                     b.ToTable("WallPosts");
-                });
-
-            modelBuilder.Entity("FriendZonePlus.Core.Entities.Follows", b =>
-                {
-                    b.HasOne("FriendZonePlus.Core.Entities.User", "Followee")
-                        .WithMany()
-                        .HasForeignKey("FolloweeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("FriendZonePlus.Core.Entities.User", "Follower")
-                        .WithMany()
-                        .HasForeignKey("FollowerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Followee");
-
-                    b.Navigation("Follower");
                 });
 
             modelBuilder.Entity("FriendZonePlus.Core.Entities.WallPost", b =>

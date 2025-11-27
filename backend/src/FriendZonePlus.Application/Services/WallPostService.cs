@@ -50,4 +50,9 @@ public class WallPostService
         createdWallPost.CreatedAt
       );
   }
+
+  public async Task<object> GetWallPostsForTargetUserAsync(int targetUserId)
+  {
+    throw new NotImplementedException();
+  }
 }
