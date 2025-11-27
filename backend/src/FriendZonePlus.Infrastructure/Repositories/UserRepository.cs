@@ -12,6 +12,10 @@ public class UserRepository : IUserRepository
   {
     _context = context;
   }
+  public async Task<User?> GetByIdAsync(int id)
+  {
+    return await _context.Users.FindAsync(id);
+  }
 
   public async Task<User> AddAsync(User user)
   {
@@ -21,4 +25,11 @@ public class UserRepository : IUserRepository
 
     return user;
   }
+
+  public async Task DeleteAsync(User user)
+  {
+    _context.Users.Remove(user);
+    await _context.SaveChangesAsync();
+  }
+
 }
