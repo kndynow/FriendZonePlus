@@ -17,6 +17,7 @@ public static class UserEndpoints
     group.MapDelete("/{id}", DeleteUser);
   }
 
+  //CREATE
   private static async Task<Results<Ok<object>, BadRequest<object>>> CreateUser(
           UserService userService,
           [FromBody] CreateUserDto dto)
@@ -32,7 +33,7 @@ public static class UserEndpoints
     }
   }
 
-  //GET
+  //GET BY ID
   private static async Task<Results<Ok<object>, NotFound>> GetUserById(
         int id,
         UserService userService)
@@ -46,6 +47,10 @@ public static class UserEndpoints
 
     return TypedResults.Ok<object>(new { user.Id, user.Username, user.Email });
   }
+
+  //TODO: GET ALL USERS
+
+  //TODO:PATCH
 
   //DELETE
   private static async Task<Results<NoContent, NotFound>> DeleteUser(int id, UserService userService)

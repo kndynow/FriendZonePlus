@@ -15,7 +15,7 @@ public static class WallPostEndpoints
     group.MapPost("/create", CreateWallPost);
   }
 
-  // Create new wall post
+  // CREATE
   private static async Task<Results<Ok<WallPostResponseDto>, BadRequest<object>>> CreateWallPost(
           WallPostService wallPostService,
           [FromBody] CreateWallPostDto dto)
@@ -33,17 +33,11 @@ public static class WallPostEndpoints
   }
 }
 
-// Get all wall posts for a target user
+//TODO: GET ALL WALL POSTS FOR A TARGET USER
 
-// private static async Task<Results<Ok<IEnumerable<WallPostResponseDto>>, NotFound>> GetWallPostsForTargetUser(
-//   int targetUserId,
-//   WallPostService wallPostService)
-//   {
-//     var wallPosts = await wallPostService.GetWallPostsForTargetUserAsync(targetUserId);
-//     return TypedResults.Ok(wallPosts);
-//   }
-// catch (ArgumentException ex)
-// {
-//   return TypedResults.BadRequest<object>(new { Error = ex.Message });
-// }
-// };
+//TODO: GET ALL WALL POSTS FOR AN AUTHOR
+
+//TODO: PATCH
+
+//TODO: DELETE
+
