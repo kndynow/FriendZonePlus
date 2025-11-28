@@ -15,6 +15,15 @@ public class FollowService
     //TODO: Follow user
     public async Task FollowAsync(int followerId, int followeeId)
     {
+        if (followerId == followeeId)
+        {
+            throw new InvalidOperationException("User cannot follow themselves.");
+        }
+        if (await _followRepository.ExistsAsync(followerId, followeeId))
+        {
+            throw new InvalidOperationException("Follow relationship already exists.");
+        }
+
         var follow = new Follows
         {
             FollowerId = followerId,

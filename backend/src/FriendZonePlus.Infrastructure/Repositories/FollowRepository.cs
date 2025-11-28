@@ -18,6 +18,11 @@ public class FollowRepository : IFollowRepository
     {
         throw new NotImplementedException();
     }
+
+    public Task<bool> ExistsAsync(int followerId, int followeeId)
+    {
+        throw new NotImplementedException();
+    }
     //TODO: Get followers
     //TODO: Unfollow user
 
