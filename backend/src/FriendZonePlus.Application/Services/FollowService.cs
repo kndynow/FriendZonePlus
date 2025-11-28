@@ -15,7 +15,7 @@ public class FollowService
         _userRepository = userRepository;
     }
 
-    //TODO: Follow user
+    //TODO: Test edge cases
     public async Task FollowAsync(int followerId, int followeeId)
     {
         
@@ -35,10 +35,20 @@ public class FollowService
 
     private async Task ValidateFollowRequest(int followerId, int followeeId)
     {
+        ValidateIdShouldBeGreaterThanZero(followerId);
+        ValidateIdShouldBeGreaterThanZero(followeeId);
         ValidateSelfFollow(followerId, followeeId);
         await ValidateFollowerExist(followerId);
         await ValidateFolloweeExist(followeeId);
         await ValidateUniqueFollow(followerId, followeeId);
+    }
+
+    private void ValidateIdShouldBeGreaterThanZero(int id)
+    {
+        if (id <= 0)
+        {
+            throw new ArgumentException("User Id must be greater than zero");
+        }
     }
 
     private void ValidateSelfFollow(int followerId, int followeeId)

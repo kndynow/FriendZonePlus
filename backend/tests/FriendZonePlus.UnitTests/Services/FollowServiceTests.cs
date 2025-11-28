@@ -115,4 +115,15 @@ public class FollowServiceTests
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _service.FollowAsync(followerId, followeeId));
     }
+
+    [Theory]
+    [InlineData(0, 2)]
+    [InlineData(1, -3)]
+    [InlineData(-1, 3)]
+    [InlineData(9, 0)]
+    public async Task FollowAsync_ShouldThrowException_WhenIdsAreInvalid(int followerId, int followeeId)
+    {
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            _service.FollowAsync(followerId, followeeId));
+    }
 }
