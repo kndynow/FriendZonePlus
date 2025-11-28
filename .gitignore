@@ -52,6 +52,7 @@ Thumbs.db
 *.temp
 *.sublime-workspace
 *.sublime-project
+learning-resources/
 
 # --- API/HTTP ---
 *.http

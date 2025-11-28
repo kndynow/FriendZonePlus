@@ -6,13 +6,28 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FriendZonePlus.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class AddPostsTable : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Posts",
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Username = table.Column<string>(type: "TEXT", nullable: false),
+                    Email = table.Column<string>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WallPosts",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -24,15 +39,15 @@ namespace FriendZonePlus.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Posts", x => x.Id);
+                    table.PrimaryKey("PK_WallPosts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Posts_Users_AuthorId",
+                        name: "FK_WallPosts_Users_AuthorId",
                         column: x => x.AuthorId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Posts_Users_TargetUserId",
+                        name: "FK_WallPosts_Users_TargetUserId",
                         column: x => x.TargetUserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -40,13 +55,13 @@ namespace FriendZonePlus.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Posts_AuthorId",
-                table: "Posts",
+                name: "IX_WallPosts_AuthorId",
+                table: "WallPosts",
                 column: "AuthorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Posts_TargetUserId",
-                table: "Posts",
+                name: "IX_WallPosts_TargetUserId",
+                table: "WallPosts",
                 column: "TargetUserId");
         }
 
@@ -54,7 +69,10 @@ namespace FriendZonePlus.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Posts");
+                name: "WallPosts");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }

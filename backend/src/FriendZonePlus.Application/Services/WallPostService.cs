@@ -5,19 +5,19 @@ using FriendZonePlus.Core.Interfaces;
 
 namespace FriendZonePlus.Application.Services;
 
-public class PostService
+public class WallPostService
 {
-  private readonly IPostRepository _postRepository;
+  private readonly IWallPostRepository _wallPostRepository;
   private readonly IUserRepository _userRepository;
 
-  public PostService(IPostRepository postRepository, IUserRepository userRepository)
+  public WallPostService(IWallPostRepository wallPostRepository, IUserRepository userRepository)
   {
-    _postRepository = postRepository;
+    _wallPostRepository = wallPostRepository;
     _userRepository = userRepository;
   }
 
 
-  public async Task<PostDtos.Response> CreatePostAsync(PostDtos.Create dto)
+  public async Task<WallPostResponseDto> CreateWallPostAsync(CreateWallPostDto dto)
   {
     if (string.IsNullOrWhiteSpace(dto.Content))
       throw new ArgumentException("Content cannot be empty");
@@ -33,7 +33,7 @@ public class PostService
     if (target == null)
       throw new ArgumentException("Target user does not exist");
 
-    var post = new Post
+    var WallPost = new WallPost
     {
       AuthorId = dto.AuthorId,
       TargetUserId = dto.TargetUserId,
@@ -41,13 +41,18 @@ public class PostService
       CreatedAt = DateTime.UtcNow
     };
 
-    var createdPost = await _postRepository.AddAsync(post);
+    var createdWallPost = await _wallPostRepository.AddAsync(WallPost);
 
-    return new PostDtos.Response(
-        createdPost.Id,
-        createdPost.AuthorId,
-        createdPost.Content,
-        createdPost.CreatedAt
+    return new WallPostResponseDto(
+        createdWallPost.Id,
+        createdWallPost.AuthorId,
+        createdWallPost.Content,
+        createdWallPost.CreatedAt
       );
+  }
+
+  public async Task<object> GetWallPostsForTargetUserAsync(int targetUserId)
+  {
+    throw new NotImplementedException();
   }
 }

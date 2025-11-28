@@ -20,25 +20,25 @@ public class UserServiceTests
   }
 
   [Fact]
-  public async Task RegisterUser_ShouldCallRepository_WhenDataIsValid()
+  public async Task CreateUser_ShouldReturnSuccess_WhenDataIsValid()
   {
     //Arrange
-    var dto = new RegisterUserDto("TestUser", "test@test.com");
+    var dto = new CreateUserDto("TestUser", "test@test.com");
 
-    //If trying to create, return a User with ID 1
+    //Simulate that database returns an ID
     _userRepoMock.Setup(repo => repo.AddAsync(It.IsAny<User>()))
-            .ReturnsAsync(new User { Id = 1 });
-
-    // Create service and send mock database
-
-
+            .ReturnsAsync((User user) =>
+            {
+              user.Id = 1;
+              return user;
+            });
     //Act
-    var result = await _sut.RegisterUserAsync(dto);
+    var userId = await _sut.CreateUserAsync(dto);
 
     //Assert
-    Assert.Equal(1, result);
+    Assert.Equal(1, userId);
 
-    //Check if AddAsync was called one time
+    //Check if AddAsync was called one time with the correct user data
     _userRepoMock.Verify(repo => repo.AddAsync(It.Is<User>(u =>
         u.Username == "TestUser" &&
         u.Email == "test@test.com"
@@ -46,16 +46,34 @@ public class UserServiceTests
   }
 
   [Fact]
-  public async Task RegisterUser_ShouldThrowException_WhenUsernameIsEmpty()
+  public async Task CreateUser_ShouldThrowException_WhenUsernameIsEmpty()
   {
     //Arrange
-    var invalidDto = new RegisterUserDto("", "test@test.com");
+    var invalidDto = new CreateUserDto("", "test@test.com");
 
     //Act & Assert
-    await Assert.ThrowsAsync<ArgumentException>(() => _sut.RegisterUserAsync(invalidDto));
+    await Assert.ThrowsAsync<ArgumentException>(() => _sut.CreateUserAsync(invalidDto));
 
-    //Verify that database never was called
+    //Verify that AddAsync was never called
     _userRepoMock.Verify(repo => repo.AddAsync(It.IsAny<User>()), Times.Never);
+  }
+
+  [Fact]
+  public async Task DeleteUser_ShouldReturnSuccess_WhenUserExists()
+  {
+    //Arrange
+    var userId = 1;
+    //Simulate that database returns a user with the correct ID
+    _userRepoMock.Setup(repo => repo.GetByIdAsync(userId)).ReturnsAsync(new User { Id = userId });
+
+    //Act
+    var success = await _sut.DeleteUserAsync(userId);
+
+    //Assert
+    Assert.True(success);
+
+    //Verify that DeleteAsync was called one time with the correct user data
+    _userRepoMock.Verify(repo => repo.DeleteAsync(It.Is<User>(u => u.Id == userId)), Times.Once);
   }
 
 }
