@@ -19,7 +19,7 @@ public class FollowService
     public async Task FollowAsync(int followerId, int followeeId)
     {
         
-       await ValitadeFollowRequest(followerId, followeeId);
+        await ValidateFollowRequest(followerId, followeeId);
 
         var follow = new Follows
         {
@@ -33,9 +33,11 @@ public class FollowService
     //TODO: Get followers
     //TODO: Unfollow user
 
-    private async Task ValitadeFollowRequest(int followerId, int followeeId)
+    private async Task ValidateFollowRequest(int followerId, int followeeId)
     {
         ValidateSelfFollow(followerId, followeeId);
+        await ValidateFollowerExist(followerId);
+        await ValidateFolloweeExist(followeeId);
         await ValidateUniqueFollow(followerId, followeeId);
     }
 
@@ -46,6 +48,25 @@ public class FollowService
             throw new InvalidOperationException("User cannot follow themselves.");
         }
     }
+
+    private async Task ValidateFollowerExist(int followerId)
+    {
+        var follower = await _userRepository.GetByIdAsync(followerId);
+        if (follower == null)
+        {
+            throw new InvalidOperationException("Follower does not exist.");
+        }
+    }
+
+    private async Task ValidateFolloweeExist(int followeeId)
+    {
+        var followee = await _userRepository.GetByIdAsync(followeeId);
+        if (followee == null)
+        {
+            throw new InvalidOperationException("Followee does not exist.");
+        }
+    }
+
     private async Task ValidateUniqueFollow(int followerId, int followeeId)
     {
         if (await _followRepository.ExistsAsync(followerId, followeeId))

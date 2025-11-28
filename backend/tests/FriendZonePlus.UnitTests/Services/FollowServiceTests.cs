@@ -24,6 +24,13 @@ public class FollowServiceTests
         int followerId = 1;
         int followeeId = 2;
 
+        _userRepoMock.Setup(repo => repo
+            .GetByIdAsync(followerId))
+            .ReturnsAsync(new User { Id = followerId });
+        _userRepoMock.Setup(repo => repo
+            .GetByIdAsync(followeeId))
+            .ReturnsAsync(new User { Id = followeeId });
+
         //Act
         await _service.FollowAsync(followerId, followeeId);
 
