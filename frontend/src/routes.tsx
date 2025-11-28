@@ -4,8 +4,8 @@ import RegisterPage from "./pages/RegisterPage";
 import NotFoundPage from "./pages/NotFoundPage";
 
 const routes: RouteObject[] = [
-  { path: "homepage", element: <HomePage /> },
-  { index: true, element: <RegisterPage /> },
+  { index: true, element: <HomePage /> },
+  { path: "register", element: <RegisterPage /> },
   { path: "*", element: <NotFoundPage /> },
 ];
 
