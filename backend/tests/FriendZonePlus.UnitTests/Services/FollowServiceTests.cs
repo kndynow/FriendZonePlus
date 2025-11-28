@@ -8,11 +8,13 @@ namespace FriendZonePlus.UnitTests.Services;
 public class FollowServiceTests
 {
     private readonly Mock<IFollowRepository> _followRepoMock;
+    private readonly Mock<IUserRepository> _userRepoMock;
     private readonly FollowService _service;
     public FollowServiceTests()
     {
+        _userRepoMock = new Mock<IUserRepository>();
         _followRepoMock = new Mock<IFollowRepository>();
-        _service = new FollowService(_followRepoMock.Object);
+        _service = new FollowService(_followRepoMock.Object, _userRepoMock.Object);
     }
 
     [Fact]
@@ -64,6 +66,46 @@ public class FollowServiceTests
 
         //Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() => 
+            _service.FollowAsync(followerId, followeeId));
+    }
+
+    [Fact]
+    public async Task FollowAsync_ShouldThrowException_WhenFollowerDoesNotExist()
+    {
+        //Arrange
+        int followerId = 1;
+        int followeeId = 2;
+
+        _userRepoMock.Setup(repo => repo
+            .GetByIdAsync(followerId))
+            .ReturnsAsync((User?)null);
+
+        _userRepoMock.Setup(repo => repo
+            .GetByIdAsync(followeeId))
+            .ReturnsAsync(new User { Id = followeeId });
+
+        //Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            _service.FollowAsync(followerId, followeeId));
+    }
+
+    [Fact]
+    public async Task FollowAsync_ShouldThrowException_WhenFolloweeDoesNotExist()
+    {
+        //Arrange
+        int followerId = 1;
+        int followeeId = 2;
+
+        _userRepoMock.Setup(repo => repo
+            .GetByIdAsync(followerId))
+            .ReturnsAsync(new User { Id = followerId });
+
+        _userRepoMock.Setup(repo => repo
+            .GetByIdAsync(followeeId))
+            .ReturnsAsync((User?)null);
+
+        //Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _service.FollowAsync(followerId, followeeId));
     }
 }
