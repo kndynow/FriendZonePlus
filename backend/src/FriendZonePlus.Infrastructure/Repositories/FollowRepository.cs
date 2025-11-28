@@ -1,3 +1,4 @@
+using FriendZonePlus.Core.Entities;
 using FriendZonePlus.Core.Interfaces;
 using FriendZonePlus.Infrastructure.Data;
 
@@ -11,8 +12,13 @@ public class FollowRepository : IFollowRepository
   {
     _context = context;
   }
-    //TODO: Get followers
+
     //TODO: Follow user
+    public Task AddAsync(Follows follows)
+    {
+        throw new NotImplementedException();
+    }
+    //TODO: Get followers
     //TODO: Unfollow user
 
 }
