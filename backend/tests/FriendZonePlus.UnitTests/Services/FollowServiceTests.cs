@@ -22,20 +22,20 @@ public class FollowServiceTests
     {
         //Arrange
         int followerId = 1;
-        int followeeId = 2;
+        int followedUserId = 2;
 
         _userRepoMock.Setup(repo => repo
             .GetByIdAsync(followerId))
             .ReturnsAsync(new User { Id = followerId });
         _userRepoMock.Setup(repo => repo
-            .GetByIdAsync(followeeId))
-            .ReturnsAsync(new User { Id = followeeId });
+            .GetByIdAsync(followedUserId))
+            .ReturnsAsync(new User { Id = followedUserId });
 
         //Act
-        await _service.FollowAsync(followerId, followeeId);
+        await _service.FollowAsync(followerId, followedUserId);
 
         //Assert
-        _followRepoMock.Verify(repo => repo.AddAsync(It.Is<Follows>(follow => follow.FollowerId == followerId && follow.FolloweeId == followeeId)), Times.Once);
+        _followRepoMock.Verify(repo => repo.AddAsync(It.Is<Follow>(follow => follow.FollowerId == followerId && follow.FollowedUserId == followedUserId)), Times.Once);
     }
 
     [Fact]
@@ -43,9 +43,9 @@ public class FollowServiceTests
     {
         //Arrange
         int followerId = 1;
-        int followeeId = 1;
+        int followedUserId = 1;
         //Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.FollowAsync(followerId, followeeId));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.FollowAsync(followerId, followedUserId));
     }
 
     [Fact]
@@ -53,11 +53,11 @@ public class FollowServiceTests
     {
         //Arrange
         int followerId = 1;
-        int followeeId = 1;
+        int followedUserId = 1;
         //Act
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.FollowAsync(followerId, followeeId));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.FollowAsync(followerId, followedUserId));
         //Assert
-        _followRepoMock.Verify(repo => repo.AddAsync(It.IsAny<Follows>()), Times.Never);
+        _followRepoMock.Verify(repo => repo.AddAsync(It.IsAny<Follow>()), Times.Never);
     }
 
     [Fact]
@@ -65,15 +65,15 @@ public class FollowServiceTests
     {
         //Arrange
         int followerId = 1;
-        int followeeId = 2;
+        int followedUserId = 2;
 
         _followRepoMock.Setup(repo => repo
-            .ExistsAsync(followerId, followeeId))
+            .ExistsAsync(followerId, followedUserId))
             .ReturnsAsync(true);
 
         //Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() => 
-            _service.FollowAsync(followerId, followeeId));
+            _service.FollowAsync(followerId, followedUserId));
     }
 
     [Fact]
@@ -81,19 +81,19 @@ public class FollowServiceTests
     {
         //Arrange
         int followerId = 1;
-        int followeeId = 2;
+        int followedUserId = 2;
 
         _userRepoMock.Setup(repo => repo
             .GetByIdAsync(followerId))
             .ReturnsAsync((User?)null);
 
         _userRepoMock.Setup(repo => repo
-            .GetByIdAsync(followeeId))
-            .ReturnsAsync(new User { Id = followeeId });
+            .GetByIdAsync(followedUserId))
+            .ReturnsAsync(new User { Id = followedUserId });
 
         //Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            _service.FollowAsync(followerId, followeeId));
+            _service.FollowAsync(followerId, followedUserId));
     }
 
     [Fact]
@@ -101,19 +101,19 @@ public class FollowServiceTests
     {
         //Arrange
         int followerId = 1;
-        int followeeId = 2;
+        int followedUserId = 2;
 
         _userRepoMock.Setup(repo => repo
             .GetByIdAsync(followerId))
             .ReturnsAsync(new User { Id = followerId });
 
         _userRepoMock.Setup(repo => repo
-            .GetByIdAsync(followeeId))
+            .GetByIdAsync(followedUserId))
             .ReturnsAsync((User?)null);
 
         //Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            _service.FollowAsync(followerId, followeeId));
+            _service.FollowAsync(followerId, followedUserId));
     }
 
     [Theory]
@@ -121,9 +121,9 @@ public class FollowServiceTests
     [InlineData(1, -3)]
     [InlineData(-1, 3)]
     [InlineData(9, 0)]
-    public async Task FollowAsync_ShouldThrowException_WhenIdsAreInvalid(int followerId, int followeeId)
+    public async Task FollowAsync_ShouldThrowException_WhenIdsAreInvalid(int followerId, int followedUserId)
     {
         await Assert.ThrowsAsync<ArgumentException>(() =>
-            _service.FollowAsync(followerId, followeeId));
+            _service.FollowAsync(followerId, followedUserId));
     }
 }

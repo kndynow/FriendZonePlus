@@ -1,6 +1,7 @@
 using FriendZonePlus.Core.Entities;
 using FriendZonePlus.Core.Interfaces;
 using FriendZonePlus.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace FriendZonePlus.Infrastructure.Repositories;
 
@@ -13,15 +14,18 @@ public class FollowRepository : IFollowRepository
     _context = context;
   }
 
-    //TODO: Follow user
-    public Task AddAsync(Follows follows)
+    public async Task AddAsync(Follow follow)
     {
-        throw new NotImplementedException();
+        _context.Follow.Add(follow);
+        await _context.SaveChangesAsync();
     }
 
-    public Task<bool> ExistsAsync(int followerId, int followeeId)
+    public async Task<bool> ExistsAsync(int followerId, int followedUserId)
     {
-        throw new NotImplementedException();
+        {
+            return await _context.Follow
+                .AnyAsync(f => f.FollowerId == followerId && f.FollowedUserId == followedUserId);
+        }
     }
     //TODO: Get followers
     //TODO: Unfollow user
