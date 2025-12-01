@@ -27,7 +27,7 @@ export default function RegisterPage() {
           </Form.Group>
 
           <Form.Group>
-            <Form.Label>First name</Form.Label>
+            <Form.Label>Last name</Form.Label>
             <Form.Control type="text" placeholder="Enter last name" />
           </Form.Group>
 
