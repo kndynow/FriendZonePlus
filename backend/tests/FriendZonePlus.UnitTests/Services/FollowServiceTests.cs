@@ -8,13 +8,13 @@ namespace FriendZonePlus.UnitTests.Services;
 public class FollowServiceTests
 {
     private readonly Mock<IFollowRepository> _followRepoMock;
-    private readonly Mock<IUserRepository> _userRepoMock;
+    private readonly Mock<IFollowValidator> _validatorMock;
     private readonly FollowService _service;
     public FollowServiceTests()
     {
-        _userRepoMock = new Mock<IUserRepository>();
         _followRepoMock = new Mock<IFollowRepository>();
-        _service = new FollowService(_followRepoMock.Object, _userRepoMock.Object);
+        _validatorMock = new Mock<IFollowValidator>();
+        _service = new FollowService(_followRepoMock.Object, _validatorMock.Object);
     }
 
     [Fact]
@@ -24,12 +24,8 @@ public class FollowServiceTests
         int followerId = 1;
         int followedUserId = 2;
 
-        _userRepoMock.Setup(repo => repo
-            .GetByIdAsync(followerId))
-            .ReturnsAsync(new User { Id = followerId });
-        _userRepoMock.Setup(repo => repo
-            .GetByIdAsync(followedUserId))
-            .ReturnsAsync(new User { Id = followedUserId });
+        _validatorMock.Setup(v => v.ValidateFollowAsync(followerId, followedUserId))
+            .Returns(Task.CompletedTask);
 
         //Act
         await _service.FollowAsync(followerId, followedUserId);
@@ -42,22 +38,30 @@ public class FollowServiceTests
     }
 
     [Fact]
-    public async Task FollowAsync_ShouldThrowException_WhenFollowerAndFollowedUserIdAreEqual()
+    public async Task FollowAsync_ShouldThrowException_WhenValidatorThrows()
     {
         //Arrange
         int followerId = 1;
         int followedUserId = 1;
+
+        _validatorMock
+            .Setup(v => v.ValidateFollowAsync(followerId, followedUserId))
+            .ThrowsAsync(new InvalidOperationException());
 
         //Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() => _service.FollowAsync(followerId, followedUserId));
     }
 
     [Fact]
-    public async Task FollowAsync_ShouldNotCallAddAsync_WhenFollowerAndFollowedUserIdAreEqual()
+    public async Task FollowAsync_ShouldNotCallAddAsync_WhenValidatorThrows()
     {
         //Arrange
         int followerId = 1;
         int followedUserId = 1;
+
+        _validatorMock
+            .Setup(v => v.ValidateFollowAsync(followerId, followedUserId))
+            .ThrowsAsync(new InvalidOperationException());
 
         //Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() => _service
@@ -73,52 +77,12 @@ public class FollowServiceTests
         int followerId = 1;
         int followedUserId = 2;
 
-        _followRepoMock.Setup(repo => repo
-            .ExistsAsync(followerId, followedUserId))
-            .ReturnsAsync(true);
+        _validatorMock
+            .Setup(v => v.ValidateFollowAsync(followerId, followedUserId))
+            .ThrowsAsync(new InvalidOperationException());
 
         //Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() => 
-            _service.FollowAsync(followerId, followedUserId));
-    }
-
-    [Fact]
-    public async Task FollowAsync_ShouldThrowException_WhenFollowerDoesNotExist()
-    {
-        //Arrange
-        int followerId = 1;
-        int followedUserId = 2;
-
-        _userRepoMock.Setup(repo => repo
-            .GetByIdAsync(followerId))
-            .ReturnsAsync((User?)null);
-
-        _userRepoMock.Setup(repo => repo
-            .GetByIdAsync(followedUserId))
-            .ReturnsAsync(new User { Id = followedUserId });
-
-        //Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            _service.FollowAsync(followerId, followedUserId));
-    }
-
-    [Fact]
-    public async Task FollowAsync_ShouldThrowException_WhenFolloweeDoesNotExist()
-    {
-        //Arrange
-        int followerId = 1;
-        int followedUserId = 2;
-
-        _userRepoMock.Setup(repo => repo
-            .GetByIdAsync(followerId))
-            .ReturnsAsync(new User { Id = followerId });
-
-        _userRepoMock.Setup(repo => repo
-            .GetByIdAsync(followedUserId))
-            .ReturnsAsync((User?)null);
-
-        //Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _service.FollowAsync(followerId, followedUserId));
     }
 
@@ -129,70 +93,69 @@ public class FollowServiceTests
     [InlineData(9, 0)]
     public async Task FollowAsync_ShouldThrowException_WhenIdsAreInvalid(int followerId, int followedUserId)
     {
+        // Arrange
+        _validatorMock
+            .Setup(v => v.ValidateFollowAsync(followerId, followedUserId))
+            .ThrowsAsync(new ArgumentException());
+
+        // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() =>
             _service.FollowAsync(followerId, followedUserId));
     }
 
     [Fact]
-    public async Task UnfollowAsync_ShouldRemoveFollowRelation_WhenItExists()
+    public async Task UnfollowAsync_ShouldRemoveFollowRelation_WhenValidatorPasses()
     {
         // Arrange
         int followerId = 1;
         int followedUserId = 2;
 
-        _userRepoMock.Setup(r => r.GetByIdAsync(followerId))
-            .ReturnsAsync(new User());
-        _userRepoMock.Setup(r => r.GetByIdAsync(followedUserId))
-            .ReturnsAsync(new User());
-        _followRepoMock.Setup(r => r.GetFollowRelationAsync(followerId, followedUserId))
-            .ReturnsAsync(new Follow { FollowerId = followerId, FollowedUserId = followedUserId });
+        _validatorMock
+            .Setup(v => v.ValidateUnfollowAsync(followerId, followedUserId))
+            .Returns(Task.CompletedTask);
+
+        var relation = new Follow { FollowerId = followerId, FollowedUserId = followedUserId };
+
+        _followRepoMock
+            .Setup(r => r.GetFollowRelationAsync(followerId, followedUserId))
+            .ReturnsAsync(relation);
 
         // Act
         await _service.UnfollowAsync(followerId, followedUserId);
 
         // Assert
-        _followRepoMock.Verify(r => r.DeleteAsync(It.IsAny<Follow>()), Times.Once);
+        _followRepoMock.Verify(r => r.DeleteAsync(relation), Times.Once);
     }
 
     [Fact]
-    public async Task UnfollowAsync_ShouldThrowException_WhenRelationDoesNotExist()
+    public async Task UnfollowAsync_ShouldnotCallDeleteAsync_WhenRelationDoesNotExist()
     {
         // Arrange
         int followerId = 1;
         int followedUserId = 2;
 
-        _userRepoMock.Setup(r => r.GetByIdAsync(followerId)).ReturnsAsync(new User());
-        _userRepoMock.Setup(r => r.GetByIdAsync(followedUserId)).ReturnsAsync(new User());
-
-        _followRepoMock.Setup(r => r.GetFollowRelationAsync(followerId, followedUserId))
-                       .ReturnsAsync((Follow?)null);
+        _validatorMock
+            .Setup(v => v.ValidateUnfollowAsync(followerId, followedUserId))
+            .ThrowsAsync(new InvalidOperationException("Follow relationship does not exist."));
 
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _service.UnfollowAsync(followerId, followedUserId));
+
+        _followRepoMock.Verify(r => r.DeleteAsync(It.IsAny<Follow>()), Times.Never);
     }
 
     [Fact]
-    public async Task UnfollowAsync_ShouldThrowException_WhenFollowerDoesNotExist()
-    {
-        // Arrange
-        _userRepoMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync((User?)null);
-        _userRepoMock.Setup(r => r.GetByIdAsync(2)).ReturnsAsync(new User());
-
-        // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            _service.UnfollowAsync(1, 2));
-    }
-
-    [Fact]
-    public async Task UnfollowAsync_ShouldThrowException_WhenFollowedUserDoesNotExist()
+    public async Task UnfollowAsync_ShouldThrowException_WhenValidatorThrows()
     {
         // Arrange
         int followerId = 1;
         int followedUserId = 2;
 
-        _userRepoMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(new User());
-        _userRepoMock.Setup(r => r.GetByIdAsync(2)).ReturnsAsync((User?)null);
+        _validatorMock
+            .Setup(v => v.ValidateUnfollowAsync(followerId, followedUserId))
+            .ThrowsAsync(new InvalidOperationException());
+
 
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
@@ -206,19 +169,13 @@ public class FollowServiceTests
     [InlineData(4, -9)]
     public async Task UnfollowAsync_ShouldThrowException_WhenIdsAreInvalid(int followerId, int followedUserId)
     {
-        await Assert.ThrowsAsync<ArgumentException>(() =>
-            _service.UnfollowAsync(followerId, followedUserId));
-    }
-
-    [Fact]
-    public async Task UnfollowAsync_ShouldThrowException_WhenFollowerAndFollowedUserIdAreEqual()
-    {
         // Arrange
-        int followerId = 1;
-        int followedUserId = 1;
+        _validatorMock
+            .Setup(v => v.ValidateUnfollowAsync(followerId, followedUserId))
+            .ThrowsAsync(new ArgumentException());
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+        await Assert.ThrowsAsync<ArgumentException>(() =>
             _service.UnfollowAsync(followerId, followedUserId));
     }
 }
