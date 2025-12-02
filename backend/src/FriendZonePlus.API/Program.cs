@@ -5,6 +5,7 @@ using FriendZonePlus.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using FriendZonePlus.API.Endpoints;
+using FriendZonePlus.Application.Helpers;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +24,8 @@ builder.Services.AddScoped<IWallPostRepository, WallPostRepository>();
 // Services
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<WallPostService>();
+builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
+builder.Services.AddScoped<IPasswordHelper, PasswordHelper>();
 
 var app = builder.Build();
 

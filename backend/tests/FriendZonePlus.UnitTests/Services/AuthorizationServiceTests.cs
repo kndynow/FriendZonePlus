@@ -21,7 +21,7 @@ namespace FriendZonePlus.UnitTests.Services
         }
 
         [Fact]
-        public async Task CreateUser_ShouldReturnResponseDto_WhenDataIsValid()
+        public async Task CreateUserAsync_ShouldReturnResponseDto_WhenDataIsValid()
         {
             // Arrange
             var dto = new RegisterUserRequestDto(
@@ -46,6 +46,7 @@ namespace FriendZonePlus.UnitTests.Services
             Assert.Equal(1, result.Id);
             Assert.Equal("Snusmumriken1978", result.Username);
         }
+
 
         //[Fact]
         //public async Task CreateUser_ShouldThrowException_WhenUsernameIsEmpty()

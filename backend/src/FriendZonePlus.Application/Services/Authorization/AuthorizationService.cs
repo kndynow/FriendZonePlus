@@ -2,7 +2,7 @@ using FriendZonePlus.Core.Interfaces;
 using FriendZonePlus.Core.Entities;
 using FriendZonePlus.Application.DTOs;
 
-public class AuthorizationService
+public class AuthorizationService : IAuthorizationService
 {
     private readonly IUserRepository _userRepository;
 
