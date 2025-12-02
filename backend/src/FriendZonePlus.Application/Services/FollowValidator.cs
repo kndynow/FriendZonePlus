@@ -21,22 +21,23 @@ namespace FriendZonePlus.Application.Services
 
         public async Task ValidateFollowAsync(int followerId, int followedUserId)
         {
-            ValidateUserId(followerId);
-            ValidateUserId(followedUserId);
-            ValidateSelfFollow(followerId, followedUserId);
-            await ValidateFollowerExists(followerId);
-            await ValidateFollowedUserExists(followedUserId);
+            await ValidateUsersAsync(followerId, followedUserId);
             await ValidateUniqueFollow(followerId, followedUserId);
         }
 
         public async Task ValidateUnfollowAsync(int followerId, int followedUserId)
+        {
+            await ValidateUsersAsync(followerId, followedUserId);
+            await ValidateFollowRelationExists(followerId, followedUserId);
+        }
+
+        private async Task ValidateUsersAsync(int followerId, int followedUserId)
         {
             ValidateUserId(followerId);
             ValidateUserId(followedUserId);
             ValidateSelfFollow(followerId, followedUserId);
             await ValidateFollowerExists(followerId);
             await ValidateFollowedUserExists(followedUserId);
-            await ValidateFollowRelationExists(followerId, followedUserId);
         }
 
         private void ValidateUserId(int userId)
