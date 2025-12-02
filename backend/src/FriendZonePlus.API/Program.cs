@@ -20,9 +20,11 @@ builder.Services.AddDbContext<FriendZonePlusContext>(options => options.UseSqlit
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IWallPostRepository, WallPostRepository>();
+builder.Services.AddScoped<IFollowRepository, FollowRepository>();
 // Services
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<WallPostService>();
+builder.Services.AddScoped<FollowService>();
 
 var app = builder.Build();
 
