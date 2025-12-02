@@ -1,5 +1,8 @@
-﻿using FriendZonePlus.Core.Entities;
+﻿using FriendZonePlus.Application.Services;
+using FriendZonePlus.Core.Entities;
+using FriendZonePlus.Core.Interfaces;
 using Moq;
+using FriendZonePlus.Application.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,31 +11,41 @@ namespace FriendZonePlus.UnitTests.Services
 {
     public class AuthorizationServiceTests
     {
-        //[Fact]
-        //public async Task CreateUser_ShouldReturnSuccess_WhenDataIsValid()
-        //{
-        //    //Arrange
-        //    var dto = new CreateUserDto("TestUser", "test@test.com");
+        private readonly Mock<IUserRepository> _userRepoMock;
+        private readonly AuthorizationService _authorizationService;
 
-        //    //Simulate that database returns an ID
-        //    _userRepoMock.Setup(repo => repo.AddAsync(It.IsAny<User>()))
-        //            .ReturnsAsync((User user) =>
-        //            {
-        //                user.Id = 1;
-        //                return user;
-        //            });
-        //    //Act
-        //    var userId = await _sut.CreateUserAsync(dto);
+        public AuthorizationServiceTests()
+        {
+            _userRepoMock = new Mock<IUserRepository>();
+            _authorizationService = new AuthorizationService(_userRepoMock.Object);
+        }
 
-        //    //Assert
-        //    Assert.Equal(1, userId);
+        [Fact]
+        public async Task CreateUser_ShouldReturnResponseDto_WhenDataIsValid()
+        {
+            // Arrange
+            var dto = new RegisterUserRequestDto(
+                  "Snusmumriken1978",
+                  "snusmumriken@hotmail.com",
+                  "Erik",
+                  "Eriksson",
+                  "secret123"
+                );
 
-        //    //Check if AddAsync was called one time with the correct user data
-        //    _userRepoMock.Verify(repo => repo.AddAsync(It.Is<User>(u =>
-        //        u.Username == "TestUser" &&
-        //        u.Email == "test@test.com"
-        //    )), Times.Once);
-        //}
+            // Simulate that database returns an ID
+            _userRepoMock.Setup(repo => repo.AddAsync(It.IsAny<User>()))
+                                .ReturnsAsync((User user) =>
+                                {
+                                    user.Id = 1;
+                                    return user;
+                                });
+            //Act
+            var result = await _authorizationService.CreateUserAsync(dto);
+
+            //Assert
+            Assert.Equal(1, result.Id);
+            Assert.Equal("Snusmumriken1978", result.Username);
+        }
 
         //[Fact]
         //public async Task CreateUser_ShouldThrowException_WhenUsernameIsEmpty()
