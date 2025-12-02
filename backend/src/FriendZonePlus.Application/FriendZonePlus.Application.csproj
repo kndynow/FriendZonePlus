@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="FluentValidation" Version="12.1.0" />
   </ItemGroup>
 
   <ItemGroup>
