@@ -1,5 +1,6 @@
 using FriendZonePlus.Core.Entities;
 using FriendZonePlus.Core.Interfaces;
+using Microsoft.VisualBasic.FileIO;
 using System.Threading.Tasks;
 
 namespace FriendZonePlus.Application.Services;
@@ -30,7 +31,16 @@ public class FollowService
     }
 
     //TODO: Get followers
-    //TODO: Unfollow user
+    //TODO: Get followed users
+
+    public async Task UnfollowAsync(int followerId, int followedUserId)
+    {
+        await ValidateUnfollowRequest(followerId, followedUserId);
+
+        var relation = await GetExistingFollowRelation(followerId, followedUserId);
+
+        await _followRepository.DeleteAsync(relation);
+    }
 
     private async Task ValidateFollowRequest(int followerId, int followedUserId)
     {
@@ -38,8 +48,17 @@ public class FollowService
         ValidateIdShouldBeGreaterThanZero(followedUserId);
         ValidateSelfFollow(followerId, followedUserId);
         await ValidateFollowerExist(followerId);
-        await ValidateFolloweeExist(followedUserId);
+        await ValidateFollowedUserExist(followedUserId);
         await ValidateUniqueFollow(followerId, followedUserId);
+    }
+
+    private async Task ValidateUnfollowRequest(int followerId, int followedUserId)
+    {
+        ValidateIdShouldBeGreaterThanZero(followerId);
+        ValidateIdShouldBeGreaterThanZero(followedUserId);
+        ValidateSelfFollow(followerId, followedUserId);
+        await ValidateFollowerExist(followerId);
+        await ValidateFollowedUserExist(followedUserId);
     }
 
     private void ValidateIdShouldBeGreaterThanZero(int id)
@@ -67,7 +86,7 @@ public class FollowService
         }
     }
 
-    private async Task ValidateFolloweeExist(int followedUserId)
+    private async Task ValidateFollowedUserExist(int followedUserId)
     {
         var followee = await _userRepository.GetByIdAsync(followedUserId);
         if (followee == null)
@@ -82,5 +101,15 @@ public class FollowService
         {
             throw new InvalidOperationException("Follow relationship already exists.");
         }
+    }
+
+    private async Task<Follow> GetExistingFollowRelation(int followerId, int followedUserId)
+    {
+        var relation = await _followRepository.GetFollowRelationAsync(followerId, followedUserId);
+
+        if (relation == null)
+            throw new InvalidOperationException("Follow relationship does not exist.");
+
+        return relation;
     }
 }
