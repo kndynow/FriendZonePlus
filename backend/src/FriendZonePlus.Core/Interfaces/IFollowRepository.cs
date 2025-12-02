@@ -6,4 +6,7 @@ public interface IFollowRepository
 {
     Task AddAsync(Follows follows);
     Task<bool> ExistsAsync(int followerId, int followeeId);
+
+    //TEST: Implementation GetFollowedUserIdsAsync
+    Task<IReadOnlyList<int>> GetFollowedUserIdsAsync(int userId);
 }
