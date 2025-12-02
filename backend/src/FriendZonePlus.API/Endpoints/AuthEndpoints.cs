@@ -1,27 +1,35 @@
-
+using FriendZonePlus.Application.DTOs;
+using FriendZonePlus.Application.Services;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using FluentValidation;
 
 public static class AuthEndpoints
 {
-  public static void MapUserEndpoints(this IEndpointRouteBuilder app)
+  public static void MapAuthEndpoints(this IEndpointRouteBuilder app)
   {
     var group = app.MapGroup("/api/Authorization")
                     .WithTags("Authorization");
 
-    // group.MapPost("/register", CreateUser);
-  }
+        group.MapPost("/register", RegisterUser);
+    }
 
-  // //CREATE
-  // private static async Task<Results<Ok<object>, BadRequest<object>>> CreateUser(
-  //         AuthorizationService authService,
-  //         [FromBody] CreateUserDto dto)
-  // {
-  //   try
-  //   {
-  //     var userId = await authService.CreateUserAsync(dto);
-  //     return TypedResults.Ok<object>(new { Id = userId, Message = "Created" });
-  //   }
-  //   catch (ArgumentException ex)
-  //   {
-  //     return TypedResults.BadRequest<object>(new { Error = ex.Message });
-  //   }
+    private static async Task<IResult> RegisterUser(
+        IAuthorizationService authorizationService,
+        RegisterUserRequestDto requestDto)
+    {
+        try
+        {
+            var result = await authorizationService.CreateUserAsync(requestDto);
+
+            return Results.Created($"/api/Authorization/{result.Id}", result);
+        }
+        catch (ValidationException ex)
+        {            
+            return Results.BadRequest(new
+            {
+                errors = ex.Errors.Select(e => e.ErrorMessage)
+            });
+        }
+     }
   }

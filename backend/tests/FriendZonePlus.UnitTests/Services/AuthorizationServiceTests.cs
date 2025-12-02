@@ -155,7 +155,7 @@ namespace FriendZonePlus.UnitTests.Services
         [InlineData("", "First name is required")]
         [InlineData("ThisNameIsWayTooLongToBeValidBecauseItExceedsThirtyCharacters", "First name cannot exceed 30 characters")]
         [InlineData("John123", "First name can only contain letters")]
-        [InlineData("Jane-Doe", "First name can only contain letters")] // if you don’t allow hyphens
+        [InlineData("Jane-Doe", "First name can only contain letters")]
         public async Task CreateUserAsync_ShouldThrowValidationException_ForInvalidFirstName(string firstName, string expectedMessage)
         {
             // Arrange
@@ -173,7 +173,7 @@ namespace FriendZonePlus.UnitTests.Services
         [Theory]
         [InlineData("", "Last name is required")]
         [InlineData("ThisLastNameIsWayTooLongToBeValidBecauseItExceedsThirtyCharacters", "Last name cannot exceed 30 characters")]
-        [InlineData("Smith123", "First name can only contain letters and hyphens")]
+        [InlineData("Smith123", "Last name can only contain letters and hyphens")]
         public async Task CreateUserAsync_ShouldThrowValidationException_ForInvalidLastName(string lastName, string expectedMessage)
         {
             // Arrange
@@ -187,6 +187,5 @@ namespace FriendZonePlus.UnitTests.Services
             // Assert
             Assert.Contains(expectedMessage, ex.Errors.Select(e => e.ErrorMessage));
         }
-
     }
 }

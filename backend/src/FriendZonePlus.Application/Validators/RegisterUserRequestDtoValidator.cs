@@ -41,7 +41,7 @@ namespace FriendZonePlus.Application.Validators
             RuleFor(x => x.LastName)
                 .NotEmpty().WithMessage("Last name is required")
                 .MaximumLength(30).WithMessage("Last name cannot exceed 30 characters")
-                .Matches(@"^[\p{L}-]+$").WithMessage("First name can only contain letters and hyphens");
+                .Matches(@"^[\p{L}-]+$").WithMessage("Last name can only contain letters and hyphens");
         }
     }
 }
