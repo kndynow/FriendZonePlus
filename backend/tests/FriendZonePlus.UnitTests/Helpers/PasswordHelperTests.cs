@@ -1,7 +1,7 @@
 using FriendZonePlus.Application.Helpers;
 using Xunit;
 
-namespace FriendZonePlus.UnitTests;
+namespace FriendZonePlus.UnitTests.Helpers;
 
 
 public class PasswordHelperTests

@@ -16,13 +16,15 @@ public class AuthorizationService : IAuthorizationService
 
     public async Task<RegisterUserResponseDto> CreateUserAsync(RegisterUserRequestDto requestDto)
     {
+        var hashedPassword = _passwordHelper.HashPassword(requestDto.Password);
+
         var user = new User
         {
             Username = requestDto.Username,
             Email = requestDto.Email,
             FirstName = requestDto.FirstName,
             LastName = requestDto.LastName,
-            PasswordHash = _passwordHelper.HashPassword(requestDto.Password),
+            PasswordHash = hashedPassword,
             CreatedAt = DateTime.UtcNow
         };
 

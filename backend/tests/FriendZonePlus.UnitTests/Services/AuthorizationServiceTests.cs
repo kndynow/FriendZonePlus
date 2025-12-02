@@ -21,11 +21,6 @@ namespace FriendZonePlus.UnitTests.Services
             _userRepoMock = new Mock<IUserRepository>();
             _passwordHelperMock = new Mock<IPasswordHelper>(); 
             _authorizationService = new AuthorizationService(_userRepoMock.Object, _passwordHelperMock.Object);
-
-            // Setting up the _passwordHelperMock so it returns a predictable hash
-            _passwordHelperMock
-            .Setup(h => h.HashPassword(It.IsAny<string>()))
-            .Returns((string pwd) => "hashed-" + pwd);
         }
 
         [Fact]
@@ -66,6 +61,11 @@ namespace FriendZonePlus.UnitTests.Services
                   "Eriksson",
                   "secret123"
                 );
+
+            // Setting up the _passwordHelperMock so it returns a predictable hash
+            _passwordHelperMock
+            .Setup(h => h.HashPassword(It.IsAny<string>()))
+            .Returns((string pwd) => "hashed-" + pwd);
 
             // Simulate that database returns an ID
             _userRepoMock.Setup(repo => repo.AddAsync(It.IsAny<User>()))

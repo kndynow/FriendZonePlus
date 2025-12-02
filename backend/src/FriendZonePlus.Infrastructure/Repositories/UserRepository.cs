@@ -1,6 +1,7 @@
 using FriendZonePlus.Core.Entities;
 using FriendZonePlus.Core.Interfaces;
 using FriendZonePlus.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace FriendZonePlus.Infrastructure.Repositories;
 
@@ -12,6 +13,7 @@ public class UserRepository : IUserRepository
   {
     _context = context;
   }
+
   public async Task<User?> GetByIdAsync(int id)
   {
     return await _context.Users.FindAsync(id);
@@ -32,4 +34,13 @@ public class UserRepository : IUserRepository
     await _context.SaveChangesAsync();
   }
 
+  public async Task<bool> ExistsByUsernameAsync(string username)
+  {
+      return await _context.Users.AnyAsync(u => u.Username == username);
+  }
+
+  public async Task<bool> ExistsByEmailAsync(string email)
+  {
+        return await _context.Users.AnyAsync(u => u.Email == email);
+  }
 }
