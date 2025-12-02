@@ -31,12 +31,11 @@ public static class WallPostEndpoints
       return TypedResults.BadRequest<object>(new { Error = ex.Message });
     }
   }
-}
 
-//TODO: GET ALL WALL POSTS FOR A TARGET USER
-private static async Task<Results<Ok<IEnumerable<WallPostResponseDto>>, BadRequest<object>>> GetWallPostsForTargetUser(
-          WallPostService wallPostService,
-          int targetUserId)
+  //TODO: GET ALL WALL POSTS FOR A TARGET USER
+  private static async Task<Results<Ok<IEnumerable<WallPostResponseDto>>, BadRequest<object>>> GetWallPostsForTargetUser(
+            WallPostService wallPostService,
+            int targetUserId)
   {
     try
     {

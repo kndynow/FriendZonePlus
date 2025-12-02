@@ -12,27 +12,10 @@ public static class UserEndpoints
     var group = app.MapGroup("/api/Users")
                     .WithTags("Users");
 
-    group.MapPost("/register", CreateUser);
     group.MapGet("/{id}", GetUserById);
     group.MapDelete("/{id}", DeleteUser);
   }
-
-  //CREATE
-  private static async Task<Results<Ok<object>, BadRequest<object>>> CreateUser(
-          UserService userService,
-          [FromBody] CreateUserDto dto)
-  {
-    try
-    {
-      var userId = await userService.CreateUserAsync(dto);
-      return TypedResults.Ok<object>(new { Id = userId, Message = "Created" });
-    }
-    catch (ArgumentException ex)
-    {
-      return TypedResults.BadRequest<object>(new { Error = ex.Message });
-    }
-  }
-
+  
   //GET BY ID
   private static async Task<Results<Ok<object>, NotFound>> GetUserById(
         int id,

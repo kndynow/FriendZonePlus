@@ -19,25 +19,6 @@ public class UserService
     return await _userRepository.GetByIdAsync(id);
   }
 
-  //Register
-  public async Task<int> CreateUserAsync(CreateUserDto dto)
-  {
-    if (string.IsNullOrWhiteSpace(dto.Username))
-    {
-      throw new ArgumentException("Username cannot be empty");
-    }
-
-    var newUser = new User
-    {
-      Username = dto.Username,
-      Email = dto.Email,
-    };
-
-    var createdUser = await _userRepository.AddAsync(newUser);
-
-    return createdUser.Id;
-  }
-
   //Delete
   public async Task<bool> DeleteUserAsync(int id)
   {
