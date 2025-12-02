@@ -1,4 +1,4 @@
-﻿namespace FriendZonePlus.Application.Helpers
+﻿namespace FriendZonePlus.Application.Helpers.PasswordHelpers
 {
     public interface IPasswordHelper
     {

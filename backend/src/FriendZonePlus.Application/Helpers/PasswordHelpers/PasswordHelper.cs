@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using BCrypt.Net;
 
-namespace FriendZonePlus.Application.Helpers
+namespace FriendZonePlus.Application.Helpers.PasswordHelpers
 {
     public class PasswordHelper : IPasswordHelper
     {

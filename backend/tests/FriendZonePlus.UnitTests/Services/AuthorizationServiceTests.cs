@@ -1,10 +1,11 @@
 ﻿using FluentValidation;
 using FriendZonePlus.Application.DTOs;
-using FriendZonePlus.Application.Helpers;
 using FriendZonePlus.Application.Services;
 using FriendZonePlus.Application.Validators;
 using FriendZonePlus.Core.Entities;
 using FriendZonePlus.Core.Interfaces;
+using FriendZonePlus.Application.Helpers.PasswordHelpers;
+
 using Moq;
 using System;
 using System.Collections.Generic;

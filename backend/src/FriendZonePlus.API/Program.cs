@@ -1,6 +1,6 @@
 using FluentValidation;
 using FriendZonePlus.API.Endpoints;
-using FriendZonePlus.Application.Helpers;
+using FriendZonePlus.Application.Helpers.PasswordHelpers;
 using FriendZonePlus.Application.Services;
 using FriendZonePlus.Application.Validators;
 using FriendZonePlus.Core.Interfaces;
@@ -32,12 +32,6 @@ builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
 builder.Services.AddScoped<IPasswordHelper, PasswordHelper>();
 //Validator
 builder.Services.AddScoped<IValidator<RegisterUserRequestDto>, RegisterUserRequestDtoValidator>();
-
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-    });
 
 var app = builder.Build();
 

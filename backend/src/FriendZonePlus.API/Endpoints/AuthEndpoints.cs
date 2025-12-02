@@ -1,8 +1,8 @@
 using FriendZonePlus.Application.DTOs;
+using FriendZonePlus.Application.Helpers.ValidationHelpers;
 using FriendZonePlus.Application.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using FluentValidation;
 
 public static class AuthEndpoints
 {
@@ -24,12 +24,10 @@ public static class AuthEndpoints
 
             return Results.Created($"/api/Authorization/{result.Id}", result);
         }
-        catch (ValidationException ex)
-        {            
-            return Results.BadRequest(new
-            {
-                errors = ex.Errors.Select(e => e.ErrorMessage)
-            });
+        catch (FluentValidation.ValidationException ex)
+        {
+            var errors = ValidationHelper.ToCamelCaseErrors(ex.Errors);
+            return Results.BadRequest(new { errors });
         }
      }
   }

@@ -1,4 +1,4 @@
-using FriendZonePlus.Application.Helpers;
+using FriendZonePlus.Application.Helpers.PasswordHelpers;
 using Xunit;
 
 namespace FriendZonePlus.UnitTests.Helpers;
