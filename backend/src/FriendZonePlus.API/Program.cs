@@ -1,10 +1,14 @@
+using FluentValidation;
+using FriendZonePlus.API.Endpoints;
+using FriendZonePlus.Application.Helpers.PasswordHelpers;
 using FriendZonePlus.Application.Services;
+using FriendZonePlus.Application.Validators;
 using FriendZonePlus.Core.Interfaces;
-using FriendZonePlus.Infrastructure.Repositories;
 using FriendZonePlus.Infrastructure.Data;
+using FriendZonePlus.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
-using FriendZonePlus.API.Endpoints;
+using System.Text.Json;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +27,11 @@ builder.Services.AddScoped<IWallPostRepository, WallPostRepository>();
 // Services
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<WallPostService>();
+builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
+// Helper
+builder.Services.AddScoped<IPasswordHelper, PasswordHelper>();
+//Validator
+builder.Services.AddScoped<IValidator<RegisterUserRequestDto>, RegisterUserRequestDtoValidator>();
 
 var app = builder.Build();
 
@@ -37,6 +46,7 @@ if (app.Environment.IsDevelopment())
 
 // app.UseAuthorization();
 
+app.MapAuthEndpoints();
 app.MapWallPostEndpoints();
 app.MapUserEndpoints();
 
