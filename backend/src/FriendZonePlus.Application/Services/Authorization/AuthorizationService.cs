@@ -1,14 +1,17 @@
 using FriendZonePlus.Core.Interfaces;
 using FriendZonePlus.Core.Entities;
 using FriendZonePlus.Application.DTOs;
+using FriendZonePlus.Application.Helpers;
 
 public class AuthorizationService : IAuthorizationService
 {
     private readonly IUserRepository _userRepository;
+    private readonly IPasswordHelper _passwordHelper;
 
-    public AuthorizationService(IUserRepository userRepository)
+    public AuthorizationService(IUserRepository userRepository, IPasswordHelper passwordHelper)
     {
         _userRepository = userRepository;
+        _passwordHelper = passwordHelper;
     }
 
     public async Task<RegisterUserResponseDto> CreateUserAsync(RegisterUserRequestDto requestDto)
@@ -19,7 +22,7 @@ public class AuthorizationService : IAuthorizationService
             Email = requestDto.Email,
             FirstName = requestDto.FirstName,
             LastName = requestDto.LastName,
-            PasswordHash = requestDto.Password,
+            PasswordHash = _passwordHelper.HashPassword(requestDto.Password),
             CreatedAt = DateTime.UtcNow
         };
 
