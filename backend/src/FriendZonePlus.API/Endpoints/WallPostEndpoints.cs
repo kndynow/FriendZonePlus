@@ -20,6 +20,9 @@ public static class WallPostEndpoints
     // group.MapDelete("/delete/{id}", DeleteWallPost);
   }
 
+  //TODO: Map to entity with Mapster
+  //TODO: Add validation to dto
+  //TODO: Global exception handler (maybe)
   // CREATE
   private static async Task<Results<Ok<WallPostResponseDto>, BadRequest<ErrorResponseDto>>> CreateWallPost(
           WallPostService wallPostService,
@@ -37,7 +40,7 @@ public static class WallPostEndpoints
     }
   }
 
-  //TODO: GET ALL WALL POSTS FOR A TARGET USER
+  //GET ALL WALL POSTS FOR A TARGET USER
   private static async Task<Results<Ok<IEnumerable<WallPostResponseDto>>, BadRequest<ErrorResponseDto>>> GetWallPostsForTargetUser(
             WallPostService wallPostService,
             int targetUserId)
@@ -54,7 +57,7 @@ public static class WallPostEndpoints
   }
 
 
-  //TODO: GET ALL WALL POSTS FOR AN AUTHOR
+  // GET ALL WALL POSTS FOR AN AUTHOR
   private static async Task<Results<Ok<IEnumerable<WallPostResponseDto>>, BadRequest<ErrorResponseDto>>> GetWallPostsForAuthor(
             WallPostService wallPostService,
             int authorId)
@@ -86,7 +89,7 @@ public static class WallPostEndpoints
     }
   }
 
-  //TODO: PATCH
+  // PATCH
   private static async Task<Results<Ok<WallPostResponseDto>, BadRequest<ErrorResponseDto>>> UpdateWallPost(
             WallPostService wallPostService,
             [FromBody] UpdateWallPostDto dto)
