@@ -10,6 +10,6 @@ public interface IWallPostService
     Task<IEnumerable<WallPostResponseDto>> GetWallPostsForAuthorAsync(int authorId);
     Task<IEnumerable<WallPostResponseDto>> GetFeedForUserAsync(int userId);
     Task<WallPostResponseDto> UpdateWallPostAsync(UpdateWallPostDto dto);
-    Task DeleteWallPostAsync(int id);
+    Task<bool> DeleteWallPostAsync(int id);
 
 }

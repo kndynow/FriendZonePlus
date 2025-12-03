@@ -127,13 +127,12 @@ public class WallPostService : IWallPostService
 
     //Update post
     wallPost.Content = dto.Content;
-    wallPost.UpdatedAt = DateTime.UtcNow;
     await _wallPostRepository.UpdateAsync(wallPost);
 
     return new WallPostResponseDto(wallPost.Id, wallPost.AuthorId, wallPost.Content, wallPost.CreatedAt);
   }
 
-  public async Task DeleteWallPostAsync(int id)
+  public async Task<bool> DeleteWallPostAsync(int id)
   {
     //Validate post exists
     var wallPost = await _wallPostRepository.GetByIdAsync(id);
@@ -143,6 +142,7 @@ public class WallPostService : IWallPostService
     }
     //Delete post
     await _wallPostRepository.DeleteAsync(id);
+    return true;
   }
 
 }
