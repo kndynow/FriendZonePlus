@@ -1,6 +1,5 @@
 using FriendZonePlus.Core.Entities;
 using FriendZonePlus.Core.Interfaces;
-using System.Threading.Tasks;
 
 namespace FriendZonePlus.Application.Services;
 
@@ -18,7 +17,7 @@ public class FollowService
     //TODO: Test edge cases
     public async Task FollowAsync(int followerId, int followeeId)
     {
-        
+
         await ValidateFollowRequest(followerId, followeeId);
 
         var follow = new Follows

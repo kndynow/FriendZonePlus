@@ -36,11 +36,11 @@ public class UserRepository : IUserRepository
 
   public async Task<bool> ExistsByUsernameAsync(string username)
   {
-      return await _context.Users.AnyAsync(u => u.Username == username);
+    return await _context.Users.AnyAsync(u => u.Username == username);
   }
 
   public async Task<bool> ExistsByEmailAsync(string email)
   {
-        return await _context.Users.AnyAsync(u => u.Email == email);
+    return await _context.Users.AnyAsync(u => u.Email == email);
   }
 }

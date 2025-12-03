@@ -1,14 +1,17 @@
+using System.Reflection;
 using FluentValidation;
 using FriendZonePlus.API.Endpoints;
+using FriendZonePlus.API.Mappings;
 using FriendZonePlus.Application.Helpers.PasswordHelpers;
 using FriendZonePlus.Application.Services;
 using FriendZonePlus.Application.Validators;
 using FriendZonePlus.Core.Interfaces;
 using FriendZonePlus.Infrastructure.Data;
 using FriendZonePlus.Infrastructure.Repositories;
+using Mapster;
+using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
-using System.Text.Json;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,6 +37,13 @@ builder.Services.AddScoped<FollowService>();
 builder.Services.AddScoped<IPasswordHelper, PasswordHelper>();
 //Validator
 builder.Services.AddScoped<IValidator<RegisterUserRequestDto>, RegisterUserRequestDtoValidator>();
+
+
+//Mapster Configuration
+var config = TypeAdapterConfig.GlobalSettings;
+config.Scan(typeof(WallPostMappings).Assembly);
+builder.Services.AddSingleton(config);
+builder.Services.AddScoped<IMapper, Mapper>();
 
 var app = builder.Build();
 

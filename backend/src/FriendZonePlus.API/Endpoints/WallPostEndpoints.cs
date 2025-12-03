@@ -1,6 +1,8 @@
 using System;
-using FriendZonePlus.Application.DTOs;
+using FriendZonePlus.API.DTOs;
 using FriendZonePlus.Application.Services;
+using FriendZonePlus.Core.Entities;
+using Mapster;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,7 +19,7 @@ public static class WallPostEndpoints
     group.MapGet("/author/{authorId}", GetWallPostsForAuthor);
     group.MapGet("/feed/{userId}", GetFeedForUser);
     group.MapPatch("/update", UpdateWallPost);
-    // group.MapDelete("/delete/{id}", DeleteWallPost);
+    group.MapDelete("/delete/{id}", DeleteWallPost);
   }
 
   //TODO: Map to entity with Mapster
@@ -26,13 +28,17 @@ public static class WallPostEndpoints
   // CREATE
   private static async Task<Results<Ok<WallPostResponseDto>, BadRequest<ErrorResponseDto>>> CreateWallPost(
           WallPostService wallPostService,
-          [FromBody] CreateWallPostDto dto)
+          CreateWallPostDto dto)
   {
+    //Map dto to entity
+    var wallPost = dto.Adapt<WallPost>();
     try
     {
-      var result = await wallPostService.CreateWallPostAsync(dto);
+      var result = await wallPostService.CreateWallPostAsync(wallPost);
 
-      return TypedResults.Ok(result);
+      var responseDto = result.Adapt<WallPostResponseDto>();
+
+      return TypedResults.Ok(responseDto);
     }
     catch (ArgumentException ex)
     {
@@ -48,7 +54,8 @@ public static class WallPostEndpoints
     try
     {
       var result = await wallPostService.GetWallPostsForTargetUserAsync(targetUserId);
-      return TypedResults.Ok(result);
+      var responseDto = result.Adapt<IEnumerable<WallPostResponseDto>>();
+      return TypedResults.Ok(responseDto);
     }
     catch (ArgumentException ex)
     {
@@ -65,7 +72,8 @@ public static class WallPostEndpoints
     try
     {
       var result = await wallPostService.GetWallPostsForAuthorAsync(authorId);
-      return TypedResults.Ok(result);
+      var responseDto = result.Adapt<IEnumerable<WallPostResponseDto>>();
+      return TypedResults.Ok(responseDto);
     }
     catch (ArgumentException ex)
     {
@@ -81,7 +89,8 @@ public static class WallPostEndpoints
     try
     {
       var result = await wallPostService.GetFeedForUserAsync(userId);
-      return TypedResults.Ok(result);
+      var responseDto = result.Adapt<IEnumerable<WallPostResponseDto>>();
+      return TypedResults.Ok(responseDto);
     }
     catch (ArgumentException ex)
     {
@@ -92,12 +101,14 @@ public static class WallPostEndpoints
   // PATCH
   private static async Task<Results<Ok<WallPostResponseDto>, BadRequest<ErrorResponseDto>>> UpdateWallPost(
             WallPostService wallPostService,
-            [FromBody] UpdateWallPostDto dto)
+            UpdateWallPostDto dto)
   {
     try
     {
-      var result = await wallPostService.UpdateWallPostAsync(dto);
-      return TypedResults.Ok(result);
+      var wallPost = dto.Adapt<WallPost>();
+      var result = await wallPostService.UpdateWallPostAsync(wallPost);
+      var responseDto = result.Adapt<WallPostResponseDto>();
+      return TypedResults.Ok(responseDto);
     }
     catch (ArgumentException ex)
     {

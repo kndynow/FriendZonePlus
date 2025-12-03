@@ -1,5 +1,4 @@
 using System;
-using FriendZonePlus.Application.DTOs;
 using FriendZonePlus.Application.Services;
 using FriendZonePlus.Core.Entities;
 using FriendZonePlus.Core.Interfaces;
@@ -14,6 +13,7 @@ public class WallPostServiceTests
   private readonly Mock<IUserRepository> _userRepoMock;
   private readonly Mock<IFollowRepository> _followRepoMock;
   private readonly WallPostService _sut;
+
 
   public WallPostServiceTests()
   {
@@ -32,7 +32,13 @@ public class WallPostServiceTests
   public async Task CreateWallPost_ShouldReturnWallPost_WhenDataIsValid()
   {
     // Arrange
-    var dto = new CreateWallPostDto(1, 2, "This is a post!");
+    var wallPost = new WallPost
+    {
+      AuthorId = 1,
+      Content = "This is a post!",
+      TargetUserId = 1,
+      CreatedAt = DateTime.UtcNow
+    };
 
     // Setup Users
     _userRepoMock.Setup(x => x.GetByIdAsync(It.IsAny<int>())).ReturnsAsync(new User());
@@ -45,12 +51,12 @@ public class WallPostServiceTests
     });
 
     // Act
-    var result = await _sut.CreateWallPostAsync(dto);
+    var result = await _sut.CreateWallPostAsync(wallPost);
 
     // Assert
     Assert.Equal(101, result.Id);
-    Assert.Equal(dto.Content, result.Content);
-    Assert.Equal(dto.AuthorId, result.AuthorId);
+    Assert.Equal(wallPost.Content, result.Content);
+    Assert.Equal(wallPost.AuthorId, result.AuthorId);
     Assert.True(result.CreatedAt > DateTime.MinValue);
 
     _WallPostRepoMock.Verify(x => x.AddAsync(It.IsAny<WallPost>()), Times.Once);
@@ -63,10 +69,16 @@ public class WallPostServiceTests
   public async Task CreateWallPost_ShouldThrowException_WhenContentIsInvalid(string invalidContent)
   {
     // Arrange & Act
-    var dto = new CreateWallPostDto(1, 2, invalidContent);
+    var wallPost = new WallPost
+    {
+      AuthorId = 1,
+      Content = invalidContent,
+      TargetUserId = 1,
+      CreatedAt = DateTime.UtcNow
+    };
 
     // Act & Assert
-    var ex = await Assert.ThrowsAsync<ArgumentException>(() => _sut.CreateWallPostAsync(dto));
+    var ex = await Assert.ThrowsAsync<ArgumentException>(() => _sut.CreateWallPostAsync(wallPost));
     Assert.Equal("Content cannot be empty", ex.Message);
   }
 
@@ -75,10 +87,16 @@ public class WallPostServiceTests
   {
     // Arrange
     var longContent = new string('x', 301);
-    var dto = new CreateWallPostDto(1, 2, longContent);
+    var wallPost = new WallPost
+    {
+      AuthorId = 1,
+      Content = longContent,
+      TargetUserId = 1,
+      CreatedAt = DateTime.UtcNow
+    };
 
     // Act & Assert
-    var ex = await Assert.ThrowsAsync<ArgumentException>(() => _sut.CreateWallPostAsync(dto));
+    var ex = await Assert.ThrowsAsync<ArgumentException>(() => _sut.CreateWallPostAsync(wallPost));
     Assert.Equal("Content too long", ex.Message);
   }
 
@@ -86,13 +104,19 @@ public class WallPostServiceTests
   public async Task CreateWallPost_ShouldThrowException_WhenAuthorDoesNotExist()
   {
     //Arrange
-    var dto = new CreateWallPostDto(99, 2, "This is a post!");
+    var wallPost = new WallPost
+    {
+      AuthorId = 99,
+      Content = "This is a post!",
+      TargetUserId = 2,
+      CreatedAt = DateTime.UtcNow
+    };
 
     //Mock so that UserRepo returns null when we query for ID 99
     _userRepoMock.Setup(x => x.GetByIdAsync(99)).ReturnsAsync((User?)null);
 
     // Act & Assert
-    var ex = await Assert.ThrowsAsync<ArgumentException>(() => _sut.CreateWallPostAsync(dto));
+    var ex = await Assert.ThrowsAsync<ArgumentException>(() => _sut.CreateWallPostAsync(wallPost));
     Assert.Equal("Author does not exist", ex.Message);
   }
 
@@ -100,14 +124,20 @@ public class WallPostServiceTests
   public async Task CreateWallPost_ShouldThrowException_WhenTargetUserDoesNotExist()
   {
     // Arrange
-    var dto = new CreateWallPostDto(1, 99, "This is a post!");
+    var wallPost = new WallPost
+    {
+      AuthorId = 1,
+      Content = "This is a post!",
+      TargetUserId = 99,
+      CreatedAt = DateTime.UtcNow
+    };
 
     // Author exists, target does not
-    _userRepoMock.Setup(x => x.GetByIdAsync(dto.AuthorId)).ReturnsAsync(new User { Id = dto.AuthorId });
-    _userRepoMock.Setup(x => x.GetByIdAsync(dto.TargetUserId)).ReturnsAsync((User?)null);
+    _userRepoMock.Setup(x => x.GetByIdAsync(wallPost.AuthorId)).ReturnsAsync(new User { Id = wallPost.AuthorId });
+    _userRepoMock.Setup(x => x.GetByIdAsync(wallPost.TargetUserId)).ReturnsAsync((User?)null);
 
     // Act & Assert
-    var ex = await Assert.ThrowsAsync<ArgumentException>(() => _sut.CreateWallPostAsync(dto));
+    var ex = await Assert.ThrowsAsync<ArgumentException>(() => _sut.CreateWallPostAsync(wallPost));
     Assert.Equal("Target user does not exist", ex.Message);
   }
 
@@ -296,7 +326,14 @@ public class WallPostServiceTests
     var updatedContent = "Updated content";
     var originalCreatedAt = DateTime.UtcNow.AddDays(-1);
 
-    var dto = new UpdateWallPostDto(wallPostId, updatedContent, authorId, DateTime.UtcNow);
+    var wallPost = new WallPost
+    {
+      Id = wallPostId,
+      AuthorId = authorId,
+      Content = updatedContent,
+      TargetUserId = 10,
+      CreatedAt = originalCreatedAt
+    };
 
     var existingWallPost = new WallPost
     {
@@ -323,7 +360,7 @@ public class WallPostServiceTests
                      .ReturnsAsync(updatedWallPost);
 
     // Act
-    var result = await _sut.UpdateWallPostAsync(dto);
+    var result = await _sut.UpdateWallPostAsync(wallPost);
 
     // Assert
     Assert.NotNull(result);
