@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FriendZonePlus.Infrastructure.Migrations
 {
     [DbContext(typeof(FriendZonePlusContext))]
-    [Migration("20251127131109_UserFollowerRelations")]
-    partial class UserFollowerRelations
+    [Migration("20251204102019_UpdateFollowAndWallPost")]
+    partial class UpdateFollowAndWallPost
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,9 +33,6 @@ namespace FriendZonePlus.Infrastructure.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("FollowerId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");

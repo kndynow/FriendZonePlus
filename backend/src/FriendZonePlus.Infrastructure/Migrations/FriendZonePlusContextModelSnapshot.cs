@@ -38,7 +38,7 @@ namespace FriendZonePlus.Infrastructure.Migrations
 
                     b.HasIndex("FollowerId");
 
-                    b.ToTable("Follow");
+                    b.ToTable("Follows");
                 });
 
             modelBuilder.Entity("FriendZonePlus.Core.Entities.Message", b =>

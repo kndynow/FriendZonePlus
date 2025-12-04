@@ -17,7 +17,7 @@ namespace FriendZonePlus.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    FolloweeId = table.Column<int>(type: "INTEGER", nullable: false),
+                    FollowedUserId = table.Column<int>(type: "INTEGER", nullable: false),
                     FollowerId = table.Column<int>(type: "INTEGER", nullable: false),
                     Status = table.Column<int>(type: "INTEGER", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
@@ -26,8 +26,8 @@ namespace FriendZonePlus.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_Follows", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Follows_Users_FolloweeId",
-                        column: x => x.FolloweeId,
+                        name: "FK_Follows_Users_FollowedUserId",
+                        column: x => x.FollowedUserId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -56,9 +56,9 @@ namespace FriendZonePlus.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Follows_FolloweeId",
+                name: "IX_Follows_FollowedUserId",
                 table: "Follows",
-                column: "FolloweeId");
+                column: "FollowedUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Follows_FollowerId",
