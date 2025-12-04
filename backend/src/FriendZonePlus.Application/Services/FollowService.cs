@@ -1,5 +1,6 @@
 using FriendZonePlus.Core.Entities;
 using FriendZonePlus.Core.Interfaces;
+using FriendZonePlus.Core.Interfaces;
 
 namespace FriendZonePlus.Application.Services;
 
@@ -7,11 +8,16 @@ public class FollowService
 {
     private readonly IFollowRepository _followRepository;
     private readonly IFollowValidator _validator;
+    private readonly IUserRepository _userRepository;
 
-    public FollowService(IFollowRepository followRepository, IFollowValidator validator)
+    public FollowService(
+        IFollowRepository followRepository,
+        IFollowValidator validator,
+        IUserRepository userRepository)
     {
         _followRepository = followRepository;
         _validator = validator;
+        _userRepository = userRepository;
     }
 
     //TODO: Test edge cases
@@ -67,21 +73,6 @@ public class FollowService
 
 
     // Validation methods
-    private async Task ValidateFollowRequest(int followerId, int followedUserId)
-    {
-        await _validator.ValidateUnfollowAsync(followerId, followedUserId);
-
-        var relation = await GetExistingFollowRelation(followerId, followedUserId);
-
-        await _followRepository.DeleteAsync(relation!);
-        ValidateIdShouldBeGreaterThanZero(followerId);
-        ValidateIdShouldBeGreaterThanZero(followedUserId);
-        ValidateSelfFollow(followerId, followedUserId);
-        await ValidateFollowerExist(followerId);
-        await ValidateFollowedUserExist(followedUserId);
-        await ValidateUniqueFollow(followerId, followedUserId);
-    }
-
     // Validate user exists
     private async Task ValidateUserExists(int userId)
     {

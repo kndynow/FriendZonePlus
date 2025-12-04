@@ -20,6 +20,16 @@ public class WallPostService : IWallPostService
 
   public async Task<WallPost> CreateWallPostAsync(WallPost wallPost)
   {
+    // Validate content
+    if (string.IsNullOrWhiteSpace(wallPost.Content))
+    {
+      throw new ArgumentException("Content cannot be empty");
+    }
+
+    if (wallPost.Content.Length > 300)
+    {
+      throw new ArgumentException("Content too long");
+    }
 
     //Validate author exists
     var author = await _userRepository.GetByIdAsync(wallPost.AuthorId);
