@@ -7,11 +7,9 @@ function App() {
   window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   return (
     <>
-      <div className="d-flex flex-column min-vh-100">
-        <NavigationBar />
-        {/* This is where pages render */}
-        <Outlet />
-      </div>
+      <NavigationBar />
+      {/* This is where pages render */}
+      <Outlet />
     </>
   );
 }

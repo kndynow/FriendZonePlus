@@ -1,24 +1,43 @@
 import "./UserPreview.css";
 import { Button, Col, Row } from "react-bootstrap";
 
-export default function UserPreview() {
+type UserPreviewProps = {
+  imgPath?: string;
+  fullName: string;
+  description?: string;
+  buttonIcon?: string;
+  onClick?: () => void;
+  underButtonText?: string;
+};
+
+export default function UserPreview({
+  imgPath,
+  fullName,
+  description,
+  buttonIcon,
+  onClick,
+  underButtonText,
+}: UserPreviewProps) {
   return (
     <>
-      <Row className="align-items-center">
+      <Row className="align-items-top p-4">
         <Col xs="auto">
           <img
-            src="images/profilePlaceholder.png"
+            src={imgPath || "images/profilePlaceholder.png"}
             className="profile-img f-shadow"
           />
         </Col>
         <Col>
-          <h2>Här är namn</h2>
-          <p>Här är optional text</p>
+          <h2>{fullName}</h2>
+          <p>{description}</p>
         </Col>
-        <Col xs="auto">
-          <Button>icon here</Button>
-          <p>optional text</p>
-        </Col>
+        {(buttonIcon || underButtonText) && (
+          <Col xs="auto">
+            {buttonIcon && <Button onClick={onClick}>{buttonIcon}</Button>}
+
+            {underButtonText && <p>{underButtonText}</p>}
+          </Col>
+        )}
       </Row>
     </>
   );
