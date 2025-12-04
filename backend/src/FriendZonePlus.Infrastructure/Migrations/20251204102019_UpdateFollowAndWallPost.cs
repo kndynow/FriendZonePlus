@@ -10,103 +10,39 @@ namespace FriendZonePlus.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Follow_Users_FollowedUserId",
-                table: "Follow");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Follow_Users_FollowerId",
-                table: "Follow");
-
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_Follow",
-                table: "Follow");
-
+            // Users -> User
             migrationBuilder.RenameTable(
-                name: "Follow",
-                newName: "Follows");
+                name: "Users",
+                newName: "User");
 
-            migrationBuilder.RenameIndex(
-                name: "IX_Follow_FollowerId",
-                table: "Follows",
-                newName: "IX_Follows_FollowerId");
+            // WallPosts -> WallPost
+            migrationBuilder.RenameTable(
+                name: "WallPosts",
+                newName: "WallPost");
 
-            migrationBuilder.RenameIndex(
-                name: "IX_Follow_FollowedUserId",
-                table: "Follows",
-                newName: "IX_Follows_FollowedUserId");
-
-            migrationBuilder.AddPrimaryKey(
-                name: "PK_Follows",
-                table: "Follows",
-                column: "Id");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Follows_Users_FollowedUserId",
-                table: "Follows",
-                column: "FollowedUserId",
-                principalTable: "Users",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Follows_Users_FollowerId",
-                table: "Follows",
-                column: "FollowerId",
-                principalTable: "Users",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
+            // Messages -> Message
+            migrationBuilder.RenameTable(
+                name: "Messages",
+                newName: "Message");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Follows_Users_FollowedUserId",
-                table: "Follows");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Follows_Users_FollowerId",
-                table: "Follows");
-
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_Follows",
-                table: "Follows");
-
+            // Message -> Messages
             migrationBuilder.RenameTable(
-                name: "Follows",
-                newName: "Follow");
+                name: "Message",
+                newName: "Messages");
 
-            migrationBuilder.RenameIndex(
-                name: "IX_Follows_FollowerId",
-                table: "Follow",
-                newName: "IX_Follow_FollowerId");
+            // WallPost -> WallPosts
+            migrationBuilder.RenameTable(
+                name: "WallPost",
+                newName: "WallPosts");
 
-            migrationBuilder.RenameIndex(
-                name: "IX_Follows_FollowedUserId",
-                table: "Follow",
-                newName: "IX_Follow_FollowedUserId");
-
-            migrationBuilder.AddPrimaryKey(
-                name: "PK_Follow",
-                table: "Follow",
-                column: "Id");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Follow_Users_FollowedUserId",
-                table: "Follow",
-                column: "FollowedUserId",
-                principalTable: "Users",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Follow_Users_FollowerId",
-                table: "Follow",
-                column: "FollowerId",
-                principalTable: "Users",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
+            // User -> Users
+            migrationBuilder.RenameTable(
+                name: "User",
+                newName: "Users");
         }
     }
 }
