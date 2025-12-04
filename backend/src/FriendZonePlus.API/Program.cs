@@ -31,8 +31,13 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<FriendZonePlusContext>(options => options.UseSqlite(connectionString));
 
 // JWT Configuration
-var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSettings["SecretKey"];
+
+if (string.IsNullOrEmpty(secretKey))
+{
+    throw new InvalidOperationException("JWT SecretKey is not configured. Please set it in appsettings.json or appsettings.Development.json");
+}
 
 builder.Services.AddAuthentication(options =>
 {

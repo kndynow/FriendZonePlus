@@ -18,11 +18,11 @@ public class JwtHelper : IJwtHelper
 
     public string GenerateToken(User user)
     {
-        var jwtSettings = _configuration.GetSection("JwtSettings");
+        var jwtSettings = _configuration.GetSection("Jwt");
         var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey is not configured");
         var issuer = jwtSettings["Issuer"];
         var audience = jwtSettings["Audience"];
-        var expirationInMinutesValue = jwtSettings["ExpirationInMinutes"] ?? throw new InvalidOperationException("JWT ExpirationInMinutes is not configured");
+        var expirationInMinutesValue = jwtSettings["TokenExpirationMinutes"] ?? throw new InvalidOperationException("JWT TokenExpirationMinutes is not configured");
         var expirationMinutes = int.Parse(expirationInMinutesValue);
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));

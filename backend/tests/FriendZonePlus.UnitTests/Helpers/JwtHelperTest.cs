@@ -20,10 +20,10 @@ public class JwtHelperTests
         var configurationBuilder = new ConfigurationBuilder();
         configurationBuilder.AddInMemoryCollection(new Dictionary<string, string?>
         {
-            { "JwtSettings:SecretKey", "test-secret-key-that-is-at-least-32-characters-long-for-hs256" },
-            { "JwtSettings:Issuer", "test-issuer" },
-            { "JwtSettings:Audience", "test-audience" },
-            { "JwtSettings:ExpirationInMinutes", "60" }
+            { "Jwt:SecretKey", "test-secret-key-that-is-at-least-32-characters-long-for-hs256" },
+            { "Jwt:Issuer", "test-issuer" },
+            { "Jwt:Audience", "test-audience" },
+            { "Jwt:TokenExpirationMinutes", "60" }
         });
         _configuration = configurationBuilder.Build();
         _jwtHelper = new JwtHelper(_configuration);
