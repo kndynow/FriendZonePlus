@@ -20,7 +20,7 @@ public class FollowService
         _userRepository = userRepository;
     }
 
-    //TODO: Test edge cases
+    // Follow user
     public async Task<Follow> FollowAsync(int followerId, int followedUserId)
     {
         await _validator.ValidateFollowAsync(followerId, followedUserId);

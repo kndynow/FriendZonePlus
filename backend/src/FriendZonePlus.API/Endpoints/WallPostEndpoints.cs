@@ -22,15 +22,11 @@ public static class WallPostEndpoints
     group.MapDelete("/delete/{id}", DeleteWallPost);
   }
 
-  //TODO: Map to entity with Mapster
-  //TODO: Add validation to dto
-  //TODO: Global exception handler (maybe)
   // CREATE
   private static async Task<Results<Ok<WallPostResponseDto>, BadRequest<ErrorResponseDto>>> CreateWallPost(
           WallPostService wallPostService,
           CreateWallPostDto dto)
   {
-    //Map dto to entity
     var wallPost = dto.Adapt<WallPost>();
     try
     {
