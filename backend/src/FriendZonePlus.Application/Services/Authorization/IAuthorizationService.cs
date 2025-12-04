@@ -1,5 +1,6 @@
-﻿
+﻿using FriendZonePlus.Core.Entities;
+
 public interface IAuthorizationService
 {
-    Task<RegisterUserResponseDto> CreateUserAsync(RegisterUserRequestDto requestDto);
+    Task<User> CreateUserAsync(User user);
 }

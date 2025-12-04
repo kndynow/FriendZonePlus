@@ -1,4 +1,6 @@
 import { Outlet, useLocation } from "react-router-dom";
+import { AuthProvider } from "../context/AuthProvider";
+import { Toaster } from "react-hot-toast";
 import NavigationBar from "./components/Navigation/NavigationBar";
 
 function App() {
@@ -8,9 +10,15 @@ function App() {
   return (
     <>
       <div className="d-flex flex-column min-vh-100">
-        <NavigationBar />
+        <Toaster
+          position="top-center"
+          toastOptions={{ duration: 4000, removeDelay: 0 }}
+        />
+        <AuthProvider>
+          <NavigationBar />
         {/* This is where pages render */}
-        <Outlet />
+          <Outlet />
+        </AuthProvider>
       </div>
     </>
   );
