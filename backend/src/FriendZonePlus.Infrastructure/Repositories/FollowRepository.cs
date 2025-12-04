@@ -14,26 +14,46 @@ public class FollowRepository : IFollowRepository
     _context = context;
   }
 
-  //TODO: Follow user
-  public Task AddAsync(Follows follows)
+  // Follow user
+  public async Task<Follow> AddAsync(Follow follow)
   {
-    throw new NotImplementedException();
+    _context.Follows.Add(follow);
+    await _context.SaveChangesAsync();
+    return follow;
   }
 
-  public Task<bool> ExistsAsync(int followerId, int followeeId)
+  // Check if follow relationship exists
+  public async Task<bool> ExistsAsync(int followerId, int followedUserId)
   {
-    throw new NotImplementedException();
+    return await _context.Follows.AnyAsync(f => f.FollowerId == followerId && f.FollowedUserId == followedUserId);
   }
 
-  //TODO: Get followers
-  //TODO: Unfollow user
+  // Unfollow user
+  public async Task RemoveAsync(int followerId, int followedUserId)
+  {
 
-  //TEST: Implementation GetFollowedUserIdsAsync
+    var rowsAffected = await _context.Follows
+      .Where(f => f.FollowerId == followerId && f.FollowedUserId == followedUserId)
+      .ExecuteDeleteAsync();
+
+  }
+
+  // Get list of user ids that follow the user
+  public async Task<IReadOnlyList<int>> GetFollowerIdsAsync(int userId)
+  {
+    return await _context.Follows
+    .Where(f => f.FollowedUserId == userId)
+    .Select(f => f.FollowerId)
+    .ToListAsync();
+  }
+
+  //Get list of user ids that the user follows
   public async Task<IReadOnlyList<int>> GetFollowedUserIdsAsync(int userId)
   {
     return await _context.Follows
       .Where(f => f.FollowerId == userId)
-      .Select(f => f.FolloweeId)
+      .Select(f => f.FollowedUserId)
       .ToListAsync();
   }
+
 }

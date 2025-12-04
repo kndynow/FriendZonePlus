@@ -12,7 +12,7 @@ public class FriendZonePlusContext : DbContext
 
   public DbSet<User> Users { get; set; }
   public DbSet<WallPost> WallPosts { get; set; }
-  public DbSet<Follows> Follows { get; set; }
+  public DbSet<Follow> Follows { get; set; }
   public DbSet<Message> Messages { get; set; }
 
   // Configurate relations between models
@@ -34,15 +34,15 @@ public class FriendZonePlusContext : DbContext
     .HasForeignKey(p => p.TargetUserId)
     .OnDelete(DeleteBehavior.Restrict);
 
-    // Configure Follows -> Followee relation
-    modelBuilder.Entity<Follows>()
-    .HasOne(f => f.Followee)
+    // Configure Follow -> FollowedUser relation
+    modelBuilder.Entity<Follow>()
+    .HasOne(f => f.FollowedUser)
     .WithMany()
-    .HasForeignKey(f => f.FolloweeId)
+    .HasForeignKey(f => f.FollowedUserId)
     .OnDelete(DeleteBehavior.Restrict);
 
-    // Configure Follows -> Follower relation
-    modelBuilder.Entity<Follows>()
+    // Configure Follow -> Follower relation
+    modelBuilder.Entity<Follow>()
     .HasOne(f => f.Follower)
     .WithMany()
     .HasForeignKey(f => f.FollowerId)

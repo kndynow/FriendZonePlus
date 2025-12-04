@@ -15,33 +15,89 @@ public class FollowService
     }
 
     //TODO: Test edge cases
-    public async Task FollowAsync(int followerId, int followeeId)
+    public async Task<Follow> FollowAsync(int followerId, int followedUserId)
     {
 
-        await ValidateFollowRequest(followerId, followeeId);
+        await ValidateFollowRequest(followerId, followedUserId);
 
-        var follow = new Follows
+        var follow = new Follow
         {
             FollowerId = followerId,
-            FolloweeId = followeeId
+            FollowedUserId = followedUserId
         };
 
-        await _followRepository.AddAsync(follow);
+        return await _followRepository.AddAsync(follow);
     }
 
-    //TODO: Get followers
-    //TODO: Unfollow user
+    //Unfollow user
+    public async Task UnfollowAsync(int followerId, int followedUserId)
+    {
+        await ValidateUnfollowRequest(followerId, followedUserId);
+        await _followRepository.RemoveAsync(followerId, followedUserId);
+    }
 
-    private async Task ValidateFollowRequest(int followerId, int followeeId)
+    private async Task ValidateUnfollowRequest(int followerId, int followedUserId)
     {
         ValidateIdShouldBeGreaterThanZero(followerId);
-        ValidateIdShouldBeGreaterThanZero(followeeId);
-        ValidateSelfFollow(followerId, followeeId);
-        await ValidateFollowerExist(followerId);
-        await ValidateFolloweeExist(followeeId);
-        await ValidateUniqueFollow(followerId, followeeId);
+        ValidateIdShouldBeGreaterThanZero(followedUserId);
+        await ValidateFollowRelationExists(followerId, followedUserId);
     }
 
+    // Get followers
+    public async Task<IEnumerable<User>> GetFollowersAsync(int userId)
+    {
+        ValidateIdShouldBeGreaterThanZero(userId);
+
+        await ValidateUserExists(userId);
+
+        var followerIds = await _followRepository.GetFollowerIdsAsync(userId);
+
+        return await _userRepository.GetByIdsAsync(followerIds);
+    }
+
+    // Get followed users
+    public async Task<IEnumerable<User>> GetFollowedUsersAsync(int userId)
+    {
+        ValidateIdShouldBeGreaterThanZero(userId);
+        await ValidateUserExists(userId);
+
+        var followedUserIds = await _followRepository.GetFollowedUserIdsAsync(userId);
+        return await _userRepository.GetByIdsAsync(followedUserIds);
+    }
+
+
+
+    // Validation methods
+    private async Task ValidateFollowRequest(int followerId, int followedUserId)
+    {
+        ValidateIdShouldBeGreaterThanZero(followerId);
+        ValidateIdShouldBeGreaterThanZero(followedUserId);
+        ValidateSelfFollow(followerId, followedUserId);
+        await ValidateFollowerExist(followerId);
+        await ValidateFollowedUserExist(followedUserId);
+        await ValidateUniqueFollow(followerId, followedUserId);
+    }
+
+    // Validate user exists
+    private async Task ValidateUserExists(int userId)
+    {
+        var user = await _userRepository.GetByIdAsync(userId);
+        if (user == null)
+        {
+            throw new ArgumentException($"User with ID {userId} does not exist.");
+        }
+    }
+
+    // Validate follow relationship exists
+    private async Task ValidateFollowRelationExists(int followerId, int followedUserId)
+    {
+        if (!await _followRepository.ExistsAsync(followerId, followedUserId))
+        {
+            throw new InvalidOperationException("Follow relationship does not exist.");
+        }
+    }
+
+    // Validate ID should be greater than zero
     private void ValidateIdShouldBeGreaterThanZero(int id)
     {
         if (id <= 0)
@@ -50,14 +106,16 @@ public class FollowService
         }
     }
 
-    private void ValidateSelfFollow(int followerId, int followeeId)
+    // Validate self follow
+    private void ValidateSelfFollow(int followerId, int followedUserId)
     {
-        if (followerId == followeeId)
+        if (followerId == followedUserId)
         {
             throw new InvalidOperationException("User cannot follow themselves.");
         }
     }
 
+    // Validate follower exists
     private async Task ValidateFollowerExist(int followerId)
     {
         var follower = await _userRepository.GetByIdAsync(followerId);
@@ -67,18 +125,20 @@ public class FollowService
         }
     }
 
-    private async Task ValidateFolloweeExist(int followeeId)
+    // Validate followed user exists
+    private async Task ValidateFollowedUserExist(int followedUserId)
     {
-        var followee = await _userRepository.GetByIdAsync(followeeId);
-        if (followee == null)
+        var followedUser = await _userRepository.GetByIdAsync(followedUserId);
+        if (followedUser == null)
         {
-            throw new InvalidOperationException("Followee does not exist.");
+            throw new InvalidOperationException("Followed user does not exist.");
         }
     }
 
-    private async Task ValidateUniqueFollow(int followerId, int followeeId)
+    // Validate unique follow
+    private async Task ValidateUniqueFollow(int followerId, int followedUserId)
     {
-        if (await _followRepository.ExistsAsync(followerId, followeeId))
+        if (await _followRepository.ExistsAsync(followerId, followedUserId))
         {
             throw new InvalidOperationException("Follow relationship already exists.");
         }

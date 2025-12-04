@@ -41,7 +41,8 @@ builder.Services.AddScoped<IValidator<RegisterUserRequestDto>, RegisterUserReque
 
 //Mapster Configuration
 var config = TypeAdapterConfig.GlobalSettings;
-config.Scan(typeof(WallPostMappings).Assembly);
+FollowMappings.ConfigureFollowMappings();
+WallPostMappings.ConfigureWallPostMappings();
 builder.Services.AddSingleton(config);
 builder.Services.AddScoped<IMapper, Mapper>();
 
@@ -60,6 +61,7 @@ if (app.Environment.IsDevelopment())
 
 app.MapAuthEndpoints();
 app.MapWallPostEndpoints();
+app.MapFollowEndpoints();
 app.MapUserEndpoints();
 
 // Create or update database on every run
