@@ -16,9 +16,17 @@ namespace FriendZonePlus.Application.Services.Messages
             _messageRepository = messageRepository;
         }
 
-        public async Task<Message> SendMessageAsync(int senderId, int recieverId, string content)
+        public async Task<Message> SendMessageAsync(int senderId, int receiverId, string content)
         {
-            throw new NotImplementedException();
+            var message = new Message
+            {
+                SenderId = senderId,
+                ReceiverId = receiverId,
+                Content = content,
+                SentAt = DateTime.UtcNow
+            };
+
+            return await _messageRepository.AddMessageAsync(message);
         }
     }
 }

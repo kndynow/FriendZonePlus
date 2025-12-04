@@ -3,6 +3,7 @@ using FriendZonePlus.API.Endpoints;
 using FriendZonePlus.API.Mappings;
 using FriendZonePlus.Application.Helpers.PasswordHelpers;
 using FriendZonePlus.Application.Services;
+using FriendZonePlus.Application.Services.Messages;
 using FriendZonePlus.Application.Validators;
 using FriendZonePlus.Core.Interfaces;
 using FriendZonePlus.Infrastructure.Data;
@@ -35,10 +36,12 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<WallPostService>();
 builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
 builder.Services.AddScoped<FollowService>();
-builder.Services.AddScoped<IFollowValidator, FollowValidator>();
+builder.Services.AddScoped<IMessageService, MessageService>();
+
 // Helper
 builder.Services.AddScoped<IPasswordHelper, PasswordHelper>();
 //Validator
+builder.Services.AddScoped<IFollowValidator, FollowValidator>();
 builder.Services.AddScoped<IValidator<RegisterUserRequestDto>, RegisterUserRequestDtoValidator>();
 
 
