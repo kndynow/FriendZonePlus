@@ -47,6 +47,13 @@ public class FriendZonePlusContext : DbContext
     .WithMany()
     .HasForeignKey(f => f.FollowerId)
     .OnDelete(DeleteBehavior.Restrict);
+
+    // Follow -> FollowedUser (User who is being followed)
+    modelBuilder.Entity<Follow>()
+.HasOne(f => f.FollowedUser)
+.WithMany()
+.HasForeignKey(f => f.FollowedUserId)
+.OnDelete(DeleteBehavior.Restrict);
   }
 
 }
