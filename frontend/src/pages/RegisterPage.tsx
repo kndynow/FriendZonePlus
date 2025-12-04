@@ -2,6 +2,7 @@ import { Button, Form, Card } from "react-bootstrap";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthProvider";
 import type { RegisterRequest } from "../../types/auth";
+import toast from "react-hot-toast";
 
 export default function RegisterPage() {
   const [form, setForm] = useState<RegisterRequest>({
@@ -30,8 +31,25 @@ export default function RegisterPage() {
     try {
       setSubmitting(true);
       await register(form);
-    } catch {
-      console.log("Registration failed.");
+
+      toast.success("Account created successfully!");
+    } catch (err: any) {
+      if (err?.errors?.username) {
+        toast.error(err.errors.username[0], { id: "register-error" });
+        return;
+      }
+
+      if (err?.errors?.email) {
+        toast.error(err.errors.email[0], { id: "register-error" });
+        return;
+      }
+
+      if (err?.message) {
+        toast.error(err.message, { id: "register-error" });
+        return;
+      }
+
+      toast.error("Unable to register account.", { id: "register-error" });
     } finally {
       setSubmitting(false);
     }

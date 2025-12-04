@@ -38,11 +38,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify(data),
       });
 
+      const result = await response.json();
+
       if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`);
+        throw result;
       }
 
-      const result = await response.json();
       return result;
     } finally {
       setLoading(false);
