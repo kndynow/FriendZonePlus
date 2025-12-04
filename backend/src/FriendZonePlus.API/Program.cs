@@ -13,6 +13,11 @@ using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using FriendZonePlus.Application.Services.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using FriendZonePlus.Application.Helpers;
+using FriendZonePlus.Application.Helpers.JwtHelper;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +29,30 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 //Config for EF Core with SQLite
 builder.Services.AddDbContext<FriendZonePlusContext>(options => options.UseSqlite(connectionString));
+
+// JWT Configuration
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var secretKey = jwtSettings["SecretKey"];
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidAudience = jwtSettings["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!))
+    };
+});
+
+builder.Services.AddAuthorization();
 
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -37,6 +66,7 @@ builder.Services.AddScoped<FollowService>();
 builder.Services.AddScoped<IFollowValidator, FollowValidator>();
 // Helper
 builder.Services.AddScoped<IPasswordHelper, PasswordHelper>();
+builder.Services.AddScoped<IJwtHelper, JwtHelper>();
 //Validator
 builder.Services.AddScoped<IValidator<RegisterUserRequestDto>, RegisterUserRequestDtoValidator>();
 
@@ -57,9 +87,10 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
-// app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
-// app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapAuthEndpoints();
 app.MapWallPostEndpoints();
@@ -83,3 +114,5 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
+
+public partial class Program { }

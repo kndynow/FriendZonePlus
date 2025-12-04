@@ -14,12 +14,12 @@ public static class WallPostEndpoints
   {
     var group = app.MapGroup("/api/WallPosts").WithTags("WallPost");
 
-    group.MapPost("/create", CreateWallPost);
-    group.MapGet("/target/{targetUserId}", GetWallPostsForTargetUser);
-    group.MapGet("/author/{authorId}", GetWallPostsForAuthor);
-    group.MapGet("/feed/{userId}", GetFeedForUser);
-    group.MapPatch("/update", UpdateWallPost);
-    group.MapDelete("/delete/{id}", DeleteWallPost);
+    group.MapPost("/create", CreateWallPost).RequireAuthorization();
+    group.MapGet("/target/{targetUserId}", GetWallPostsForTargetUser).RequireAuthorization();
+    group.MapGet("/author/{authorId}", GetWallPostsForAuthor).RequireAuthorization();
+    group.MapGet("/feed/{userId}", GetFeedForUser).RequireAuthorization();
+    group.MapPatch("/update", UpdateWallPost).RequireAuthorization();
+    group.MapDelete("/delete/{id}", DeleteWallPost).RequireAuthorization();
   }
 
   // CREATE

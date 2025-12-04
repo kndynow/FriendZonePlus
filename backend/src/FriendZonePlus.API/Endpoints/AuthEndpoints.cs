@@ -3,6 +3,7 @@ using FriendZonePlus.API.DTOs;
 using FriendZonePlus.Application.Helpers.ValidationHelpers;
 using FriendZonePlus.Core.Entities;
 using FriendZonePlus.Application.Services.Authentication;
+using Microsoft.AspNetCore.Mvc;
 
 public static class AuthEndpoints
 {
@@ -12,11 +13,12 @@ public static class AuthEndpoints
                         .WithTags("Authorization");
 
         group.MapPost("/register", RegisterUser);
+        group.MapPost("/login", Login);
     }
 
     private static async Task<IResult> RegisterUser(
         IAuthenticationService authenticationService,
-        IValidator<RegisterUserRequestDto> validator,
+        [FromServices] IValidator<RegisterUserRequestDto> validator,
         RegisterUserRequestDto requestDto)
     {
         var validationResult = await validator.ValidateAsync(requestDto);
@@ -48,5 +50,26 @@ public static class AuthEndpoints
         {
             return Results.BadRequest(new { message = "Unable to create account." });
         }
+    }
+
+    private static async Task<IResult> Login(
+        IAuthenticationService authenticationService,
+        LoginRequestDto requestDto)
+    {
+
+        if (string.IsNullOrEmpty(requestDto.UsernameOrEmail) ||
+        string.IsNullOrEmpty(requestDto.Password))
+        {
+            return Results.BadRequest(new { message = "Username or email and password are required." });
+        }
+
+        var token = await authenticationService.LoginAsync(requestDto.UsernameOrEmail, requestDto.Password);
+
+        if (token == null)
+        {
+            return Results.Unauthorized();
+        }
+
+        return Results.Ok(new { token });
     }
 }

@@ -13,3 +13,14 @@ public record RegisterUserResponseDto(
     string Username,
     DateTime CreatedAt
     );
+
+public record LoginRequestDto(
+    string UsernameOrEmail,
+    string Password
+);
+
+public record LoginResponseDto(
+    string Token,
+    int UserId,
+    string Username
+);
