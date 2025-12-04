@@ -12,7 +12,7 @@ const navItems = [
 
 export default function NavigationBar() {
   return (
-    <div className="bottom-nav">
+    <div className="bottom-nav f-shadow">
       {navItems.map((navItem) => (
         <NavItem key={navItem.to} to={navItem.to} icon={navItem.icon} />
       ))}

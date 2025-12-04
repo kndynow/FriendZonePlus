@@ -16,7 +16,7 @@ export function NavItem({ to, icon }: NavItemProps) {
 
   return (
     <NavLink to={to} className={({ isActive }) => getNavItemClass(isActive)}>
-      {({ isActive }) => <i className={getIconClass(isActive)} />}
+      {({ isActive }) => <i className={getIconClass(isActive)} f-shadow />}
     </NavLink>
   );
 }
