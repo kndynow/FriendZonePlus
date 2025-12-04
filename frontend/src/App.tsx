@@ -9,17 +9,15 @@ function App() {
   window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   return (
     <>
-      <div className="d-flex flex-column min-vh-100">
-        <Toaster
-          position="top-center"
-          toastOptions={{ duration: 4000, removeDelay: 0 }}
-        />
-        <AuthProvider>
-          <NavigationBar />
+      <Toaster
+        position="top-center"
+        toastOptions={{ duration: 4000, removeDelay: 0 }}
+      />
+      <AuthProvider>
+        <NavigationBar />
         {/* This is where pages render */}
-          <Outlet />
-        </AuthProvider>
-      </div>
+        <Outlet />
+      </AuthProvider>
     </>
   );
 }

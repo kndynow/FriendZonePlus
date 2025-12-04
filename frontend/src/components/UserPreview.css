@@ -1,0 +1,9 @@
+.profile-img {
+  width: 60px;
+  border-radius: 50%;
+}
+
+p {
+  color:rgba(0, 0, 0, 0.342);
+  margin-bottom: 0 !important;
+}
