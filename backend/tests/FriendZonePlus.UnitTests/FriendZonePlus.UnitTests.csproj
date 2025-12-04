@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="../../src/FriendZonePlus.API/FriendZonePlus.API.csproj" />
     <ProjectReference Include="..\..\src\FriendZonePlus.Application\FriendZonePlus.Application.csproj" />
     <ProjectReference Include="..\..\src\FriendZonePlus.Core\FriendZonePlus.Core.csproj" />
     <ProjectReference Include="..\..\src\FriendZonePlus.Infrastructure\FriendZonePlus.Infrastructure.csproj" />

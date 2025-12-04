@@ -1,25 +1,21 @@
 using FluentValidation;
-using FriendZonePlus.Application.DTOs;
+using FriendZonePlus.API.DTOs;
 using FriendZonePlus.Application.Helpers.ValidationHelpers;
-using FriendZonePlus.Application.Services;
 using FriendZonePlus.Core.Entities;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
-using FluentValidation.Results;
+using FriendZonePlus.Application.Services.Authentication;
 
 public static class AuthEndpoints
 {
-  public static void MapAuthEndpoints(this IEndpointRouteBuilder app)
-  {
-    var group = app.MapGroup("/api/Auth")
-                    .WithTags("Authorization");
+    public static void MapAuthEndpoints(this IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/Auth")
+                        .WithTags("Authorization");
 
         group.MapPost("/register", RegisterUser);
     }
 
     private static async Task<IResult> RegisterUser(
-        IAuthorizationService authorizationService,
+        IAuthenticationService authenticationService,
         IValidator<RegisterUserRequestDto> validator,
         RegisterUserRequestDto requestDto)
     {
@@ -43,7 +39,7 @@ public static class AuthEndpoints
                 CreatedAt = DateTime.UtcNow
             };
 
-            var result = await authorizationService.CreateUserAsync(user);
+            var result = await authenticationService.CreateUserAsync(user);
 
             return Results.Created($"/api/Auth/{result.Id}", result);
         }
@@ -52,5 +48,5 @@ public static class AuthEndpoints
         {
             return Results.BadRequest(new { message = "Unable to create account." });
         }
-     }
-  }
+    }
+}
