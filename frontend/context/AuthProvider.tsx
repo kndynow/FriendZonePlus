@@ -9,7 +9,7 @@ import type { RegisterRequest, User } from "../types/auth.ts";
 
 interface AuthContextType {
   user: User | null;
-  register: (data: RegisterRequest) => Promise<void>;
+  register: (data: RegisterRequest) => Promise<any>;
   loading: boolean;
 }
 
@@ -32,12 +32,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true);
 
-      const response = await fetch("/api/login", {
+      const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          data,
-        }),
+        body: JSON.stringify(data),
       });
 
       if (!response.ok) {

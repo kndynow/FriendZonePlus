@@ -11,6 +11,9 @@ export default function RegisterPage() {
     firstName: "",
     lastName: "",
   });
+  const { register } = useAuth();
+
+  const [submitting, setSubmitting] = useState(false);
 
   function setProperty(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
@@ -23,6 +26,15 @@ export default function RegisterPage() {
 
   async function handleRegister(event: React.FormEvent) {
     event.preventDefault();
+
+    try {
+      setSubmitting(true);
+      await register(form);
+    } catch {
+      console.log("Registration failed.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -46,9 +58,9 @@ export default function RegisterPage() {
           <Form.Group>
             <Form.Label>Username</Form.Label>
             <Form.Control
-              type="username"
+              type="text"
               name="username"
-              value={form.email}
+              value={form.username}
               placeholder="Enter username"
               onChange={setProperty}
               required
@@ -91,8 +103,13 @@ export default function RegisterPage() {
             />
           </Form.Group>
 
-          <Button className="mt-2" variant="primary">
-            Register
+          <Button
+            className="mt-2"
+            variant="primary"
+            disabled={submitting}
+            type="submit"
+          >
+            {submitting ? "Registering..." : "Register"}
           </Button>
         </Form>
       </Card.Body>
