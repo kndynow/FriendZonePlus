@@ -4,23 +4,23 @@ import { Button, Col, Row } from "react-bootstrap";
 type UserPreviewProps = {
   imgPath?: string;
   fullName: string;
-  description?: string;
+  messagePreview?: string;
   buttonIcon?: string;
   onClick?: () => void;
-  underButtonText?: string;
+  timeStamp?: string;
 };
 
 export default function UserPreview({
   imgPath,
   fullName,
-  description,
+  messagePreview,
   buttonIcon,
   onClick,
-  underButtonText,
+  timeStamp,
 }: UserPreviewProps) {
   return (
     <>
-      <Row className="align-items-top p-4">
+      <Row className="align-items-top p-2 mb-3">
         <Col xs="auto">
           <img
             src={imgPath || "images/profilePlaceholder.png"}
@@ -28,14 +28,14 @@ export default function UserPreview({
           />
         </Col>
         <Col>
-          <h2>{fullName}</h2>
-          <p>{description}</p>
+          <h5>{fullName}</h5>
+          <p>{messagePreview}</p>
         </Col>
-        {(buttonIcon || underButtonText) && (
+        {(buttonIcon || timeStamp) && (
           <Col xs="auto">
             {buttonIcon && <Button onClick={onClick}>{buttonIcon}</Button>}
 
-            {underButtonText && <p>{underButtonText}</p>}
+            {timeStamp && <p>{timeStamp}</p>}
           </Col>
         )}
       </Row>
