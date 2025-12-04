@@ -7,11 +7,11 @@ using System.Text;
 
 namespace FriendZonePlus.Application.Services.Messages
 {
-    public class MessageService
+    public class MessageService : IMessageService
     {
         private readonly IMessageRepository _messageRepository;
 
-        public MessageService (IMessageRepository messageRepository)
+        public MessageService(IMessageRepository messageRepository)
         {
             _messageRepository = messageRepository;
         }
