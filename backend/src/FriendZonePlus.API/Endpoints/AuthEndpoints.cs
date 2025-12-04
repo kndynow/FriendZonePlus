@@ -31,18 +31,18 @@ public static class AuthEndpoints
             return Results.BadRequest(new { errors });
         }
 
-        var user = new User
-        {
-            Username = requestDto.Username,
-            Email = requestDto.Email,
-            FirstName = requestDto.FirstName,
-            LastName = requestDto.LastName,
-            PasswordHash = requestDto.Password,
-            CreatedAt = DateTime.UtcNow
-        };
-
         try
         {
+            var user = new User
+            {
+                Username = requestDto.Username,
+                Email = requestDto.Email,
+                FirstName = requestDto.FirstName,
+                LastName = requestDto.LastName,
+                PasswordHash = requestDto.Password,
+                CreatedAt = DateTime.UtcNow
+            };
+
             var result = await authorizationService.CreateUserAsync(user);
 
             return Results.Created($"/api/Auth/{result.Id}", result);
@@ -52,5 +52,5 @@ public static class AuthEndpoints
         {
             return Results.BadRequest(new { message = "Unable to create account." });
         }
-    }
+     }
   }
