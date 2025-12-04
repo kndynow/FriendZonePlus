@@ -1,7 +1,8 @@
 import { Outlet, useLocation } from "react-router-dom";
-import { AuthProvider } from "../context/AuthProvider";
 import { Toaster } from "react-hot-toast";
 import NavigationBar from "./components/Navigation/NavigationBar";
+import Header from "./components/Header/Header";
+import { Container } from "react-bootstrap";
 
 function App() {
   // scroll to top when the route changes
@@ -9,15 +10,19 @@ function App() {
   window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   return (
     <>
-      <Toaster
-        position="top-center"
-        toastOptions={{ duration: 4000, removeDelay: 0 }}
-      />
-      <AuthProvider>
+      <div className="layout-wrapper">
+        <Header />
+        <Container>
+          <main className="page-content">
+            <Toaster
+              position="top-center"
+              toastOptions={{ duration: 4000, removeDelay: 0 }}
+            />
+            <Outlet />
+          </main>
+        </Container>
         <NavigationBar />
-        {/* This is where pages render */}
-        <Outlet />
-      </AuthProvider>
+      </div>
     </>
   );
 }

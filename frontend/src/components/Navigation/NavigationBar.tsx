@@ -1,4 +1,4 @@
-import "./NavigationBar.css";
+import { Col, Row } from "react-bootstrap";
 import { NavItem } from "./NavItem";
 
 //TODO: change to real pages
@@ -12,10 +12,12 @@ const navItems = [
 
 export default function NavigationBar() {
   return (
-    <div className="bottom-nav f-shadow">
+    <Row className="bottom-nav f-shadow">
       {navItems.map((navItem) => (
-        <NavItem key={navItem.to} to={navItem.to} icon={navItem.icon} />
+        <Col className="d-flex justify-content-center align-items-center">
+          <NavItem key={navItem.to} to={navItem.to} icon={navItem.icon} />
+        </Col>
       ))}
-    </div>
+    </Row>
   );
 }
