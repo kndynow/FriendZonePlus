@@ -20,7 +20,7 @@ namespace FriendZonePlus.Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.0");
 
-            modelBuilder.Entity("FriendZonePlus.Core.Entities.Follows", b =>
+            modelBuilder.Entity("FriendZonePlus.Core.Entities.Follow", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -29,7 +29,7 @@ namespace FriendZonePlus.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("FolloweeId")
+                    b.Property<int>("FollowedUserId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("FollowerId")
@@ -37,7 +37,7 @@ namespace FriendZonePlus.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FolloweeId");
+                    b.HasIndex("FollowedUserId");
 
                     b.HasIndex("FollowerId");
 
@@ -134,11 +134,11 @@ namespace FriendZonePlus.Infrastructure.Migrations
                     b.ToTable("WallPosts");
                 });
 
-            modelBuilder.Entity("FriendZonePlus.Core.Entities.Follows", b =>
+            modelBuilder.Entity("FriendZonePlus.Core.Entities.Follow", b =>
                 {
-                    b.HasOne("FriendZonePlus.Core.Entities.User", "Followee")
+                    b.HasOne("FriendZonePlus.Core.Entities.User", "FollowedUser")
                         .WithMany()
-                        .HasForeignKey("FolloweeId")
+                        .HasForeignKey("FollowedUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -148,7 +148,7 @@ namespace FriendZonePlus.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Followee");
+                    b.Navigation("FollowedUser");
 
                     b.Navigation("Follower");
                 });

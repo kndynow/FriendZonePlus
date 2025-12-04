@@ -1,58 +1,120 @@
 using System;
-using FriendZonePlus.Application.DTOs;
+using FriendZonePlus.Application.Interfaces;
 using FriendZonePlus.Core.Entities;
 using FriendZonePlus.Core.Interfaces;
 
 namespace FriendZonePlus.Application.Services;
 
-public class WallPostService
+public class WallPostService : IWallPostService
 {
   private readonly IWallPostRepository _wallPostRepository;
   private readonly IUserRepository _userRepository;
-
-  public WallPostService(IWallPostRepository wallPostRepository, IUserRepository userRepository)
+  private readonly IFollowRepository _followRepository;
+  public WallPostService(IWallPostRepository wallPostRepository, IUserRepository userRepository, IFollowRepository followRepository)
   {
     _wallPostRepository = wallPostRepository;
     _userRepository = userRepository;
+    _followRepository = followRepository;
   }
 
 
-  public async Task<WallPostResponseDto> CreateWallPostAsync(CreateWallPostDto dto)
+  public async Task<WallPost> CreateWallPostAsync(WallPost wallPost)
   {
-    if (string.IsNullOrWhiteSpace(dto.Content))
+    // Validate content
+    if (string.IsNullOrWhiteSpace(wallPost.Content))
+    {
       throw new ArgumentException("Content cannot be empty");
+    }
 
-    if (dto.Content.Length > 300)
+    if (wallPost.Content.Length > 300)
+    {
       throw new ArgumentException("Content too long");
+    }
 
-    var author = await _userRepository.GetByIdAsync(dto.AuthorId);
+    //Validate author exists
+    var author = await _userRepository.GetByIdAsync(wallPost.AuthorId);
     if (author == null)
       throw new ArgumentException("Author does not exist");
 
-    var target = await _userRepository.GetByIdAsync(dto.TargetUserId);
+    //Validate target user exists
+    var target = await _userRepository.GetByIdAsync(wallPost.TargetUserId);
     if (target == null)
       throw new ArgumentException("Target user does not exist");
 
-    var WallPost = new WallPost
-    {
-      AuthorId = dto.AuthorId,
-      TargetUserId = dto.TargetUserId,
-      Content = dto.Content,
-      CreatedAt = DateTime.UtcNow
-    };
-
-    var createdWallPost = await _wallPostRepository.AddAsync(WallPost);
-
-    return new WallPostResponseDto(
-        createdWallPost.Id,
-        createdWallPost.AuthorId,
-        createdWallPost.Content,
-        createdWallPost.CreatedAt
-      );
+    //Add post to database
+    return await _wallPostRepository.AddAsync(wallPost);
   }
 
-  public async Task<object> GetWallPostsForTargetUserAsync(int targetUserId)
+  public async Task<IEnumerable<WallPost>> GetFeedForUserAsync(int userId)
   {
-    throw new NotImplementedException();
+    //Validate user exists
+    var user = await _userRepository.GetByIdAsync(userId);
+    if (user == null)
+    {
+      throw new ArgumentException("User does not exist");
+    }
+
+    // Get IDs for all users the current user follows
+    var followedUserIds = await _followRepository.GetFollowedUserIdsAsync(userId);
+
+
+    return await _wallPostRepository.GetFeedForUserAsync(followedUserIds);
   }
+
+  public async Task<IEnumerable<WallPost>> GetWallPostsForAuthorAsync(int authorId)
+  {
+    //Validate author exists
+    var author = await _userRepository.GetByIdAsync(authorId);
+    if (author == null)
+    {
+      throw new ArgumentException("Author does not exist");
+    }
+
+    // Get all posts for the author
+    return await _wallPostRepository.GetByAuthorIdAsync(authorId);
+  }
+  public async Task<IEnumerable<WallPost>> GetWallPostsForTargetUserAsync(int targetUserId)
+  {
+    //Validate target user exists
+    var target = await _userRepository.GetByIdAsync(targetUserId);
+    if (target == null)
+    {
+      throw new ArgumentException("Target user does not exist");
+    }
+
+    // Get all posts for the target user
+    return await _wallPostRepository.GetByTargetUserIdAsync(targetUserId);
+
+  }
+
+  public async Task<WallPost> UpdateWallPostAsync(WallPost wallPost)
+  {
+    //Validate post exists
+    var _wallPost = await _wallPostRepository.GetByIdAsync(wallPost.Id);
+
+    if (wallPost == null)
+    {
+      throw new ArgumentException("Post does not exist");
+    }
+
+    //Update post
+    _wallPost.Content = wallPost.Content;
+
+    return await _wallPostRepository.UpdateAsync(_wallPost);
+
+  }
+
+  public async Task<bool> DeleteWallPostAsync(int id)
+  {
+    //Validate post exists
+    var wallPost = await _wallPostRepository.GetByIdAsync(id);
+    if (wallPost == null)
+    {
+      throw new ArgumentException("Post does not exist");
+    }
+    //Delete post
+    await _wallPostRepository.DeleteAsync(id);
+    return true;
+  }
+
 }
