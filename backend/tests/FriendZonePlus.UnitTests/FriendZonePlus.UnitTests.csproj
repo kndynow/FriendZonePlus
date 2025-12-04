@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\FriendZonePlus.Application\FriendZonePlus.Application.csproj" />
     <ProjectReference Include="..\..\src\FriendZonePlus.Core\FriendZonePlus.Core.csproj" />
+    <ProjectReference Include="..\..\src\FriendZonePlus.Infrastructure\FriendZonePlus.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
