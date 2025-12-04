@@ -20,6 +20,12 @@ public class FriendZonePlusContext : DbContext
   {
     base.OnModelCreating(modelBuilder);
 
+    // Configure table names to singular
+    modelBuilder.Entity<User>().ToTable("User");
+    modelBuilder.Entity<WallPost>().ToTable("WallPost");
+    modelBuilder.Entity<Follow>().ToTable("Follow");
+    modelBuilder.Entity<Message>().ToTable("Message");
+
     // Configure Post -> Author relation
     modelBuilder.Entity<WallPost>()
     .HasOne(p => p.Author)
@@ -47,13 +53,6 @@ public class FriendZonePlusContext : DbContext
     .WithMany()
     .HasForeignKey(f => f.FollowerId)
     .OnDelete(DeleteBehavior.Restrict);
-
-    // Follow -> FollowedUser (User who is being followed)
-    modelBuilder.Entity<Follow>()
-.HasOne(f => f.FollowedUser)
-.WithMany()
-.HasForeignKey(f => f.FollowedUserId)
-.OnDelete(DeleteBehavior.Restrict);
   }
 
 }

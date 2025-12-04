@@ -3,6 +3,7 @@ using System;
 using FriendZonePlus.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FriendZonePlus.Infrastructure.Migrations
 {
     [DbContext(typeof(FriendZonePlusContext))]
-    partial class FriendZonePlusContextModelSnapshot : ModelSnapshot
+    [Migration("20251204132140_AddSentAtToMessage")]
+    partial class AddSentAtToMessage
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.0");
