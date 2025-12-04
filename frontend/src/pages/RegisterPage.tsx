@@ -1,19 +1,16 @@
 import { Button, Form, Card } from "react-bootstrap";
 import { useState } from "react";
-
-const initialForm = {
-  email: "",
-  password: "",
-  firstName: "",
-  lastName: "",
-};
+import { useAuth } from "../../context/AuthProvider";
+import type { RegisterRequest } from "../../types/auth";
 
 export default function RegisterPage() {
-  const [form, setForm] = useState(initialForm);
-
-  async function handleRegister(event: React.FormEvent) {
-    event.preventDefault();
-  }
+  const [form, setForm] = useState<RegisterRequest>({
+    username: "",
+    email: "",
+    password: "",
+    firstName: "",
+    lastName: "",
+  });
 
   function setProperty(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
@@ -22,6 +19,10 @@ export default function RegisterPage() {
       ...prev,
       [name]: value,
     }));
+  }
+
+  async function handleRegister(event: React.FormEvent) {
+    event.preventDefault();
   }
 
   return (
@@ -37,6 +38,18 @@ export default function RegisterPage() {
               name="email"
               value={form.email}
               placeholder="Enter email"
+              onChange={setProperty}
+              required
+            />
+          </Form.Group>
+
+          <Form.Group>
+            <Form.Label>Username</Form.Label>
+            <Form.Control
+              type="username"
+              name="username"
+              value={form.email}
+              placeholder="Enter username"
               onChange={setProperty}
               required
             />

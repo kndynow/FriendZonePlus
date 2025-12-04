@@ -1,4 +1,5 @@
 import { Outlet, useLocation } from "react-router-dom";
+import { AuthProvider } from "../context/AuthProvider";
 
 function App() {
   // scroll to top when the route changes
@@ -7,8 +8,10 @@ function App() {
   return (
     <>
       <div className="d-flex flex-column min-vh-100">
-        {/* This is where pages render */}
-        <Outlet />
+        <AuthProvider>
+          {/* This is where pages render */}
+          <Outlet />
+        </AuthProvider>
       </div>
     </>
   );
