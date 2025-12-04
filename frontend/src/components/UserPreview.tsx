@@ -20,10 +20,10 @@ export default function UserPreview({
 }: UserPreviewProps) {
   return (
     <>
-      <Row className="align-items-top p-2 mb-3">
+      <Row className="align-items-center p-1">
         <Col xs="auto">
           <img
-            src={imgPath || "images/profilePlaceholder.png"}
+            src={imgPath || "/images/profilePlaceholder.png"}
             className="profile-img f-shadow"
           />
         </Col>
