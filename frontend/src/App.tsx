@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from "react-router-dom";
 import { AuthProvider } from "../context/AuthProvider";
 import { Toaster } from "react-hot-toast";
+import NavigationBar from "./components/Navigation/NavigationBar";
 
 function App() {
   // scroll to top when the route changes
@@ -14,7 +15,8 @@ function App() {
           toastOptions={{ duration: 4000, removeDelay: 0 }}
         />
         <AuthProvider>
-          {/* This is where pages render */}
+          <NavigationBar />
+        {/* This is where pages render */}
           <Outlet />
         </AuthProvider>
       </div>
