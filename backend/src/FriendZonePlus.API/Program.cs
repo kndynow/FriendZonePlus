@@ -1,4 +1,3 @@
-using System.Reflection;
 using FluentValidation;
 using FriendZonePlus.API.Endpoints;
 using FriendZonePlus.API.Mappings;
@@ -12,6 +11,7 @@ using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using System.Reflection;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,6 +28,8 @@ builder.Services.AddDbContext<FriendZonePlusContext>(options => options.UseSqlit
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IWallPostRepository, WallPostRepository>();
 builder.Services.AddScoped<IFollowRepository, FollowRepository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+
 // Services
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<WallPostService>();
@@ -64,6 +66,7 @@ app.MapAuthEndpoints();
 app.MapWallPostEndpoints();
 app.MapFollowEndpoints();
 app.MapUserEndpoints();
+app.MapMessageEndpoints();
 
 // Create or update database on every run
 using (var scope = app.Services.CreateScope())
