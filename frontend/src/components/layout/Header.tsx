@@ -1,7 +1,7 @@
 import { Col, Row } from "react-bootstrap";
-import BackButton from "./BackButton";
+import BackButton from "../ui/BackButton";
 import { useMatches } from "react-router-dom";
-import UserPreview from "../UserPreview";
+import UserPreview from "../../feature/user/UserPreview";
 
 export default function Header() {
   const fakeUser = {
@@ -10,9 +10,12 @@ export default function Header() {
 
   const matches = useMatches();
   const match = matches[matches.length - 1];
-  const title =
-    (match.handle as { title?: string } | undefined)?.title || "FriendZone+";
-  if ((match.handle as any)?.type === "user") {
+
+  const handle = (match.handle as any) || {};
+  const isUserHeader = handle.type === "user";
+  const title = handle.title || "FriendZone+";
+
+  if (isUserHeader) {
     return (
       <Row className="top-nav f-shadow align-items-center">
         <Col xs="auto">

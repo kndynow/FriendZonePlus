@@ -10,7 +10,7 @@ const navItems = [
   { to: "/settings", icon: "gear" },
 ];
 
-export default function NavigationBar() {
+export default function BottomNavigation() {
   return (
     <Row className="bottom-nav f-shadow">
       {navItems.map((navItem) => (

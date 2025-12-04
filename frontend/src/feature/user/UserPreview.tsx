@@ -1,4 +1,3 @@
-import "./UserPreview.css";
 import { Button, Col, Row } from "react-bootstrap";
 
 type UserPreviewProps = {
@@ -27,8 +26,8 @@ export default function UserPreview({
             className="profile-img f-shadow"
           />
         </Col>
-        <Col>
-          <h5>{fullName}</h5>
+        <Col className="d-flex flex-column justify-content-center">
+          <h5 className="m-0">{fullName}</h5>
           <p>{messagePreview}</p>
         </Col>
         {(buttonIcon || timeStamp) && (
