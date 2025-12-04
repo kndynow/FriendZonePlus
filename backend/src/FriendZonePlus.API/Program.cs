@@ -33,6 +33,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<WallPostService>();
 builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
 builder.Services.AddScoped<FollowService>();
+builder.Services.AddScoped<IFollowValidator, FollowValidator>();
 // Helper
 builder.Services.AddScoped<IPasswordHelper, PasswordHelper>();
 //Validator
