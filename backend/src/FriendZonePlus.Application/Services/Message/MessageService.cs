@@ -1,9 +1,11 @@
-﻿using FriendZonePlus.Application.DTOs;
+﻿using FluentValidation;
+using FriendZonePlus.Application.DTOs;
 using FriendZonePlus.Core.Entities;
 using FriendZonePlus.Core.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 
@@ -13,15 +15,23 @@ namespace FriendZonePlus.Application.Services.Messages
     {
         private readonly IMessageRepository _messageRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IValidator<SendMessageRequestDto> _validator;
 
-        public MessageService(IMessageRepository messageRepository, IUserRepository userRepository)
+        public MessageService(IMessageRepository messageRepository, IUserRepository userRepository, IValidator<SendMessageRequestDto> validator)
         {
             _messageRepository = messageRepository;
             _userRepository = userRepository;
+            _validator = validator;
         }
 
         public async Task<MessageResponseDto> SendMessageAsync(int senderId, SendMessageRequestDto dto)
         {
+            var validationResult = await _validator.ValidateAsync(dto);
+            if (!validationResult.IsValid)
+            {
+                throw new FluentValidation.ValidationException(validationResult.Errors);
+            }
+
             if (senderId == dto.ReceiverId)
                 throw new ArgumentException("User cannot send message to itself");
 

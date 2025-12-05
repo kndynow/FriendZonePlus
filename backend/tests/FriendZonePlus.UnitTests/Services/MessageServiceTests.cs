@@ -1,7 +1,9 @@
 
+using FluentValidation;
 using FriendZonePlus.Application.DTOs;
 using FriendZonePlus.Application.Services;
 using FriendZonePlus.Application.Services.Messages;
+using FriendZonePlus.Application.Validators;
 using FriendZonePlus.Core.Entities;
 using FriendZonePlus.Core.Interfaces;
 using Moq;
@@ -13,13 +15,15 @@ public class MessageServiceTests
 {
     private readonly Mock<IMessageRepository> _messageRepoMock;
     private readonly Mock<IUserRepository> _userRepositoryMock;
+    private readonly IValidator<SendMessageRequestDto> _validator;
     private readonly MessageService _messageService;
 
     public MessageServiceTests()
     {
         _messageRepoMock = new Mock<IMessageRepository>();
         _userRepositoryMock = new Mock<IUserRepository>();
-        _messageService = new MessageService(_messageRepoMock.Object, _userRepositoryMock.Object);
+        _validator = new SendMessageRequestDtoValidator();
+        _messageService = new MessageService(_messageRepoMock.Object, _userRepositoryMock.Object, _validator);
     }
 
     [Fact]
@@ -207,5 +211,40 @@ public class MessageServiceTests
 
         Assert.Equal("Receiver does not exist", ex.Message);
         _messageRepoMock.Verify(r => r.GetMessagesBetweenUsersAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Never);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(null)]
+    public async Task SendMessageAsync_ShouldThrowValidationException_WhenContentIsInvalid(string content)
+    {
+        // Arrange
+        var senderId = 1;
+        var dto = new SendMessageRequestDto(ReceiverId: 2, Content: content);
+
+        // Act & Assert
+        var ex = await Assert.ThrowsAsync<ValidationException>(
+            () => _messageService.SendMessageAsync(senderId, dto)
+        );
+
+        // Checks  the exception contains the correct error message
+        Assert.Contains(ex.Errors, e => e.PropertyName == nameof(dto.Content));
+    }
+
+    [Fact]
+    public async Task SendMessageAsync_ShouldThrowValidationException_WhenContentTooLong()
+    {
+        // Arrange
+        var senderId = 1;
+        var longContent = new string('a', 301); // 301 characters
+        var dto = new SendMessageRequestDto(ReceiverId: 2, Content: longContent);
+
+        // Act & Assert
+        var ex = await Assert.ThrowsAsync<ValidationException>(
+            () => _messageService.SendMessageAsync(senderId, dto)
+        );
+
+        // Checks that the exception contains the correct error message
+        Assert.Contains(ex.Errors, e => e.PropertyName == nameof(dto.Content));
     }
 }

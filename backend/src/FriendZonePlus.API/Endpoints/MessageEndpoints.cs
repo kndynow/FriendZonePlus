@@ -13,6 +13,7 @@ namespace FriendZonePlus.API.Endpoints
                 .WithTags("Message");
 
             group.MapPost("send", SendMessage);
+            //group.MapGet("get", GetMessagesBetweenUsers);
         }
 
         private static async Task<IResult> SendMessage(
@@ -28,6 +29,7 @@ namespace FriendZonePlus.API.Endpoints
                 //    return Results.Unauthorized();
                 //}
 
+                // Temporary until JWT is in place
                 var senderId = 1;
 
                 var response = await messageService.SendMessageAsync(senderId, requestDto);
@@ -43,5 +45,10 @@ namespace FriendZonePlus.API.Endpoints
                 return Results.BadRequest( new { message = "Unable to send message." });
             }
         }
+
+        //private static Task<IEnumerable<MessageResponseDto>> GetMessagesBetweenUsers(IMessageService messageService, ClaimsPrincipal user)
+        //{
+
+        //}
     }
 }

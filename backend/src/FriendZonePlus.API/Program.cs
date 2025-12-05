@@ -1,6 +1,7 @@
 using FluentValidation;
 using FriendZonePlus.API.Endpoints;
 using FriendZonePlus.API.Mappings;
+using FriendZonePlus.Application.DTOs;
 using FriendZonePlus.Application.Helpers.PasswordHelpers;
 using FriendZonePlus.Application.Services;
 using FriendZonePlus.Application.Services.Messages;
@@ -43,7 +44,7 @@ builder.Services.AddScoped<IPasswordHelper, PasswordHelper>();
 //Validator
 builder.Services.AddScoped<IFollowValidator, FollowValidator>();
 builder.Services.AddScoped<IValidator<RegisterUserRequestDto>, RegisterUserRequestDtoValidator>();
-
+builder.Services.AddScoped<IValidator<SendMessageRequestDto>, SendMessageRequestDtoValidator>();
 
 //Mapster Configuration
 var config = TypeAdapterConfig.GlobalSettings;
