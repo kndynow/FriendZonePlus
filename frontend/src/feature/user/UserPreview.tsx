@@ -1,25 +1,24 @@
-import { Button, Col, Row } from "react-bootstrap";
+import { Col, Row } from "react-bootstrap";
 
 type UserPreviewProps = {
   imgPath?: string;
   fullName: string;
-  messagePreview?: string;
-  buttonIcon?: string;
-  onClick?: () => void;
-  timeStamp?: string;
+  subtitle?: string;
+  button?: {
+    buttonIcon: string;
+    onClick: () => void;
+  };
 };
 
 export default function UserPreview({
   imgPath,
   fullName,
-  messagePreview,
-  buttonIcon,
-  onClick,
-  timeStamp,
+  subtitle,
+  button,
 }: UserPreviewProps) {
   return (
     <>
-      <Row className="align-items-center p-1">
+      <Row className="align-items-start p-2">
         <Col xs="auto">
           <img
             src={imgPath || "/images/profilePlaceholder.png"}
@@ -28,13 +27,18 @@ export default function UserPreview({
         </Col>
         <Col className="d-flex flex-column justify-content-center">
           <h5 className="m-0">{fullName}</h5>
-          <p>{messagePreview}</p>
+          <p>{subtitle}</p>
         </Col>
-        {(buttonIcon || timeStamp) && (
-          <Col xs="auto">
-            {buttonIcon && <Button onClick={onClick}>{buttonIcon}</Button>}
-
-            {timeStamp && <p>{timeStamp}</p>}
+        {button?.buttonIcon && (
+          <Col
+            xs="auto"
+            className="d-flex flex-column align-items-end justify-content-start"
+          >
+            {button.buttonIcon && (
+              <button onClick={button.onClick} className="f-button">
+                {button.buttonIcon}
+              </button>
+            )}
           </Col>
         )}
       </Row>
