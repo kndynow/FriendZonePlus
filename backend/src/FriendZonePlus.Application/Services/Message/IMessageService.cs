@@ -1,9 +1,10 @@
 ﻿using FriendZonePlus.Core.Entities;
+using FriendZonePlus.Application.DTOs;
 
 namespace FriendZonePlus.Application.Services.Messages
 {
     public interface IMessageService
     {
-        Task<Message> SendMessageAsync(int senderId, int receiverId, string content);
+        Task<MessageResponseDto> SendMessageAsync(int senderId, SendMessageRequestDto Dto);
     }
 }
