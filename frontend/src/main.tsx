@@ -5,6 +5,7 @@ import App from "./App";
 import routes from "./routes";
 import "../sass/_index.scss";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import { AuthProvider } from "../context/AuthProvider";
 
 const router = createBrowserRouter([
   {
@@ -16,6 +17,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </StrictMode>
 );
