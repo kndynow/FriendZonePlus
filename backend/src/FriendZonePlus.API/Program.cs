@@ -1,9 +1,11 @@
-using System.Reflection;
 using FluentValidation;
 using FriendZonePlus.API.Endpoints;
+using FriendZonePlus.API.Hubs;
 using FriendZonePlus.API.Mappings;
+using FriendZonePlus.Application.DTOs;
 using FriendZonePlus.Application.Helpers.PasswordHelpers;
 using FriendZonePlus.Application.Services;
+using FriendZonePlus.Application.Services.Messages;
 using FriendZonePlus.Application.Validators;
 using FriendZonePlus.Core.Interfaces;
 using FriendZonePlus.Infrastructure.Data;
@@ -12,6 +14,7 @@ using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using System.Reflection;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,17 +31,24 @@ builder.Services.AddDbContext<FriendZonePlusContext>(options => options.UseSqlit
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IWallPostRepository, WallPostRepository>();
 builder.Services.AddScoped<IFollowRepository, FollowRepository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+
 // Services
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<WallPostService>();
 builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
 builder.Services.AddScoped<FollowService>();
-builder.Services.AddScoped<IFollowValidator, FollowValidator>();
+builder.Services.AddScoped<IMessageService, MessageService>();
+
 // Helper
 builder.Services.AddScoped<IPasswordHelper, PasswordHelper>();
 //Validator
+builder.Services.AddScoped<IFollowValidator, FollowValidator>();
 builder.Services.AddScoped<IValidator<RegisterUserRequestDto>, RegisterUserRequestDtoValidator>();
+builder.Services.AddScoped<IValidator<SendMessageRequestDto>, SendMessageRequestDtoValidator>();
 
+//SignalR
+builder.Services.AddSignalR();
 
 //Mapster Configuration
 var config = TypeAdapterConfig.GlobalSettings;
@@ -64,6 +74,9 @@ app.MapAuthEndpoints();
 app.MapWallPostEndpoints();
 app.MapFollowEndpoints();
 app.MapUserEndpoints();
+app.MapMessageEndpoints();
+
+app.MapHub<MessageHub>("/hubs/message");
 
 // Create or update database on every run
 using (var scope = app.Services.CreateScope())

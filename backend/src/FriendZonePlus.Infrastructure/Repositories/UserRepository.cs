@@ -49,4 +49,8 @@ public class UserRepository : IUserRepository
     return await _context.Users.AnyAsync(u => u.Email == email);
   }
 
+  public async Task<bool> ExistsByIdAsync(int id)
+  {
+      return await _context.Users.AnyAsync(u => u.Id == id);
+  }
 }
