@@ -1,4 +1,3 @@
-
 using FluentValidation;
 
 namespace FriendZonePlus.API.Filters;

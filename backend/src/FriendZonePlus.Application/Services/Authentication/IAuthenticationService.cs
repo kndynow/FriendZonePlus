@@ -1,5 +1,4 @@
 ﻿using FriendZonePlus.Application.DTOs;
-using FriendZonePlus.Core.Entities;
 
 namespace FriendZonePlus.Application.Services.Authentication;
 

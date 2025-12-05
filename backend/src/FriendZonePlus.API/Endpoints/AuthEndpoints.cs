@@ -1,9 +1,5 @@
-using FluentValidation;
 using FriendZonePlus.Application.DTOs;
-using FriendZonePlus.Application.Helpers.ValidationHelpers;
-using FriendZonePlus.Core.Entities;
 using FriendZonePlus.Application.Services.Authentication;
-using Microsoft.AspNetCore.Mvc;
 using FriendZonePlus.API.Filters;
 
 public static class AuthEndpoints
