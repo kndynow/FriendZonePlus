@@ -59,6 +59,34 @@ public class MessageServiceTests
     }
 
     [Fact]
+    public async Task SendMessageAsync_ShouldThrowError_WhenUserSendsToItself()
+    {
+        // Assert
+        var senderId = 1;
+        var dto = new SendMessageRequestDto(ReceiverId: 1, Content: "Howdy!");
+
+        _userRepositoryMock
+        .Setup(r => r.ExistsByIdAsync(senderId))
+        .ReturnsAsync(true);
+
+        _userRepositoryMock
+            .Setup(r => r.ExistsByIdAsync(dto.ReceiverId))
+            .ReturnsAsync(true);
+
+        // Act & Assert
+        var expected = await Assert.ThrowsAsync<ArgumentException>(() =>
+            _messageService.SendMessageAsync(senderId, dto)
+        );
+
+        Assert.Equal("User cannot send message to itself", expected.Message);
+
+        _messageRepoMock.Verify(
+            r => r.AddMessageAsync(It.IsAny<Message>()),
+            Times.Never
+        );
+    }
+
+    [Fact]
     public async Task SendMessageAsync_ShouldThrowError_WhenReceiverIdDoesntExist()
     {
         // Assert

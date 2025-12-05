@@ -22,6 +22,8 @@ namespace FriendZonePlus.Application.Services.Messages
 
         public async Task<MessageResponseDto> SendMessageAsync(int senderId, SendMessageRequestDto dto)
         {
+            if (senderId == dto.ReceiverId)
+                throw new ArgumentException("User cannot send message to itself");
 
             if (!await _userRepository.ExistsByIdAsync(dto.ReceiverId))
                 throw new ArgumentException("Receiver does not exist");
