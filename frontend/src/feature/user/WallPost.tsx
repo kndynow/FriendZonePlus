@@ -7,26 +7,29 @@ type WallPostProps = {
     imgPath?: string;
   };
   content: string;
-  buttonIcon?: string;
+  button?: {
+    buttonIcon: string;
+    onClick: () => void;
+  };
   subtitle?: string;
 };
 
 export default function WallPost({
   user,
   content,
-  buttonIcon,
+  button,
   subtitle,
 }: WallPostProps) {
   return (
     <>
-      <Row className="f-border f-shadow py-2 m-1 my-4">
+      <Row className="f-border f-shadow py-3 m-1 my-4 semi-transparent-bg">
         <Col>
           <div>
             <UserPreview
               fullName={user.fullName}
               imgPath={user.imgPath}
               subtitle={subtitle}
-              buttonIcon={buttonIcon}
+              button={button}
             />
 
             <div className="p-2">
