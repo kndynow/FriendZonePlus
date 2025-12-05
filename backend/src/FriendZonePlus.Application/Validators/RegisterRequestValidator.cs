@@ -1,27 +1,22 @@
 using FriendZonePlus.Application.DTOs;
 using FluentValidation;
-using FriendZonePlus.Core.Interfaces;
 
 namespace FriendZonePlus.Application.Validators
 {
-    public class RegisterUserRequestDtoValidator : AbstractValidator<RegisterUserRequestDto>
+    public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
     {
-        public RegisterUserRequestDtoValidator(IUserRepository userRepository)
+        public RegisterRequestValidator()
         {
             RuleFor(x => x.Username)
                 .NotEmpty().WithMessage("Username is required")
                 .MinimumLength(3).WithMessage("Username must be at least 3 characters")
-                .MaximumLength(20).WithMessage("Username cannot exceed 20 characters")
-                .MustAsync(async (username, ct) => !await userRepository.ExistsByUsernameAsync(username))
-                .WithMessage("Username already taken");
+                .MaximumLength(20).WithMessage("Username cannot exceed 20 characters");
 
             RuleFor(x => x.Email)
                  .NotEmpty().WithMessage("Email is required")
                  .EmailAddress().WithMessage("Invalid email")
                  .MinimumLength(5).WithMessage("Email must be longer than 5 characters")
-                 .MaximumLength(50).WithMessage("Email cannot exceed 50 characters")
-                 .MustAsync(async (email, ct) => !await userRepository.ExistsByEmailAsync(email))
-                 .WithMessage("Email already taken");
+                 .MaximumLength(50).WithMessage("Email cannot exceed 50 characters");
 
             RuleFor(x => x.Password)
                 .NotEmpty().WithMessage("Password is required")

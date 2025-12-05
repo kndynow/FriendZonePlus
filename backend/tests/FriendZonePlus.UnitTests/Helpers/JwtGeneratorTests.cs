@@ -1,32 +1,31 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using FriendZonePlus.Application.Helpers.JwtHelper;
+using FriendZonePlus.Application.Interfaces;
 using FriendZonePlus.Core.Entities;
-using Microsoft.Extensions.Configuration;
+using FriendZonePlus.Infrastructure.Authentication;
+using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace FriendZonePlus.UnitTests.Helpers;
 
-public class JwtHelperTests
+public class JwtTokenGeneratorTests
 {
 
-    private readonly IConfiguration _configuration;
-    private readonly JwtHelper _jwtHelper;
+    private readonly JwtTokenGenerator _jwtTokenGenerator;
 
-    public JwtHelperTests()
+    public JwtTokenGeneratorTests()
     {
-        // Setup in-memory configuration
-        var configurationBuilder = new ConfigurationBuilder();
-        configurationBuilder.AddInMemoryCollection(new Dictionary<string, string?>
+        // Setup JWT settings
+        var jwtSettings = new JwtSettings
         {
-            { "Jwt:SecretKey", "test-secret-key-that-is-at-least-32-characters-long-for-hs256" },
-            { "Jwt:Issuer", "test-issuer" },
-            { "Jwt:Audience", "test-audience" },
-            { "Jwt:TokenExpirationMinutes", "60" }
-        });
-        _configuration = configurationBuilder.Build();
-        _jwtHelper = new JwtHelper(_configuration);
+            SecretKey = "test-secret-key-that-is-at-least-32-characters-long-for-hs256",
+            Issuer = "test-issuer",
+            Audience = "test-audience",
+            TokenExpirationMinutes = 60
+        };
+        var options = Options.Create(jwtSettings);
+        _jwtTokenGenerator = new JwtTokenGenerator(options);
     }
 
     private User CreateTestUser()
@@ -50,7 +49,7 @@ public class JwtHelperTests
         var user = CreateTestUser();
 
         // Act
-        var token = _jwtHelper.GenerateToken(user);
+        var token = _jwtTokenGenerator.GenerateToken(user);
 
         // Assert
         Assert.NotNull(token);
@@ -68,16 +67,15 @@ public class JwtHelperTests
         var user = CreateTestUser();
 
         // Act
-        var token = _jwtHelper.GenerateToken(user);
+        var token = _jwtTokenGenerator.GenerateToken(user);
 
         // Assert
         var handler = new JwtSecurityTokenHandler();
         var jsonToken = handler.ReadJwtToken(token);
 
-        Assert.Equal(user.Id.ToString(), jsonToken.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value
-        );
-        Assert.Equal(user.Username, jsonToken.Claims.First(c => c.Type == ClaimTypes.Name).Value);
-        Assert.Equal(user.Email, jsonToken.Claims.First(c => c.Type == ClaimTypes.Email).Value);
+        Assert.Equal(user.Id.ToString(), jsonToken.Claims.First(c => c.Type == "sub").Value);
+        Assert.Equal(user.Username, jsonToken.Claims.First(c => c.Type == "username").Value);
+        Assert.Equal(user.Email, jsonToken.Claims.First(c => c.Type == "email").Value);
     }
 
     [Fact]
@@ -90,8 +88,8 @@ public class JwtHelperTests
         user2.Username = "testuser2";
 
         // Act
-        var token1 = _jwtHelper.GenerateToken(user1);
-        var token2 = _jwtHelper.GenerateToken(user2);
+        var token1 = _jwtTokenGenerator.GenerateToken(user1);
+        var token2 = _jwtTokenGenerator.GenerateToken(user2);
 
         // Assert
         Assert.NotEqual(token1, token2);
@@ -105,8 +103,8 @@ public class JwtHelperTests
         var user = CreateTestUser();
 
         // Act
-        var token1 = _jwtHelper.GenerateToken(user);
-        var token2 = _jwtHelper.GenerateToken(user);
+        var token1 = _jwtTokenGenerator.GenerateToken(user);
+        var token2 = _jwtTokenGenerator.GenerateToken(user);
 
         // Assert
         // Tokens should be different because each token has a unique JTI (JWT ID)

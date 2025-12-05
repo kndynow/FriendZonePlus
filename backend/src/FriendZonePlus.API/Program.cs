@@ -16,8 +16,11 @@ using FriendZonePlus.Application.Services.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Text.Json;
 using FriendZonePlus.Application.Helpers;
-using FriendZonePlus.Application.Helpers.JwtHelper;
+using FriendZonePlus.Infrastructure.Authentication;
+using FriendZonePlus.Application.Interfaces;
+using FriendZonePlus.API.Infrastructure;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,39 +28,48 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddOpenApi();
 
+// Configure JSON serialization to use camelCase
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+});
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=friendzoneplus.db";
+
+// Exception handling
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 //Config for EF Core with SQLite
 builder.Services.AddDbContext<FriendZonePlusContext>(options => options.UseSqlite(connectionString));
 
 // JWT Configuration
-var jwtSettings = builder.Configuration.GetSection("Jwt");
-var secretKey = jwtSettings["SecretKey"];
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
+builder.Services.AddSingleton<IJwtGenerator, JwtTokenGenerator>();
 
-if (string.IsNullOrEmpty(secretKey))
-{
-    throw new InvalidOperationException("JWT SecretKey is not configured. Please set it in appsettings.json or appsettings.Development.json");
-}
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
+// JWT Authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidAudience = jwtSettings["Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!))
-    };
-});
+        var jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>();
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings?.Issuer,
+            ValidAudience = jwtSettings?.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwtSettings?.SecretKey ?? throw new InvalidOperationException("JWT SecretKey is not configured"))
+            )
+        };
+    });
 
 builder.Services.AddAuthorization();
+
 
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -71,9 +83,8 @@ builder.Services.AddScoped<FollowService>();
 builder.Services.AddScoped<IFollowValidator, FollowValidator>();
 // Helper
 builder.Services.AddScoped<IPasswordHelper, PasswordHelper>();
-builder.Services.AddScoped<IJwtHelper, JwtHelper>();
 //Validator
-builder.Services.AddScoped<IValidator<RegisterUserRequestDto>, RegisterUserRequestDtoValidator>();
+builder.Services.AddScoped<IValidator<RegisterRequest>, RegisterRequestValidator>();
 
 
 //Mapster Configuration
@@ -93,6 +104,7 @@ if (app.Environment.IsDevelopment())
 }
 
 //app.UseHttpsRedirection();
+app.UseExceptionHandler();
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -119,5 +131,3 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
-
-public partial class Program { }

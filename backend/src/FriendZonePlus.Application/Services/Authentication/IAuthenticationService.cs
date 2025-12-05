@@ -1,9 +1,10 @@
-﻿using FriendZonePlus.Core.Entities;
+﻿using FriendZonePlus.Application.DTOs;
+using FriendZonePlus.Core.Entities;
 
 namespace FriendZonePlus.Application.Services.Authentication;
 
 public interface IAuthenticationService
 {
-    Task<User> CreateUserAsync(User user);
-    Task<string?> LoginAsync(string usernameOrEmail, string password);
+    Task<AuthResponse> RegisterAsync(RegisterRequest request);
+    Task<AuthResponse> LoginAsync(LoginRequest request);
 }

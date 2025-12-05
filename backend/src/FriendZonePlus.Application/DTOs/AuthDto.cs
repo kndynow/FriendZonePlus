@@ -1,6 +1,6 @@
 namespace FriendZonePlus.Application.DTOs;
 
-public record RegisterUserRequestDto(
+public record RegisterRequest(
     string Username,
     string Email,
     string FirstName,
@@ -8,20 +8,28 @@ public record RegisterUserRequestDto(
     string Password
     );
 
-public record RegisterUserResponseDto(
-    int Id,
-    string Username,
-    DateTime CreatedAt
-    );
-
-public record LoginRequestDto(
-    string UsernameOrEmail,
-    string Password
+public record LoginRequest(
+string UsernameOrEmail,
+string Password
 );
 
-public record LoginResponseDto(
+public record AuthResponse(
     string Token,
     int UserId,
     string Username
 );
+
+// Remove when registering is implemented
+public record RegisterResponse(
+    int UserId,
+    string Username,
+    DateTime CreatedAt
+    );
+
+public record LoginResponse(
+    string Token,
+    int UserId,
+    string Username
+);
+
 
