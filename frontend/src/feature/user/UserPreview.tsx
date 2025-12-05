@@ -35,7 +35,7 @@ export default function UserPreview({
             className="d-flex flex-column align-items-end justify-content-start"
           >
             {button.buttonIcon && (
-              <button onClick={button.onClick} className="back-button">
+              <button onClick={button.onClick} className="f-button">
                 {button.buttonIcon}
               </button>
             )}
