@@ -113,4 +113,71 @@ public class MessageServiceTests
             Times.Never
         );
     }
+
+    [Fact]
+    public async Task GetMessagesBetweenUsersAsync_ShouldReturnOrderedMessages()
+    {
+        // Arrange
+        int senderId = 1;
+        int receiverId = 2;
+
+        _userRepositoryMock.Setup(r => r.ExistsByIdAsync(senderId)).ReturnsAsync(true);
+        _userRepositoryMock.Setup(r => r.ExistsByIdAsync(receiverId)).ReturnsAsync(true);
+
+        var messagesFromRepo = new List<Message>
+        {
+            new Message { Id = 1, SenderId = 1, ReceiverId = 2, Content = "Hi", SentAt = DateTime.UtcNow.AddMinutes(-2) },
+            new Message { Id = 2, SenderId = 2, ReceiverId = 1, Content = "Hello", SentAt = DateTime.UtcNow.AddMinutes(-1) }
+        };
+
+        _messageRepoMock
+            .Setup(r => r.GetMessagesBetweenUsersAsync(senderId, receiverId))
+            .ReturnsAsync(messagesFromRepo);
+
+        // Act
+        var result = await _messageService.GetMessagesBetweenUsersAsync(senderId, receiverId);
+
+        // Assert
+        Assert.Equal(2, result.Count());
+        Assert.Equal("Hi", result.ElementAt(0).Content);
+        Assert.Equal("Hello", result.ElementAt(1).Content);
+
+        _messageRepoMock.Verify(r => r.GetMessagesBetweenUsersAsync(senderId, receiverId), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetMessagesBetweenUsersAsync_ShouldThrowError_WhenSenderDoesNotExist()
+    {
+        // Arrange
+        var senderId = 1;
+        var receiverId = 2;
+
+        _userRepositoryMock.Setup(r => r.ExistsByIdAsync(senderId)).ReturnsAsync(false);
+        _userRepositoryMock.Setup(r => r.ExistsByIdAsync(receiverId)).ReturnsAsync(true);
+
+        // Act & Assert
+        var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
+            _messageService.GetMessagesBetweenUsersAsync(senderId, receiverId));
+
+        Assert.Equal("Cannot retrieve messages for the same user", ex.Message);
+        _messageRepoMock.Verify(r => r.GetMessagesBetweenUsersAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task GetMessagesBetweenUsersAsync_ShouldThrowError_WhenReceiverDoesNotExist()
+    {
+        // Arrange
+        var senderId = 1;
+        var receiverId = 2;
+
+        _userRepositoryMock.Setup(r => r.ExistsByIdAsync(senderId)).ReturnsAsync(true);
+        _userRepositoryMock.Setup(r => r.ExistsByIdAsync(receiverId)).ReturnsAsync(false);
+
+        // Act & Assert
+        var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
+            _messageService.GetMessagesBetweenUsersAsync(senderId, receiverId));
+
+        Assert.Equal("Receiver does not exist", ex.Message);
+        _messageRepoMock.Verify(r => r.GetMessagesBetweenUsersAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Never);
+    }
 }
