@@ -1,2 +1,22 @@
 @use "bootstrap";
 @use "shared-styling";
+@use "sticky-header";
+@use "sticky-footer";
+
+.layout-wrapper {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.page-content {
+  width: 100%;
+  padding-top: 90px;
+  padding-bottom: 90px;
+}
+
+.profile-img {
+  width: 50px;
+  border-radius: 50%;
+}
