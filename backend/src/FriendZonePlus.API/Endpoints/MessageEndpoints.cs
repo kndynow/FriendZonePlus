@@ -13,7 +13,7 @@ namespace FriendZonePlus.API.Endpoints
                 .WithTags("Message");
 
             group.MapPost("send", SendMessage);
-            //group.MapGet("get", GetMessagesBetweenUsers);
+            group.MapGet("conversation/{receiverId:int}", GetMessagesBetweenUsers);
         }
 
         private static async Task<IResult> SendMessage(
@@ -30,7 +30,7 @@ namespace FriendZonePlus.API.Endpoints
                 //}
 
                 // Temporary until JWT is in place
-                var senderId = 1;
+                var senderId = 2;
 
                 var response = await messageService.SendMessageAsync(senderId, requestDto);
 
@@ -46,9 +46,33 @@ namespace FriendZonePlus.API.Endpoints
             }
         }
 
-        //private static Task<IEnumerable<MessageResponseDto>> GetMessagesBetweenUsers(IMessageService messageService, ClaimsPrincipal user)
-        //{
+        private static async Task<IResult> GetMessagesBetweenUsers(IMessageService messageService, ClaimsPrincipal user, int receiverId)
+        {
+            try
+            {
+                //var senderIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                //if (string.IsNullOrEmpty(senderIdClaim) || !int.TryParse(senderIdClaim, out int senderId))
+                //{
+                //    return Results.Unauthorized();
+                //}
 
-        //}
+                // Temporary until JWT is in place
+
+                var senderId = 1;
+
+                var response = await messageService.GetMessagesBetweenUsersAsync(senderId, receiverId);
+
+                return Results.Ok(response);
+            }
+
+            catch (ArgumentException ex)
+            {
+                return Results.BadRequest(new { message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return Results.BadRequest(new { message = "Unable to send message." });
+            }
+        }
     }
 }

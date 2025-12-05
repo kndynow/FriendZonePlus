@@ -59,15 +59,15 @@ namespace FriendZonePlus.Application.Services.Messages
                 response.IsRead
             );
         }
-        public async Task<IEnumerable<MessageResponseDto>> GetMessagesBetweenUsersAsync(int senderUserId, int receivingUserId)
+        public async Task<IEnumerable<MessageResponseDto>> GetMessagesBetweenUsersAsync(int senderId, int receiverId)
         {
-            if (!await _userRepository.ExistsByIdAsync(receivingUserId))
+            if (!await _userRepository.ExistsByIdAsync(receiverId))
                 throw new ArgumentException("Receiver does not exist");
 
-            if (!await _userRepository.ExistsByIdAsync(senderUserId))
+            if (!await _userRepository.ExistsByIdAsync(senderId))
                 throw new ArgumentException("Cannot retrieve messages for the same user");
 
-            var messages = await _messageRepository.GetMessagesBetweenUsersAsync(senderUserId, receivingUserId);
+            var messages = await _messageRepository.GetMessagesBetweenUsersAsync(senderId, receiverId);
 
             var responseDtos = messages
               .OrderBy(m => m.SentAt) 

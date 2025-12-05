@@ -8,6 +8,6 @@ namespace FriendZonePlus.Core.Interfaces
     public interface IMessageRepository
     {
         Task<Message> AddMessageAsync(Message message);
-        Task<IEnumerable<Message>> GetMessagesBetweenUsersAsync(int senderUserId, int receivingUserId);
+        Task<IEnumerable<Message>> GetMessagesBetweenUsersAsync(int senderId, int receiverId);
     }
 }

@@ -26,12 +26,12 @@ namespace FriendZonePlus.Infrastructure.Repositories
             return message;
         }
 
-        public async Task<IEnumerable<Message>> GetMessagesBetweenUsersAsync(int senderUserId, int receivingUserId)
+        public async Task<IEnumerable<Message>> GetMessagesBetweenUsersAsync(int senderId, int receiverId)
         {
             return await _context.Messages
                 .Where(m =>
-                    (m.SenderId == senderUserId && m.ReceiverId == receivingUserId) ||
-                    (m.SenderId == receivingUserId && m.ReceiverId == senderUserId))
+                    (m.SenderId == senderId && m.ReceiverId == receiverId) ||
+                    (m.SenderId == receiverId && m.ReceiverId == senderId))
                 .OrderBy(m => m.SentAt)
                 .ToListAsync();                
         }
