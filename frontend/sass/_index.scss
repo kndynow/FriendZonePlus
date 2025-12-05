@@ -20,3 +20,15 @@
   width: 50px;
   border-radius: 50%;
 }
+
+
+.pastel-bg {
+  background: radial-gradient(circle at 70% 70%, #f3e2fd, transparent),
+    radial-gradient(circle at 30% 30%, #b1d9f1ec, transparent),
+    radial-gradient(circle at 50% 90%, #d6affadc, transparent);
+  background-color: #ffeafd;
+    filter: blur(2px);
+    position: fixed;
+    inset: 0;
+    z-index: -100;
+}
