@@ -1,5 +1,6 @@
 using FluentValidation;
 using FriendZonePlus.API.Endpoints;
+using FriendZonePlus.API.Hubs;
 using FriendZonePlus.API.Mappings;
 using FriendZonePlus.Application.DTOs;
 using FriendZonePlus.Application.Helpers.PasswordHelpers;
@@ -46,6 +47,9 @@ builder.Services.AddScoped<IFollowValidator, FollowValidator>();
 builder.Services.AddScoped<IValidator<RegisterUserRequestDto>, RegisterUserRequestDtoValidator>();
 builder.Services.AddScoped<IValidator<SendMessageRequestDto>, SendMessageRequestDtoValidator>();
 
+//SignalR
+builder.Services.AddSignalR();
+
 //Mapster Configuration
 var config = TypeAdapterConfig.GlobalSettings;
 FollowMappings.ConfigureFollowMappings();
@@ -71,6 +75,8 @@ app.MapWallPostEndpoints();
 app.MapFollowEndpoints();
 app.MapUserEndpoints();
 app.MapMessageEndpoints();
+
+app.MapHub<MessageHub>("/hubs/message");
 
 // Create or update database on every run
 using (var scope = app.Services.CreateScope())

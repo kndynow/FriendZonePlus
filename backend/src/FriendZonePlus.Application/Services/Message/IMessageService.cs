@@ -6,6 +6,7 @@ namespace FriendZonePlus.Application.Services.Messages
     public interface IMessageService
     {
         Task<MessageResponseDto> SendMessageAsync(int senderId, SendMessageRequestDto Dto);
-        Task<IEnumerable<MessageResponseDto>> GetMessagesBetweenUsersAsync(int senderUserId, int retreivingUserId);
+        Task<IEnumerable<MessageResponseDto>> GetMessagesBetweenUsersAsync(int senderId, int retreivingUserId);
+        Task<IEnumerable<MessageResponseDto>> GetLatestChatsAsync(int userId);
     }
 }

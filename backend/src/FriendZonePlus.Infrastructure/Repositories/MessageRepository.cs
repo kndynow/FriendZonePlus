@@ -35,5 +35,20 @@ namespace FriendZonePlus.Infrastructure.Repositories
                 .OrderBy(m => m.SentAt)
                 .ToListAsync();                
         }
-     }
+                
+        public async Task<IEnumerable<Message>> GetLatestMessagesForUserAsync(int userId)
+        {
+            var messages = await _context.Messages
+              .Where(m => m.SenderId == userId || m.ReceiverId == userId)
+              .OrderByDescending(m => m.SentAt)
+              .ToListAsync();
+
+            var latestChats = messages
+              .GroupBy(m => m.SenderId == userId ? m.ReceiverId : m.SenderId)
+              .Select(g => g.Take(1).First())
+              .OrderByDescending(m => m.SentAt);
+            
+            return latestChats;
+        }
+    }
 }

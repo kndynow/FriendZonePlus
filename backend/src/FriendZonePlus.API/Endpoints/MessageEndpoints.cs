@@ -14,6 +14,7 @@ namespace FriendZonePlus.API.Endpoints
 
             group.MapPost("send", SendMessage);
             group.MapGet("conversation/{receiverId:int}", GetMessagesBetweenUsers);
+            group.MapGet("latest", GetLatestChats);
         }
 
         private static async Task<IResult> SendMessage(
@@ -72,6 +73,35 @@ namespace FriendZonePlus.API.Endpoints
             catch (Exception)
             {
                 return Results.BadRequest(new { message = "Unable to send message." });
+            }
+        }
+        private static async Task<IResult> GetLatestChats(
+         IMessageService messageService,
+         ClaimsPrincipal user)
+        {
+            try
+            {
+                // JWT version (enable later)
+                // var senderIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                // if (string.IsNullOrEmpty(senderIdClaim) || !int.TryParse(senderIdClaim, out int senderId))
+                // {
+                //     return Results.Unauthorized();
+                // }
+
+                // Temporary until JWT is in place
+                var senderId = 5;
+
+                var response = await messageService.GetLatestChatsAsync(senderId);
+
+                return Results.Ok(response);
+            }
+            catch (ArgumentException ex)
+            {
+                return Results.BadRequest(new { message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return Results.BadRequest(new { message = "Unable to retrieve latest chats." });
             }
         }
     }

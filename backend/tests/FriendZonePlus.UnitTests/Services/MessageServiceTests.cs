@@ -247,4 +247,27 @@ public class MessageServiceTests
         // Checks that the exception contains the correct error message
         Assert.Contains(ex.Errors, e => e.PropertyName == nameof(dto.Content));
     }
+
+    [Fact]
+    public async Task GetLatestChatsAsync_ShouldReturnMappedDtos()
+    {
+        // Arrange
+        var userId = 1;
+        var messages = new List<Message>
+    {
+        new Message { Id = 1, SenderId = userId, ReceiverId = 2, Content = "Hi", SentAt = DateTime.UtcNow, IsRead = false },
+        new Message { Id = 2, SenderId = 3, ReceiverId = userId, Content = "Hello", SentAt = DateTime.UtcNow, IsRead = false }
+    };
+
+        _messageRepoMock.Setup(r => r.GetLatestMessagesForUserAsync(userId))
+                        .ReturnsAsync(messages);
+
+        // Act
+        var result = await _messageService.GetLatestChatsAsync(userId);
+
+        // Assert
+        Assert.Equal(2, result.Count());
+        Assert.Contains(result, m => m.Id == 1 && m.Content == "Hi");
+        Assert.Contains(result, m => m.Id == 2 && m.Content == "Hello");
+    }
 }

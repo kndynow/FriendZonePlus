@@ -72,15 +72,29 @@ namespace FriendZonePlus.Application.Services.Messages
             var responseDtos = messages
               .OrderBy(m => m.SentAt) 
               .Select(m => new MessageResponseDto(
-                  Id: m.Id,
-                  SenderId: m.SenderId,
-                  ReceiverId: m.ReceiverId,
-                  Content: m.Content,
-                  SentAt: m.SentAt,
-                  IsRead: m.IsRead
+                  m.Id,
+                  m.SenderId,
+                  m.ReceiverId,
+                  m.Content,
+                  m.SentAt,
+                  m.IsRead
                ));
 
             return responseDtos;
+        }
+
+        public async Task<IEnumerable<MessageResponseDto>> GetLatestChatsAsync(int userId)
+        {
+            var messages = await _messageRepository.GetLatestMessagesForUserAsync(userId);
+
+            return messages.Select(m => new MessageResponseDto(
+                m.Id,
+                m.SenderId,
+                m.ReceiverId,
+                m.Content,
+                m.SentAt,
+                m.IsRead
+            ));
         }
     }
 }

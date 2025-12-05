@@ -9,5 +9,7 @@ namespace FriendZonePlus.Core.Interfaces
     {
         Task<Message> AddMessageAsync(Message message);
         Task<IEnumerable<Message>> GetMessagesBetweenUsersAsync(int senderId, int receiverId);
+        Task<IEnumerable<Message>> GetLatestMessagesForUserAsync(int userId);
+
     }
 }
