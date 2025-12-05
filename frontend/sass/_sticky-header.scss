@@ -8,18 +8,3 @@
   border-bottom-left-radius: 20px;
   z-index: 100;
 }
-
-.back-button {
-  font-size: 22px;
-  color: rgb(0, 0, 0);
-  background-color: transparent;
-  border: none;
-  padding: 0;
-}
-
-.back-button:focus,
-.back-button:focus-visible,
-.back-button:active {
-  outline: none;
-  box-shadow: none;
-}

@@ -7,7 +7,7 @@ export default function BackButton() {
     navigate(-1);
   };
   return (
-    <button onClick={handleClick} aria-label="Go back" className="back-button">
+    <button onClick={handleClick} aria-label="Go back" className="f-button">
       <i className="bi bi-arrow-left-circle" />
     </button>
   );

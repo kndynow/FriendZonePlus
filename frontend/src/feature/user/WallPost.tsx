@@ -22,7 +22,7 @@ export default function WallPost({
 }: WallPostProps) {
   return (
     <>
-      <Row className="f-border f-shadow py-3 m-1 my-4 semi-transparent-bg">
+      <Row className="f-border f-shadow py-2 pb-3 m-1 my-4 semi-transparent-bg">
         <Col>
           <div>
             <UserPreview
