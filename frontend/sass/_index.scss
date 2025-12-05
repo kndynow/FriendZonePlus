@@ -34,6 +34,22 @@
     z-index: -100;
 }
 
-.semi-transparent-bg {
-  background-color: #ffffff60;
+.message {
+  max-width: 80%;
+  padding: 10px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.message.other {
+  align-self: flex-start;
+  background: #e8d9ff;
+  border-bottom-left-radius: 0px;
+}
+
+.message.me {
+  align-self: flex-end;
+  background: #cfe8ff;
+  border-bottom-right-radius: 0px;
 }

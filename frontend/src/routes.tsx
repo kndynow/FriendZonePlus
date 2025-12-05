@@ -5,7 +5,8 @@ import NotFoundPage from "./pages/NotFoundPage";
 import UserPage from "./pages/UserPage";
 import SettingsPage from "./pages/SettingsPage";
 import FindFriendsPage from "./pages/FindFriendsPage";
-import MessagesPage from "./pages/MessagesPage";
+import MessagesPage from "./feature/messages/MessagesPage";
+import PrivateChat from "./feature/messages/PrivateChat";
 
 const routes: RouteObject[] = [
   {
@@ -42,6 +43,11 @@ const routes: RouteObject[] = [
     path: "messages",
     element: <MessagesPage />,
     handle: { title: "Messages" },
+  },
+  {
+    path: "messages/:id",
+    element: <PrivateChat />,
+    handle: { type: "user" },
   },
 ];
 
