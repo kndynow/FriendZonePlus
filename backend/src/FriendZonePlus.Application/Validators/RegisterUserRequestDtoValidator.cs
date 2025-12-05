@@ -1,8 +1,8 @@
-﻿using FriendZonePlus.API.DTOs;
+using FriendZonePlus.Application.DTOs;
 using FluentValidation;
 using FriendZonePlus.Core.Interfaces;
 
-namespace FriendZonePlus.API.Validators
+namespace FriendZonePlus.Application.Validators
 {
     public class RegisterUserRequestDtoValidator : AbstractValidator<RegisterUserRequestDto>
     {
@@ -43,3 +43,4 @@ namespace FriendZonePlus.API.Validators
         }
     }
 }
+

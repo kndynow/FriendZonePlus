@@ -1,10 +1,10 @@
 using FluentValidation;
 using FriendZonePlus.API.Endpoints;
 using FriendZonePlus.API.Mappings;
-using FriendZonePlus.API.Validators;
+using FriendZonePlus.Application.Validators;
 using FriendZonePlus.Application.Helpers.PasswordHelpers;
 using FriendZonePlus.Application.Services;
-using FriendZonePlus.API.DTOs;
+using FriendZonePlus.Application.DTOs;
 using FriendZonePlus.Core.Interfaces;
 using FriendZonePlus.Infrastructure.Data;
 using FriendZonePlus.Infrastructure.Repositories;

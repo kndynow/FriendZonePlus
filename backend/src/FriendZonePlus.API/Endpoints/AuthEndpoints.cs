@@ -1,5 +1,5 @@
 using FluentValidation;
-using FriendZonePlus.API.DTOs;
+using FriendZonePlus.Application.DTOs;
 using FriendZonePlus.Application.Helpers.ValidationHelpers;
 using FriendZonePlus.Core.Entities;
 using FriendZonePlus.Application.Services.Authentication;

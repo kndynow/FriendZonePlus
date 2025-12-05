@@ -1,5 +1,5 @@
 using Mapster;
-using FriendZonePlus.API.DTOs;
+using FriendZonePlus.Application.DTOs;
 using FriendZonePlus.Core.Entities;
 
 namespace FriendZonePlus.API.Mappings;

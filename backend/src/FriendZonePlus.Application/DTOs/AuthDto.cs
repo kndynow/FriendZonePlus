@@ -1,4 +1,4 @@
-namespace FriendZonePlus.API.DTOs;
+namespace FriendZonePlus.Application.DTOs;
 
 public record RegisterUserRequestDto(
     string Username,
@@ -24,3 +24,4 @@ public record LoginResponseDto(
     int UserId,
     string Username
 );
+
