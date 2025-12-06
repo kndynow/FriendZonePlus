@@ -24,14 +24,14 @@ namespace FriendZonePlus.API.Endpoints
         {
             try
             {
-                //var senderIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                //if (string.IsNullOrEmpty(senderIdClaim) || !int.TryParse(senderIdClaim, out int senderId))
-                //{
-                //    return Results.Unauthorized();
-                //}
+                var senderIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(senderIdClaim) || !int.TryParse(senderIdClaim, out int senderId))
+                {
+                    return Results.Unauthorized();
+                }
 
                 // Temporary until JWT is in place
-                var senderId = 2;
+                //var senderId = 2;
 
                 var response = await messageService.SendMessageAsync(senderId, requestDto);
 
@@ -51,15 +51,14 @@ namespace FriendZonePlus.API.Endpoints
         {
             try
             {
-                //var senderIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                //if (string.IsNullOrEmpty(senderIdClaim) || !int.TryParse(senderIdClaim, out int senderId))
-                //{
-                //    return Results.Unauthorized();
-                //}
+                var senderIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(senderIdClaim) || !int.TryParse(senderIdClaim, out int senderId))
+                {
+                    return Results.Unauthorized();
+                }
 
                 // Temporary until JWT is in place
-
-                var senderId = 1;
+                //var senderId = 1;
 
                 var response = await messageService.GetMessagesBetweenUsersAsync(senderId, receiverId);
 
@@ -81,15 +80,14 @@ namespace FriendZonePlus.API.Endpoints
         {
             try
             {
-                // JWT version (enable later)
-                // var senderIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                // if (string.IsNullOrEmpty(senderIdClaim) || !int.TryParse(senderIdClaim, out int senderId))
-                // {
-                //     return Results.Unauthorized();
-                // }
+                 var senderIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(senderIdClaim) || !int.TryParse(senderIdClaim, out int senderId))
+                {
+                    return Results.Unauthorized();
+                }
 
                 // Temporary until JWT is in place
-                var senderId = 5;
+                //var senderId = 5;
 
                 var response = await messageService.GetLatestChatsAsync(senderId);
 
