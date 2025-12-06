@@ -20,7 +20,7 @@ export default function LoginPage() {
 
     try {
       setSubmitting(true);
-      const result = await login({
+      await login({
         usernameOrEmail: form.usernameOrEmail,
         password: form.password,
       });

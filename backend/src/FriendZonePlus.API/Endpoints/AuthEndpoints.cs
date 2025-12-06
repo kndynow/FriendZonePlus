@@ -40,11 +40,7 @@ public static class AuthEndpoints
 
             return TypedResults.Ok(new
             {
-                response.UserId,
-                response.Username,
-                response.Email,
-                response.FirstName,
-                response.LastName
+                response
             });
         }).AddEndpointFilter<ValidationFilter<LoginRequest>>();
 

@@ -37,17 +37,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Fetches the user from localstorage
+  // Bootstrap: load cached user for instant UI, then validate with server (/api/auth/me)
   useEffect(() => {
-    const storedUser = localStorage.getItem(USER_KEY);
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch {
-        localStorage.removeItem(USER_KEY);
+    let mounted = true;
+
+    const bootstrap = async () => {
+      setLoading(true);
+
+      // quick local cache for instant UI
+      const storedUser = localStorage.getItem(USER_KEY);
+      if (storedUser) {
+        try {
+          if (mounted) setUser(JSON.parse(storedUser));
+        } catch {
+          localStorage.removeItem(USER_KEY);
+        }
       }
-    }
-    setLoading(false);
+
+      // validate cookie/session with backend
+      try {
+        const res = await fetch("/api/auth/me", { credentials: "include" });
+        if (res.ok) {
+          // session valid (do nothing)
+        } else {
+          // invalid session -> clear and redirect
+          persistUser(null);
+        }
+      } catch {
+        // network error: keep cached user for UX
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    bootstrap();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const persistUser = (u: User | null) => {
@@ -64,7 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true);
 
-      const response = await fetch("api/auth/login", {
+      const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -72,19 +99,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       const result = await response.json();
+      console.log(result);
 
       if (!response.ok) {
         throw result;
       } else {
-        if (result?.userId && result?.username) {
-          persistUser({
-            id: result.userId,
-            username: result.username,
-            email: result.email ?? "",
-            firstName: result.firstName ?? "",
-            lastName: result.lastName ?? "",
-          });
-        }
+        //Set user
+        persistUser({
+          id: result.userId,
+          username: result.username,
+          email: result.email ?? "",
+          firstName: result.firstName ?? "",
+          lastName: result.lastName ?? "",
+        });
       }
       return result as AuthResponse;
     } finally {
@@ -108,7 +135,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const register = async (data: RegisterRequest) => {
     try {
       setLoading(true);
-
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -121,7 +147,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!response.ok) {
         throw result;
       }
-
       return result;
     } finally {
       setLoading(false);
@@ -130,7 +155,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   //Return context provider
   return (
-    <AuthContext.Provider value={{ user, register, login, loading }}>
+    <AuthContext.Provider value={{ user, register, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
