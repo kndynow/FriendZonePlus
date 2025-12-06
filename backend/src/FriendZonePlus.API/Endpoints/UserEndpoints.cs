@@ -15,7 +15,7 @@ public static class UserEndpoints
     group.MapGet("/{id}", GetUserById);
     group.MapDelete("/{id}", DeleteUser);
   }
-  
+
   //GET BY ID
   private static async Task<Results<Ok<object>, NotFound>> GetUserById(
         int id,

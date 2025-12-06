@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace FriendZonePlus.API.DTOs;
+namespace FriendZonePlus.Application.DTOs;
 
 public record FollowUserRequestDto(
     [Required, Range(1, int.MaxValue, ErrorMessage = "Follower Id must be greater than 0") ]
@@ -29,3 +29,4 @@ public record UserListResponseDto(
     string Username,
     string Email
 );
+
