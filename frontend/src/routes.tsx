@@ -1,4 +1,5 @@
 import type { RouteObject } from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import RegisterPage from "./pages/RegisterPage";
 import NotFoundPage from "./pages/NotFoundPage";
@@ -8,6 +9,11 @@ import FindFriendsPage from "./pages/FindFriendsPage";
 import MessagesPage from "./pages/MessagesPage";
 
 const routes: RouteObject[] = [
+  {
+    index: true,
+    element: <LoginPage />,
+    handle: { title: "Login" },
+  },
   {
     index: true,
     element: <HomePage />,
