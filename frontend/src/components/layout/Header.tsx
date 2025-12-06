@@ -17,7 +17,7 @@ export default function Header() {
 
   if (isUserHeader) {
     return (
-      <Row className="top-nav f-shadow align-items-center">
+      <Row className="top-nav f-shadow align-items-center semi-transparent-bg">
         <Col xs="auto">
           <BackButton />
         </Col>
@@ -30,7 +30,7 @@ export default function Header() {
   }
   return (
     <>
-      <Row className="top-nav f-shadow align-items-center">
+      <Row className="top-nav f-shadow align-items-center semi-transparent-bg">
         <Col xs="auto">
           <BackButton />
         </Col>
