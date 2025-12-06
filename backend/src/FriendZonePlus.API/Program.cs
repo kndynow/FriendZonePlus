@@ -7,7 +7,6 @@ using FriendZonePlus.Application.DTOs;
 using FriendZonePlus.Application.Helpers.PasswordHelpers;
 using FriendZonePlus.Application.Services;
 using FriendZonePlus.Application.Services.Messages;
-using FriendZonePlus.Application.Validators;
 using FriendZonePlus.Core.Interfaces;
 using FriendZonePlus.Infrastructure.Data;
 using FriendZonePlus.Infrastructure.Repositories;
@@ -15,13 +14,11 @@ using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
-using System.Reflection;
 using FriendZonePlus.Application.Services.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json;
-using FriendZonePlus.Application.Helpers;
 using FriendZonePlus.Infrastructure.Authentication;
 using FriendZonePlus.Application.Interfaces;
 using FriendZonePlus.API.Infrastructure;
@@ -51,6 +48,7 @@ builder.Services.AddDbContext<FriendZonePlusContext>(options => options.UseSqlit
 // JWT Configuration
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
 builder.Services.AddSingleton<IJwtGenerator, JwtTokenGenerator>();
+builder.Services.AddSingleton<ITokenValidator, TokenValidator>();
 
 // JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
