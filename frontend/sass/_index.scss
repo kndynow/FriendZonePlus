@@ -3,7 +3,7 @@
 @use "sticky-header";
 @use "sticky-footer";
 
-.layout-wrapper {
+.layout-wrapper { 
   height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -12,13 +12,17 @@
 
 .page-content {
   width: 100%;
-  padding-top: 100px;
-  padding-bottom: 90px;
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  overflow: scroll;
+  margin-top: 85px;
+  margin-bottom: 80px;
 }
 
 .profile-img {
-  width: 50px;
-  height: 50px;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
 }
 
@@ -34,8 +38,18 @@
     z-index: -100;
 }
 
+.message-wrapper {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.message-wrapper.me {
+  justify-content: flex-end;
+}
+
 .message {
-  max-width: 80%;
+  max-width: 75%;
   padding: 10px;
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -43,13 +57,26 @@
 }
 
 .message.other {
-  align-self: flex-start;
   background: #e8d9ff;
   border-bottom-left-radius: 0px;
 }
 
 .message.me {
-  align-self: flex-end;
   background: #cfe8ff;
   border-bottom-right-radius: 0px;
+}
+
+.chat-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }

@@ -7,13 +7,32 @@ export default function PrivateChat() {
     {
       id: 1,
       from: "other",
-      content:
-        "Lorem ipsum dolor sit amet.gergerggggggggg gggggggggggggggggggggggggggggggggggggggg ggggggggggggggggggggergerg..",
+      content: "Hej! Vad gör du? 😊",
     },
-    { id: 2, from: "me", content: "Ja" },
-    { id: 3, from: "other", content: "Lorem ipsum dolor sit amet..." },
-    { id: 4, from: "me", content: "Jo" },
-    { id: 5, from: "other", content: "Lorem ipsum dolor sit amet..." },
+    {
+      id: 2,
+      from: "me",
+      content:
+        "Inte så mycket, ligger i soffan och försöker bestämma om jag ska laga mat eller beställa något. Du då?",
+    },
+    {
+      id: 3,
+      from: "other",
+      content:
+        "Haha samma här! Har stirrat in i kylen tre gånger och hoppas att något magiskt ska dyka upp men nope 😂",
+    },
+    {
+      id: 4,
+      from: "me",
+      content:
+        "Känner igen det där. Jag har typ bara pasta, lite ost och… ett halvt paket körsbärstomater som börjar se tveksamma ut 🫠",
+    },
+    {
+      id: 5,
+      from: "other",
+      content:
+        "Det låter ändå som mer än vad jag har. Jag har bara yoghurt och en gammal paprika som jag inte riktigt vågar titta på längre 😭",
+    },
   ]);
 
   const [input, setInput] = useState("");
