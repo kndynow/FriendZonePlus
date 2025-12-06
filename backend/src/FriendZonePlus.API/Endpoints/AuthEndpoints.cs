@@ -1,56 +1,26 @@
-using FluentValidation;
 using FriendZonePlus.Application.DTOs;
-using FriendZonePlus.Application.Helpers.ValidationHelpers;
-using FriendZonePlus.Application.Services;
-using FriendZonePlus.Core.Entities;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
-using FluentValidation.Results;
+using FriendZonePlus.Application.Services.Authentication;
+using FriendZonePlus.API.Filters;
 
 public static class AuthEndpoints
 {
-  public static void MapAuthEndpoints(this IEndpointRouteBuilder app)
-  {
-    var group = app.MapGroup("/api/Auth")
-                    .WithTags("Authorization");
-
-        group.MapPost("/register", RegisterUser);
-    }
-
-    private static async Task<IResult> RegisterUser(
-        IAuthorizationService authorizationService,
-        IValidator<RegisterUserRequestDto> validator,
-        RegisterUserRequestDto requestDto)
+    public static void MapAuthEndpoints(this IEndpointRouteBuilder app)
     {
-        var validationResult = await validator.ValidateAsync(requestDto);
+        var group = app.MapGroup("/api/Auth")
+                        .WithTags("Authorization");
 
-        if (!validationResult.IsValid)
-        {
-            var errors = ValidationHelper.ToCamelCaseErrors(validationResult.Errors);
-            return Results.BadRequest(new { errors });
-        }
 
-        try
-        {
-            var user = new User
+        group.MapPost("/register", async (RegisterRequest request, IAuthenticationService authService) =>
             {
-                Username = requestDto.Username,
-                Email = requestDto.Email,
-                FirstName = requestDto.FirstName,
-                LastName = requestDto.LastName,
-                PasswordHash = requestDto.Password,
-                CreatedAt = DateTime.UtcNow
-            };
+                var response = await authService.RegisterAsync(request);
+                return TypedResults.Created($"/api/Auth/{response.UserId}", response);
+            }).AddEndpointFilter<ValidationFilter<RegisterRequest>>();
 
-            var result = await authorizationService.CreateUserAsync(user);
-
-            return Results.Created($"/api/Auth/{result.Id}", result);
-        }
-
-        catch (Exception)
+        group.MapPost("/login", async (LoginRequest request, IAuthenticationService
+        authenticationService) =>
         {
-            return Results.BadRequest(new { message = "Unable to create account." });
-        }
-     }
-  }
+            var response = await authenticationService.LoginAsync(request);
+            return TypedResults.Ok(response);
+        }).AddEndpointFilter<ValidationFilter<LoginRequest>>();
+    }
+}

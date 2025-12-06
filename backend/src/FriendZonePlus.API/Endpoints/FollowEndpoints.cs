@@ -1,5 +1,5 @@
 using System;
-using FriendZonePlus.API.DTOs;
+using FriendZonePlus.Application.DTOs;
 using FriendZonePlus.Application.Services;
 using Mapster;
 using Microsoft.AspNetCore.Http.HttpResults;

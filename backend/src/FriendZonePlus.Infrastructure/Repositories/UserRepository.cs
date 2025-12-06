@@ -49,4 +49,22 @@ public class UserRepository : IUserRepository
     return await _context.Users.AnyAsync(u => u.Email == email);
   }
 
+  public async Task<bool> ExistsByIdAsync(int id)
+  {
+    return await _context.Users.AnyAsync(u => u.Id == id);
+  }
+  public async Task<User?> GetByUsernameAsync(string username)
+  {
+    return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+  }
+
+  public async Task<User?> GetByEmailAsync(string email)
+  {
+    return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+  }
+
+  public async Task<User?> GetByUsernameOrEmailAsync(string usernameOrEmail)
+  {
+    return await _context.Users.FirstOrDefaultAsync(u => u.Username == usernameOrEmail || u.Email == usernameOrEmail);
+  }
 }

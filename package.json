@@ -3,9 +3,9 @@
     "version": "1.0.0",
     "private": true,
     "scripts": {
-        "start": "concurrently -n \"FRONTEND,BACKEND,WAIT\" -c \"blue,green,yellow\" -k \"npm run dev --prefix frontend\" \"npm run backend\"",
+        "start": "concurrently -k \"npm run frontend\" \"npm run backend\"",
         "dev": "npm start",
-        "frontend": "npm run dev --prefix frontend",
+        "frontend": "cd frontend && npm run dev",
         "backend": "dotnet watch --project backend/src/FriendZonePlus.API/FriendZonePlus.API.csproj",
         "save": "node scripts/save-seed.js"
     },

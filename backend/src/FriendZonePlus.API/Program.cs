@@ -1,9 +1,12 @@
-using System.Reflection;
 using FluentValidation;
 using FriendZonePlus.API.Endpoints;
+using FriendZonePlus.API.Hubs;
 using FriendZonePlus.API.Mappings;
+using FriendZonePlus.Application.Validators;
+using FriendZonePlus.Application.DTOs;
 using FriendZonePlus.Application.Helpers.PasswordHelpers;
 using FriendZonePlus.Application.Services;
+using FriendZonePlus.Application.Services.Messages;
 using FriendZonePlus.Application.Validators;
 using FriendZonePlus.Core.Interfaces;
 using FriendZonePlus.Infrastructure.Data;
@@ -12,6 +15,16 @@ using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using System.Reflection;
+using FriendZonePlus.Application.Services.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.Text.Json;
+using FriendZonePlus.Application.Helpers;
+using FriendZonePlus.Infrastructure.Authentication;
+using FriendZonePlus.Application.Interfaces;
+using FriendZonePlus.API.Infrastructure;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,26 +32,71 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddOpenApi();
 
+// Configure JSON serialization to use camelCase
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+});
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=friendzoneplus.db";
+
+// Exception handling
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 //Config for EF Core with SQLite
 builder.Services.AddDbContext<FriendZonePlusContext>(options => options.UseSqlite(connectionString));
+
+// JWT Configuration
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
+builder.Services.AddSingleton<IJwtGenerator, JwtTokenGenerator>();
+
+// JWT Authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        var jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>();
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings?.Issuer,
+            ValidAudience = jwtSettings?.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwtSettings?.SecretKey ?? throw new InvalidOperationException("JWT SecretKey is not configured"))
+            )
+        };
+    });
+
+builder.Services.AddAuthorization();
+
 
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IWallPostRepository, WallPostRepository>();
 builder.Services.AddScoped<IFollowRepository, FollowRepository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+
 // Services
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<WallPostService>();
-builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<FollowService>();
-builder.Services.AddScoped<IFollowValidator, FollowValidator>();
+builder.Services.AddScoped<IMessageService, MessageService>();
+
 // Helper
 builder.Services.AddScoped<IPasswordHelper, PasswordHelper>();
 //Validator
-builder.Services.AddScoped<IValidator<RegisterUserRequestDto>, RegisterUserRequestDtoValidator>();
+builder.Services.AddScoped<IFollowValidator, FollowValidator>();
+builder.Services.AddScoped<IValidator<RegisterRequest>, RegisterRequestValidator>();
+builder.Services.AddScoped<IValidator<SendMessageRequestDto>, SendMessageRequestDtoValidator>();
 
+//SignalR
+builder.Services.AddSignalR();
 
 //Mapster Configuration
 var config = TypeAdapterConfig.GlobalSettings;
@@ -56,14 +114,19 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
-// app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
+app.UseExceptionHandler();
 
-// app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapAuthEndpoints();
 app.MapWallPostEndpoints();
 app.MapFollowEndpoints();
 app.MapUserEndpoints();
+app.MapMessageEndpoints();
+
+app.MapHub<MessageHub>("/hubs/message");
 
 // Create or update database on every run
 using (var scope = app.Services.CreateScope())

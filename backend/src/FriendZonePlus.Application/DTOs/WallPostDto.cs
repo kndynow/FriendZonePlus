@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace FriendZonePlus.API.DTOs;
+namespace FriendZonePlus.Application.DTOs;
 
 public record CreateWallPostDto(
     [Required]
@@ -24,3 +24,4 @@ public record UpdateWallPostDto(
     string Content,
     int AuthorId
     );
+
