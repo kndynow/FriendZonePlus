@@ -99,7 +99,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       const result = await response.json();
-      console.log(result);
 
       if (!response.ok) {
         throw result;
