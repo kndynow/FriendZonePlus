@@ -43,7 +43,7 @@ public class AuthenticationService : IAuthenticationService
         return new AuthResponse(token, user.Id, user.Username);
     }
 
-    public async Task<AuthResponse> LoginAsync(LoginRequest request)
+    public async Task<LoginResponse> LoginAsync(LoginRequest request)
     {
         var user = await _userRepository.GetByUsernameOrEmailAsync(request.UsernameOrEmail);
 
@@ -58,6 +58,6 @@ public class AuthenticationService : IAuthenticationService
 
         var token = _jwtGenerator.GenerateToken(user);
 
-        return new AuthResponse(token, user.Id, user.Username);
+        return new LoginResponse(token, user.Id, user.Username, user.Email, user.FirstName, user.LastName);
     }
 }
