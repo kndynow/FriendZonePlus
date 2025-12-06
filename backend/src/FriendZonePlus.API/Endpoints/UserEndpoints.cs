@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using FriendZonePlus.Application.DTOs;
+using FriendZonePlus.Application.Interfaces;
 using FriendZonePlus.Application.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -9,42 +11,56 @@ public static class UserEndpoints
 {
   public static void MapUserEndpoints(this IEndpointRouteBuilder app)
   {
-    var group = app.MapGroup("/api/Users")
+    var group = app.MapGroup("/api/users")
                     .WithTags("Users");
 
-    group.MapGet("/{id}", GetUserById);
-    group.MapDelete("/{id}", DeleteUser);
-  }
-
-  //GET BY ID
-  private static async Task<Results<Ok<object>, NotFound>> GetUserById(
-        int id,
-        UserService userService)
-  {
-    var user = await userService.GetUserByIdAsync(id);
-
-    if (user is null)
+    //Get user profile
+    group.MapGet("/{id}", async (int id, IUserService userservice) =>
     {
-      return TypedResults.NotFound();
-    }
+      var userProfile = await userservice.GetUserProfileAsync(id);
 
-    return TypedResults.Ok<object>(new { user.Id, user.Username, user.Email });
-  }
+      return TypedResults.Ok(userProfile);
+    });
 
-  //TODO: GET ALL USERS
-
-  //TODO:PATCH
-
-  //DELETE
-  private static async Task<Results<NoContent, NotFound>> DeleteUser(int id, UserService userService)
-  {
-    var success = await userService.DeleteUserAsync(id);
-
-    if (!success)
+    //Update user profile
+    group.MapPut("/me", async (UpdateUserDto dto, ClaimsPrincipal user, IUserService userService) =>
     {
-      return TypedResults.NotFound();
-    }
+      var currentUserId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
-    return TypedResults.NoContent();
+      await userService.UpdateUserProfileAsync(currentUserId, dto);
+
+      return TypedResults.Ok(new { message = "User profile updated successfully" });
+    });
+
+    //Delete user
+    group.MapDelete("/me", async (ClaimsPrincipal user, IUserService userService) =>
+    {
+      var currentUserId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+      await userService.DeleteUserAsync(currentUserId);
+
+      return TypedResults.NoContent();
+    });
+
+    //Follow user
+    group.MapPost("/{id}/follow", async (int id, ClaimsPrincipal user, IUserService userService) =>
+    {
+      var currentUserId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+      await userService.FollowUserAsync(currentUserId, id);
+
+      return TypedResults.Ok(new { message = "User followed successfully" });
+    });
+
+    //Unfollow user
+    group.MapDelete("/{id}/unfollow", async (int id, ClaimsPrincipal user, IUserService userService) =>
+    {
+      var currentUserId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+      await userService.UnfollowUserAsync(currentUserId, id);
+
+      return TypedResults.Ok(new { message = "User unfollowed successfully" });
+    });
   }
+
 }

@@ -1,5 +1,5 @@
 using FriendZonePlus.Core.Entities;
-using FriendZonePlus.Core.Interfaces;
+using FriendZonePlus.Application.Interfaces;
 using FriendZonePlus.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,23 +14,16 @@ public class UserRepository : IUserRepository
     _context = context;
   }
 
-  public async Task<User> AddAsync(User user)
+  public async Task AddAsync(User user)
   {
     _context.Users.Add(user);
-
     await _context.SaveChangesAsync();
-
-    return user;
   }
 
-
-  public async Task<User?> GetByIdAsync(int id)
+  public async Task UpdateAsync(User user)
   {
-    return await _context.Users.FindAsync(id);
-  }
-  public async Task<IEnumerable<User>> GetByIdsAsync(IEnumerable<int> ids)
-  {
-    return await _context.Users.Where(u => ids.Contains(u.Id)).ToListAsync();
+    _context.Users.Update(user);
+    await _context.SaveChangesAsync();
   }
 
   public async Task DeleteAsync(User user)
@@ -39,20 +32,11 @@ public class UserRepository : IUserRepository
     await _context.SaveChangesAsync();
   }
 
-  public async Task<bool> ExistsByUsernameAsync(string username)
+  public async Task<User?> GetByIdAsync(int id)
   {
-    return await _context.Users.AnyAsync(u => u.Username == username);
+    return await _context.Users.FindAsync(id);
   }
 
-  public async Task<bool> ExistsByEmailAsync(string email)
-  {
-    return await _context.Users.AnyAsync(u => u.Email == email);
-  }
-
-  public async Task<bool> ExistsByIdAsync(int id)
-  {
-    return await _context.Users.AnyAsync(u => u.Id == id);
-  }
   public async Task<User?> GetByUsernameAsync(string username)
   {
     return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
@@ -67,4 +51,35 @@ public class UserRepository : IUserRepository
   {
     return await _context.Users.FirstOrDefaultAsync(u => u.Username == usernameOrEmail || u.Email == usernameOrEmail);
   }
+
+  public async Task<User?> GetByIdWithRelationsAsync(int id)
+  {
+    return await _context.Users.Include(u => u.Followers)
+      .Include(u => u.Following)
+      .FirstOrDefaultAsync(u => u.Id == id);
+  }
+
+  public async Task<bool> IsFollowingAsync(int followerId, int followedUserId)
+  {
+    return await _context.Follows.AnyAsync(f => f.FollowerId == followerId && f.FollowedUserId == followedUserId);
+  }
+
+  public async Task FollowUserAsync(int followerId, int followedUserId)
+  {
+    var follow = new Follow { FollowerId = followerId, FollowedUserId = followedUserId };
+    await _context.Follows.AddAsync(follow);
+    await _context.SaveChangesAsync();
+  }
+
+  public async Task UnfollowUserAsync(int followerId, int followedUserId)
+  {
+    var follow = await _context.Follows.FirstOrDefaultAsync(f => f.FollowerId == followerId && f.FollowedUserId == followedUserId);
+
+    if (follow != null)
+    {
+      _context.Follows.Remove(follow);
+      await _context.SaveChangesAsync();
+    }
+  }
+
 }
