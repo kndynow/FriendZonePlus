@@ -30,7 +30,7 @@ public static class AuthEndpoints
             httpContext.Response.Cookies.Append("auth", response.Token, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true, // Must be true in prod
+                Secure = false, // MUST BE TRUE IN PRODUCTION
                 SameSite = SameSiteMode.Strict,
                 Expires = DateTime.UtcNow.AddMinutes(jwtSettings.TokenExpirationMinutes)
             });
@@ -38,7 +38,10 @@ public static class AuthEndpoints
             return TypedResults.Ok(new
             {
                 response.UserId,
-                response.Username
+                response.Username,
+                response.Email,
+                response.FirstName,
+                response.LastName
             });
         }).AddEndpointFilter<ValidationFilter<LoginRequest>>();
 

@@ -8,6 +8,7 @@ export default function LoginPage() {
   const [form, setForm] = useState({ usernameOrEmail: "", password: "" });
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   function setProperty(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
@@ -19,7 +20,10 @@ export default function LoginPage() {
 
     try {
       setSubmitting(true);
-      // const result = await login(form.usernameOrEmail, form.password);
+      const result = await login({
+        usernameOrEmail: form.usernameOrEmail,
+        password: form.password,
+      });
       toast.success("Log in successful!");
       navigate("/");
     } catch (err: any) {

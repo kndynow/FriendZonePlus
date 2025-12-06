@@ -29,7 +29,10 @@ public record RegisterResponse(
 public record LoginResponse(
     string Token,
     int UserId,
-    string Username
+    string Username,
+    string Email,
+    string FirstName,
+    string LastName
 );
 
 

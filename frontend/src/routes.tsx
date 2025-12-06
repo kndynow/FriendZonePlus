@@ -11,13 +11,13 @@ import MessagesPage from "./pages/MessagesPage";
 const routes: RouteObject[] = [
   {
     index: true,
-    element: <LoginPage />,
-    handle: { title: "Login" },
-  },
-  {
-    index: true,
     element: <HomePage />,
     handle: { title: "Home" },
+  },
+  {
+    path: "login",
+    element: <LoginPage />,
+    handle: { title: "Login" },
   },
   {
     path: "register",

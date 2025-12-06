@@ -5,6 +5,10 @@ export interface RegisterRequest {
   firstName: string;
   lastName: string;
 }
+export interface LoginRequest {
+  usernameOrEmail: string;
+  password: string;
+}
 
 export interface AuthResponse {
   token: string;
@@ -15,4 +19,7 @@ export interface AuthResponse {
 export interface User {
   id: string;
   username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
 }
