@@ -1,10 +1,16 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
 
-public class NameIdentifierUserIdProvider : IUserIdProvider
+public class SessionUserIdProvider : IUserIdProvider
 {
     public string GetUserId(HubConnectionContext connection)
     {
-        return connection.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userId = connection.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrWhiteSpace(userId))
+    {
+            return null;
+    }
+        return userId; 
     }
 }

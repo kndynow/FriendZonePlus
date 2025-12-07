@@ -140,6 +140,7 @@ app.UseExceptionHandler();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseCors();
 
 app.MapAuthEndpoints();
 app.MapWallPostEndpoints();
