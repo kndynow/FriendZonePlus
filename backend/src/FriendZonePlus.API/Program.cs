@@ -1,27 +1,28 @@
 using FluentValidation;
 using FriendZonePlus.API.Endpoints;
 using FriendZonePlus.API.Hubs;
+using FriendZonePlus.API.Infrastructure;
 using FriendZonePlus.API.Mappings;
-using FriendZonePlus.Application.Validators;
 using FriendZonePlus.Application.DTOs;
 using FriendZonePlus.Application.Helpers.PasswordHelpers;
+using FriendZonePlus.Application.Interfaces;
 using FriendZonePlus.Application.Services;
+using FriendZonePlus.Application.Services.Authentication;
 using FriendZonePlus.Application.Services.Messages;
+using FriendZonePlus.Application.Validators;
 using FriendZonePlus.Core.Interfaces;
+using FriendZonePlus.Infrastructure.Authentication;
 using FriendZonePlus.Infrastructure.Data;
 using FriendZonePlus.Infrastructure.Repositories;
 using Mapster;
 using MapsterMapper;
-using Microsoft.EntityFrameworkCore;
-using Scalar.AspNetCore;
-using FriendZonePlus.Application.Services.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
 using System.Text;
 using System.Text.Json;
-using FriendZonePlus.Infrastructure.Authentication;
-using FriendZonePlus.Application.Interfaces;
-using FriendZonePlus.API.Infrastructure;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -105,6 +106,7 @@ builder.Services.AddScoped<WallPostService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<FollowService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<IMessageNotifier, SignalRMessageNotifier>();
 
 // Helper
 builder.Services.AddScoped<IPasswordHelper, PasswordHelper>();
@@ -114,6 +116,7 @@ builder.Services.AddScoped<IValidator<RegisterRequest>, RegisterRequestValidator
 builder.Services.AddScoped<IValidator<SendMessageRequestDto>, SendMessageRequestDtoValidator>();
 
 //SignalR
+builder.Services.AddSingleton<IUserIdProvider, SessionUserIdProvider>(); 
 builder.Services.AddSignalR();
 
 //Mapster Configuration
