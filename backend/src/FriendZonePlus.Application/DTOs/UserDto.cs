@@ -22,7 +22,10 @@ public record UserResponseDto(
 public record UserListResponseDto(
     int Id,
     string Username,
-    string Email
+    string Email,
+    string FirstName,
+    string LastName,
+    string ProfilePictureUrl
 );
 
 
