@@ -68,7 +68,7 @@ export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
         </Button>
       </Form>
 
-      <p className="text-center mt-3 px-2">
+      <p className="text-center mt-3">
         No account yet?
         <span className="text-primary px-2" onClick={onSwitchToRegister}>
           Register here!
