@@ -16,7 +16,7 @@ export default function ProtectedLayout() {
   }
 
   if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/welcome" state={{ from: location }} replace />;
   }
 
   return <Outlet />;
