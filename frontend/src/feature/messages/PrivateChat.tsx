@@ -2,42 +2,26 @@ import { useEffect, useRef, useState } from "react";
 import SingleMessage from "./SingleMessage";
 import { Col, Row } from "react-bootstrap";
 import ChatInput from "./ChatInput";
-
-const initialMessages = [
-  { id: 1, from: "other", content: "Hej! Vad gör du? 😊" },
-  {
-    id: 2,
-    from: "me",
-    content:
-      "Inte så mycket, ligger i soffan och försöker bestämma om jag ska laga mat eller beställa något. Du då?",
-  },
-  {
-    id: 3,
-    from: "other",
-    content:
-      "Haha samma här! Har stirrat in i kylen tre gånger och hoppas att något magiskt ska dyka upp men nope 😂",
-  },
-  {
-    id: 4,
-    from: "me",
-    content:
-      "Känner igen det där. Jag har typ bara pasta, lite ost och… ett halvt paket körsbärstomater som börjar se tveksamma ut 🫠",
-  },
-];
+import { useMessages } from "./useMessages";
+import { useAuth } from "../../../context/AuthProvider";
 
 export default function PrivateChat() {
-  const [messages, setMessages] = useState(initialMessages);
+  const { messages, getConversation, setMessages } = useMessages();
+  const { user } = useAuth();
+
   const [input, setInput] = useState("");
+  const receiverId = 1;
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
-  const scrollToBottom = () => {
-    const container = scrollRef.current;
-    if (!container) return;
-    container.scrollTop = container.scrollHeight;
-  };
+  useEffect(() => {
+    scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight);
+  }, [messages]);
 
-  useEffect(scrollToBottom, [messages]);
+  useEffect(() => {
+    if (!user) return;
+    getConversation(receiverId, user.id);
+  }, [user, receiverId]);
 
   const sendMessage = () => {
     if (!input.trim()) return;
@@ -49,6 +33,7 @@ export default function PrivateChat() {
 
     setInput("");
   };
+
   return (
     <>
       <div className="semi-transparent-bg f-border p-3 d-flex flex-column">
