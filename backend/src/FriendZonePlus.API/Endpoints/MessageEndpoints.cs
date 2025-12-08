@@ -71,6 +71,11 @@ namespace FriendZonePlus.API.Endpoints
                 return Results.Ok(response);
             }
 
+            catch (UnauthorizedAccessException)
+            {
+                return Results.Forbid();
+            }
+
             catch (ArgumentException ex)
             {
                 return Results.BadRequest(new { message = ex.Message });

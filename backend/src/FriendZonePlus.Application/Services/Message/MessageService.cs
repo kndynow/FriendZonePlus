@@ -74,9 +74,12 @@ namespace FriendZonePlus.Application.Services.Messages
                 throw new ArgumentException("Receiver does not exist");
 
             if (await _userRepository.GetByIdAsync(senderId) is null)
-                throw new ArgumentException("Cannot retrieve messages for the same user");
+                throw new ArgumentException("Sender does not exist");
 
             var messages = await _messageRepository.GetMessagesBetweenUsersAsync(senderId, receiverId);
+
+            if (!messages.Any())
+                throw new UnauthorizedAccessException("No conversation exists.");
 
             var responseDtos = messages
               .OrderBy(m => m.SentAt)

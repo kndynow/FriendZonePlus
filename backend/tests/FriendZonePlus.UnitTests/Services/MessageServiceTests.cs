@@ -194,7 +194,7 @@ public class MessageServiceTests
         var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
             _messageService.GetMessagesBetweenUsersAsync(senderId, receiverId));
 
-        Assert.Equal("Cannot retrieve messages for the same user", ex.Message);
+        Assert.Equal("Sender does not exist", ex.Message);
         _messageRepoMock.Verify(r => r.GetMessagesBetweenUsersAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Never);
     }
 

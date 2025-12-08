@@ -9,7 +9,6 @@ import type {
   RegisterRequest,
   User,
   LoginRequest,
-  AuthResponse,
 } from "../types/auth.ts";
 
 interface AuthContextType {
@@ -112,7 +111,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           lastName: result.lastName ?? "",
         });
       }
-      return result as AuthResponse;
     } finally {
       setLoading(false);
     }

@@ -27,7 +27,7 @@ const routes: RouteObject[] = [
       {
         path: "settings",
         element: <SettingsPage />,
-        handle: { title: "Settings" },
+        handle: { title: "Settings" }
       },
       {
         path: "findFriends",

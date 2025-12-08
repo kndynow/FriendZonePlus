@@ -2,51 +2,61 @@ import { useEffect, useState } from "react";
 import UserPreview from "../user/UserPreview";
 import { useAuth } from "../../../context/AuthProvider";
 import { Row, Col, Container } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import type { Follower } from "../../../types/followers";
 
 export default function MessagesPage() {
+  const navigate = useNavigate();
   const { user } = useAuth();
-  const [followers, setFollowers] = useState([]);
+  const [followers, setFollowers] = useState<Follower[]>([]);
+
   const [latestMessages, setLatestMessages] = useState<{
-    [key: string]: string;
+    [key: string]: { senderName: string; content: string };
   }>({});
 
-  // Fetch followers
   useEffect(() => {
-    async function fetchFollowers() {
+    async function fetchAll() {
       if (!user) return;
 
       try {
-        const res = await fetch(`/api/users/me/following`);
-        const data = await res.json();
-        console.log(data);
-        setFollowers(data);
-      } catch (error) {
-        console.error("Failed to fetch followers:", error);
-      }
-    }
+        const [followersRes, messagesRes] = await Promise.all([
+          fetch(`/api/users/me/following`),
+          fetch(`/api/Message/latest/`),
+        ]);
 
-    fetchFollowers();
-  }, [user]);
+        if (!followersRes.ok || !messagesRes.ok) {
+          throw new Error("Failed to load");
+        }
 
-  // Fetch latest messages
-  useEffect(() => {
-    async function fetchLatestMessages() {
-      if (!user) return;
+        const followersData = await followersRes.json();
+        const messagesData = await messagesRes.json();
 
-      try {
-        const res = await fetch(`/api/Message/latest/`);
-        const data = await res.json();
-        const messagesMap: { [key: string]: string } = {};
-        data.forEach((msg: any) => {
-          messagesMap[msg.senderId] = msg.message;
+        setFollowers(followersData);
+
+        const messagesMap: any = {};
+        messagesData.forEach((msg: any) => {
+          const otherUserId =
+            msg.senderId === user.id ? msg.receiverId : msg.senderId;
+
+          const sender =
+            msg.senderId === user.id
+              ? "You"
+              : followersData.find((f: any) => f.id === msg.senderId)
+                  ?.firstName || "Unknown";
+
+          messagesMap[otherUserId] = {
+            senderName: sender,
+            content: msg.content,
+          };
         });
+
         setLatestMessages(messagesMap);
       } catch (error) {
-        console.error("Failed to fetch latest messages:", error);
+        console.error("Failed to fetch messages");
       }
     }
 
-    fetchLatestMessages();
+    fetchAll();
   }, [user]);
 
   return (
@@ -58,11 +68,17 @@ export default function MessagesPage() {
             className="f-border f-shadow semi-transparent-bg pt-2 mb-2"
           >
             <Col>
-              <div>
+              <div onClick={() => navigate(`/messages/${follower.id}`)}>
                 <UserPreview
                   fullName={`${follower.firstName} ${follower.lastName}`}
                   imgPath={follower.imgPath}
-                  subtitle={latestMessages[follower.id] || "No messages yet"}
+                  subtitle={
+                    latestMessages[follower.id]
+                      ? `${latestMessages[follower.id].senderName}: ${
+                          latestMessages[follower.id].content
+                        }`
+                      : "No messages yet"
+                  }
                 />
               </div>
             </Col>
