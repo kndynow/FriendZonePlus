@@ -7,7 +7,7 @@ import { useAuth } from "../../../context/AuthProvider";
 import { useParams } from "react-router-dom";
 
 export default function PrivateChat() {
-  const { messages, getConversation, setMessages } = useMessages();
+  const { messages, getConversation, sendMessage } = useMessages();
   const { user } = useAuth();
 
   const [input, setInput] = useState("");
@@ -26,14 +26,10 @@ export default function PrivateChat() {
     getConversation(receiverId, user.id);
   }, [user, receiverId]);
 
-  const sendMessage = () => {
-    if (!input.trim()) return;
+  const handleSend = () => {
+    if (!input.trim() || !user) return;
 
-    setMessages((prev) => [
-      ...prev,
-      { id: Date.now(), from: "me", content: input },
-    ]);
-
+    sendMessage(receiverId, input, user.id);
     setInput("");
   };
 
@@ -56,7 +52,7 @@ export default function PrivateChat() {
             <ChatInput
               input={input}
               setInput={setInput}
-              sendMessage={sendMessage}
+              sendMessage={handleSend}
             />
           </Col>
         </Row>
