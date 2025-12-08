@@ -14,6 +14,15 @@ public static class UserEndpoints
     var group = app.MapGroup("/api/users")
                     .WithTags("Users");
 
+    //Get users
+    group.MapGet("/", async ([FromServices] IUserService userService) =>
+    {
+      var users = await userService.GetAllUsersAsync();
+      return TypedResults.Ok(users);
+    })
+    .WithDescription("Gets a list of all users")
+    .WithSummary("Get users");
+
     //Get user profile
     group.MapGet("/{id}", async (int id, [FromServices] IUserService userservice) =>
     {
@@ -47,6 +56,7 @@ public static class UserEndpoints
     })
     .WithDescription("Deletes the authenticated user's account")
     .WithSummary("Delete user account");
+
 
     //Follow user
     group.MapPost("/{id}/follow", async (int id, ClaimsPrincipal user, [FromServices] IUserService userService) =>

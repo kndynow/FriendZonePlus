@@ -78,4 +78,9 @@ public class UserService : IUserService
     return following.Adapt<List<UserListResponseDto>>();
   }
 
+  public async Task<List<UserProfileDto>> GetAllUsersAsync()
+  {
+    var users = await _userRepository.GetAllUsersAsync();
+    return users.Adapt<List<UserProfileDto>>();
+  }
 }
