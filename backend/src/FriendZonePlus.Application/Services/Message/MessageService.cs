@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using FriendZonePlus.Application.DTOs;
 using FriendZonePlus.Core.Entities;
+using FriendZonePlus.Core.Interfaces;
 using FriendZonePlus.Application.Interfaces;
 using System;
 using System.Collections;

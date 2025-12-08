@@ -21,7 +21,7 @@ public static class WallPostEndpoints
     group.MapPost("/", async (
       CreateWallPostDto dto,
       ClaimsPrincipal user,
-      IWallPostService wallPostService) =>
+      [FromServices] IWallPostService wallPostService) =>
     {
       var currentUserId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
       var createdPost = await wallPostService.CreateAsync(currentUserId, dto);
@@ -33,7 +33,7 @@ public static class WallPostEndpoints
       int id,
       UpdateWallPostDto dto,
       ClaimsPrincipal user,
-      IWallPostService wallPostService) =>
+      [FromServices] IWallPostService wallPostService) =>
     {
       var currentUserId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
       await wallPostService.UpdateWallPostAsync(currentUserId, id, dto);
@@ -44,7 +44,7 @@ public static class WallPostEndpoints
     group.MapDelete("/{id}", async (
       int id,
       ClaimsPrincipal user,
-      IWallPostService wallPostService) =>
+      [FromServices] IWallPostService wallPostService) =>
     {
 
       var currentUserId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
@@ -55,7 +55,7 @@ public static class WallPostEndpoints
     // Get feed
     group.MapGet("/feed", async (
       ClaimsPrincipal user,
-      IWallPostService wallPostService) =>
+      [FromServices] IWallPostService wallPostService) =>
     {
       var currentUserId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
       var feed = await wallPostService.GetFeedAsync(currentUserId);
@@ -63,7 +63,7 @@ public static class WallPostEndpoints
     });
 
     // Get wall posts for target user
-    app.MapGet("/users/{id}/wall", async (int id, IWallPostService wallpostService) =>
+    app.MapGet("/users/{id}/wall", async (int id, [FromServices] IWallPostService wallpostService) =>
     {
       var wallPosts = await wallpostService.GetWallPostsAsync(id);
       return TypedResults.Ok(wallPosts);

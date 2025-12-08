@@ -31,7 +31,7 @@ namespace FriendZonePlus.Infrastructure.Authentication
                 ValidIssuer = _jwtSettings.Issuer,
                 ValidAudience = _jwtSettings.Audience,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
-                ClockSkew = TimeSpan.FromSeconds(30)
+                ClockSkew = TimeSpan.FromSeconds(30),
             };
 
             try

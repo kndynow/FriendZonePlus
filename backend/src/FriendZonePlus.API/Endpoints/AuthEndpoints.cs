@@ -4,9 +4,9 @@ using FriendZonePlus.Application.Services.Authentication;
 using FriendZonePlus.Infrastructure.Authentication;
 using FriendZonePlus.Application.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 public static class AuthEndpoints
 {
@@ -16,13 +16,13 @@ public static class AuthEndpoints
                         .WithTags("Authorization");
 
 
-        group.MapPost("/register", async (RegisterRequest request, IAuthenticationService authService) =>
+        group.MapPost("/register", async (RegisterRequest request, [FromServices] IAuthenticationService authService) =>
         {
             var response = await authService.RegisterAsync(request);
             return TypedResults.Created($"/api/Auth/{response.UserId}", response);
         }).AddEndpointFilter<ValidationFilter<RegisterRequest>>();
 
-        group.MapPost("/login", async (LoginRequest request, IAuthenticationService
+        group.MapPost("/login", async (LoginRequest request, [FromServices] IAuthenticationService
         authenticationService,
         HttpContext httpContext,
         IOptions<JwtSettings> jwtOptions) =>
@@ -64,9 +64,16 @@ public static class AuthEndpoints
             if (principal == null)
                 return TypedResults.Unauthorized();
 
-            var userId = principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+            // Try multiple claim types to find the values
+            var userId = principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
+                      ?? principal.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                      ?? principal.FindFirst("sub")?.Value;
+
             var username = principal.FindFirst("username")?.Value;
-            var email = principal.FindFirst(JwtRegisteredClaimNames.Email)?.Value;
+
+            var email = principal.FindFirst(JwtRegisteredClaimNames.Email)?.Value
+                     ?? principal.FindFirst(ClaimTypes.Email)?.Value
+                     ?? principal.FindFirst("email")?.Value;
 
             return (IResult)TypedResults.Ok(new { UserId = userId, Username = username, Email = email });
         });

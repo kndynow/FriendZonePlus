@@ -15,7 +15,7 @@ public static class UserEndpoints
                     .WithTags("Users");
 
     //Get user profile
-    group.MapGet("/{id}", async (int id, IUserService userservice) =>
+    group.MapGet("/{id}", async (int id, [FromServices] IUserService userservice) =>
     {
       var userProfile = await userservice.GetUserProfileAsync(id);
 
@@ -23,7 +23,7 @@ public static class UserEndpoints
     });
 
     //Update user profile
-    group.MapPut("/me", async (UpdateUserDto dto, ClaimsPrincipal user, IUserService userService) =>
+    group.MapPut("/me", async (UpdateUserDto dto, ClaimsPrincipal user, [FromServices] IUserService userService) =>
     {
       var currentUserId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
@@ -33,7 +33,7 @@ public static class UserEndpoints
     });
 
     //Delete user
-    group.MapDelete("/me", async (ClaimsPrincipal user, IUserService userService) =>
+    group.MapDelete("/me", async (ClaimsPrincipal user, [FromServices] IUserService userService) =>
     {
       var currentUserId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
@@ -43,7 +43,7 @@ public static class UserEndpoints
     });
 
     //Follow user
-    group.MapPost("/{id}/follow", async (int id, ClaimsPrincipal user, IUserService userService) =>
+    group.MapPost("/{id}/follow", async (int id, ClaimsPrincipal user, [FromServices] IUserService userService) =>
     {
       var currentUserId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
@@ -53,7 +53,7 @@ public static class UserEndpoints
     });
 
     //Unfollow user
-    group.MapDelete("/{id}/unfollow", async (int id, ClaimsPrincipal user, IUserService userService) =>
+    group.MapDelete("/{id}/unfollow", async (int id, ClaimsPrincipal user, [FromServices] IUserService userService) =>
     {
       var currentUserId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 

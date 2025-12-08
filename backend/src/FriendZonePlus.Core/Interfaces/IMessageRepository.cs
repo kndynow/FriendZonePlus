@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FriendZonePlus.Application.Interfaces
+namespace FriendZonePlus.Core.Interfaces
 {
     public interface IMessageRepository
     {

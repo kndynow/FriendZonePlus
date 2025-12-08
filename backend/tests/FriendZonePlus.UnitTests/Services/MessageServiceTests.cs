@@ -1,7 +1,7 @@
 
 using FluentValidation;
 using FriendZonePlus.Application.DTOs;
-using FriendZonePlus.Application.Services;
+using FriendZonePlus.Application.Interfaces;
 using FriendZonePlus.Application.Services.Messages;
 using FriendZonePlus.Application.Validators;
 using FriendZonePlus.Core.Entities;
@@ -37,17 +37,17 @@ public class MessageServiceTests
            .Setup(r => r.AddMessageAsync(It.IsAny<Message>()))
            .ReturnsAsync((Message m) =>
            {
-             m.Id = 1; 
-             return m;
+               m.Id = 1;
+               return m;
            });
 
         _userRepositoryMock
-           .Setup(r => r.ExistsByIdAsync(dto.ReceiverId))
-           .ReturnsAsync(true);
+           .Setup(r => r.GetByIdAsync(dto.ReceiverId))
+           .ReturnsAsync(new User { Id = dto.ReceiverId });
 
         _userRepositoryMock
-         .Setup(r => r.ExistsByIdAsync(senderId))
-        .ReturnsAsync(true);
+         .Setup(r => r.GetByIdAsync(senderId))
+        .ReturnsAsync(new User { Id = senderId });
 
         // Act
         var expected = await _messageService.SendMessageAsync(senderId, dto);
@@ -70,12 +70,12 @@ public class MessageServiceTests
         var dto = new SendMessageRequestDto(ReceiverId: 1, Content: "Howdy!");
 
         _userRepositoryMock
-        .Setup(r => r.ExistsByIdAsync(senderId))
-        .ReturnsAsync(true);
+        .Setup(r => r.GetByIdAsync(senderId))
+        .ReturnsAsync(new User { Id = senderId });
 
         _userRepositoryMock
-            .Setup(r => r.ExistsByIdAsync(dto.ReceiverId))
-            .ReturnsAsync(true);
+            .Setup(r => r.GetByIdAsync(dto.ReceiverId))
+            .ReturnsAsync(new User { Id = dto.ReceiverId });
 
         // Act & Assert
         var expected = await Assert.ThrowsAsync<ArgumentException>(() =>
@@ -98,12 +98,12 @@ public class MessageServiceTests
         var dto = new SendMessageRequestDto(ReceiverId: 2, Content: "Howdy!");
 
         _userRepositoryMock
-        .Setup(r => r.ExistsByIdAsync(senderId))
-        .ReturnsAsync(true);
+        .Setup(r => r.GetByIdAsync(senderId))
+        .ReturnsAsync(new User { Id = senderId });
 
         _userRepositoryMock
-            .Setup(r => r.ExistsByIdAsync(dto.ReceiverId))
-            .ReturnsAsync(false);
+            .Setup(r => r.GetByIdAsync(dto.ReceiverId))
+            .ReturnsAsync((User?)null);
 
         // Act & Assert
         var expected = await Assert.ThrowsAsync<ArgumentException>(() =>
@@ -126,12 +126,12 @@ public class MessageServiceTests
         var dto = new SendMessageRequestDto(ReceiverId: 2, Content: "Howdy!");
 
         _userRepositoryMock
-            .Setup(r => r.ExistsByIdAsync(senderId))
-            .ReturnsAsync(false);
+            .Setup(r => r.GetByIdAsync(senderId))
+            .ReturnsAsync((User?)null);
 
         _userRepositoryMock
-         .Setup(r => r.ExistsByIdAsync(dto.ReceiverId))
-         .ReturnsAsync(true);
+         .Setup(r => r.GetByIdAsync(dto.ReceiverId))
+         .ReturnsAsync(new User { Id = dto.ReceiverId });
 
         // Act & Assert
         var expected = await Assert.ThrowsAsync<ArgumentException>(() =>
@@ -153,8 +153,8 @@ public class MessageServiceTests
         int senderId = 1;
         int receiverId = 2;
 
-        _userRepositoryMock.Setup(r => r.ExistsByIdAsync(senderId)).ReturnsAsync(true);
-        _userRepositoryMock.Setup(r => r.ExistsByIdAsync(receiverId)).ReturnsAsync(true);
+        _userRepositoryMock.Setup(r => r.GetByIdAsync(senderId)).ReturnsAsync(new User { Id = senderId });
+        _userRepositoryMock.Setup(r => r.GetByIdAsync(receiverId)).ReturnsAsync(new User { Id = receiverId });
 
         var messagesFromRepo = new List<Message>
         {
@@ -184,8 +184,8 @@ public class MessageServiceTests
         var senderId = 1;
         var receiverId = 2;
 
-        _userRepositoryMock.Setup(r => r.ExistsByIdAsync(senderId)).ReturnsAsync(false);
-        _userRepositoryMock.Setup(r => r.ExistsByIdAsync(receiverId)).ReturnsAsync(true);
+        _userRepositoryMock.Setup(r => r.GetByIdAsync(senderId)).ReturnsAsync((User?)null);
+        _userRepositoryMock.Setup(r => r.GetByIdAsync(receiverId)).ReturnsAsync(new User { Id = receiverId });
 
         // Act & Assert
         var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
@@ -202,8 +202,8 @@ public class MessageServiceTests
         var senderId = 1;
         var receiverId = 2;
 
-        _userRepositoryMock.Setup(r => r.ExistsByIdAsync(senderId)).ReturnsAsync(true);
-        _userRepositoryMock.Setup(r => r.ExistsByIdAsync(receiverId)).ReturnsAsync(false);
+        _userRepositoryMock.Setup(r => r.GetByIdAsync(senderId)).ReturnsAsync(new User { Id = senderId });
+        _userRepositoryMock.Setup(r => r.GetByIdAsync(receiverId)).ReturnsAsync((User?)null);
 
         // Act & Assert
         var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
@@ -215,12 +215,12 @@ public class MessageServiceTests
 
     [Theory]
     [InlineData("")]
-    [InlineData(null)]
-    public async Task SendMessageAsync_ShouldThrowValidationException_WhenContentIsInvalid(string content)
+    [InlineData(null!)]
+    public async Task SendMessageAsync_ShouldThrowValidationException_WhenContentIsInvalid(string? content)
     {
         // Arrange
         var senderId = 1;
-        var dto = new SendMessageRequestDto(ReceiverId: 2, Content: content);
+        var dto = new SendMessageRequestDto(ReceiverId: 2, Content: content!);
 
         // Act & Assert
         var ex = await Assert.ThrowsAsync<ValidationException>(

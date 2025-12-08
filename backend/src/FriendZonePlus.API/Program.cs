@@ -8,6 +8,7 @@ using FriendZonePlus.Application.Helpers.PasswordHelpers;
 using FriendZonePlus.Application.Services;
 using FriendZonePlus.Application.Services.Messages;
 using FriendZonePlus.Application.Interfaces;
+using FriendZonePlus.Core.Interfaces;
 using FriendZonePlus.Infrastructure.Data;
 using FriendZonePlus.Infrastructure.Repositories;
 using Mapster;
@@ -21,6 +22,8 @@ using System.Text;
 using System.Text.Json;
 using FriendZonePlus.Infrastructure.Authentication;
 using FriendZonePlus.API.Infrastructure;
+using FriendZonePlus.Application.Mappings;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -99,16 +102,14 @@ builder.Services.AddScoped<IWallPostRepository, WallPostRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
 // Services
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<WallPostService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IWallPostService, WallPostService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-builder.Services.AddScoped<FollowService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 
 // Helper
 builder.Services.AddScoped<IPasswordHelper, PasswordHelper>();
 //Validator
-builder.Services.AddScoped<IFollowValidator, FollowValidator>();
 builder.Services.AddScoped<IValidator<RegisterRequest>, RegisterRequestValidator>();
 builder.Services.AddScoped<IValidator<SendMessageRequestDto>, SendMessageRequestDtoValidator>();
 
@@ -117,8 +118,8 @@ builder.Services.AddSignalR();
 
 //Mapster Configuration
 var config = TypeAdapterConfig.GlobalSettings;
-FollowMappings.ConfigureFollowMappings();
-WallPostMappings.ConfigureWallPostMappings();
+config.Apply(new MappingConfig());
+
 builder.Services.AddSingleton(config);
 builder.Services.AddScoped<IMapper, Mapper>();
 
@@ -139,7 +140,6 @@ app.UseAuthorization();
 
 app.MapAuthEndpoints();
 app.MapWallPostEndpoints();
-app.MapFollowEndpoints();
 app.MapUserEndpoints();
 app.MapMessageEndpoints();
 

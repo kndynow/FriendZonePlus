@@ -1,5 +1,5 @@
 ﻿using FriendZonePlus.Infrastructure.Data;
-using FriendZonePlus.Application.Interfaces;
+using FriendZonePlus.Core.Interfaces;
 using System;
 using FriendZonePlus.Core.Entities;
 using System.Collections.Generic;
