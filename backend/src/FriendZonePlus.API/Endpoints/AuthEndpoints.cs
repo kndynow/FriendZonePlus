@@ -15,7 +15,6 @@ public static class AuthEndpoints
         var group = app.MapGroup("/api/Auth")
                         .WithTags("Authorization");
 
-
         group.MapPost("/register", async (RegisterRequest request, IAuthenticationService authService) =>
         {
             var response = await authService.RegisterAsync(request);
@@ -40,7 +39,11 @@ public static class AuthEndpoints
 
             return TypedResults.Ok(new
             {
-                response
+                response.UserId,
+                response.FirstName,
+                response.LastName,
+                response.Username,
+                response.Email
             });
         }).AddEndpointFilter<ValidationFilter<LoginRequest>>();
 
@@ -50,6 +53,7 @@ public static class AuthEndpoints
             return TypedResults.Ok();
         });
 
+        // Validateas that the user has an active valid token
         group.MapGet("/me", (HttpContext httpContext) =>
         {
             var token = httpContext.Request.Cookies["auth"];
@@ -64,11 +68,7 @@ public static class AuthEndpoints
             if (principal == null)
                 return TypedResults.Unauthorized();
 
-            var userId = principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-            var username = principal.FindFirst("username")?.Value;
-            var email = principal.FindFirst(JwtRegisteredClaimNames.Email)?.Value;
-
-            return (IResult)TypedResults.Ok(new { UserId = userId, Username = username, Email = email });
+            return (IResult)TypedResults.Ok();
         });
     }
 }
