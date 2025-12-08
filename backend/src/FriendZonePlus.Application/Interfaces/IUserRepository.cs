@@ -19,5 +19,7 @@ public interface IUserRepository
     Task<bool> IsFollowingAsync(int followerId, int followedUserId);
     Task FollowUserAsync(int followerId, int followedUserId);
     Task UnfollowUserAsync(int followerId, int followedUserId);
+    Task<List<User>> GetFollowersAsync(int userId);
+    Task<List<User>> GetFollowingAsync(int userId);
 
 }

@@ -21,4 +21,10 @@ public record UserResponseDto(
     string Email
 );
 
+public record UserListResponseDto(
+    int Id,
+    string Username,
+    string Email
+);
+
 

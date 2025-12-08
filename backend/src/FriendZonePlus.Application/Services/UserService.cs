@@ -66,4 +66,16 @@ public class UserService : IUserService
     await _userRepository.UnfollowUserAsync(currentUserId, targetUserId);
   }
 
+  public async Task<List<UserListResponseDto>> GetFollowersAsync(int userId)
+  {
+    var followers = await _userRepository.GetFollowersAsync(userId);
+    return followers.Adapt<List<UserListResponseDto>>();
+  }
+
+  public async Task<List<UserListResponseDto>> GetFollowingAsync(int userId)
+  {
+    var following = await _userRepository.GetFollowingAsync(userId);
+    return following.Adapt<List<UserListResponseDto>>();
+  }
+
 }

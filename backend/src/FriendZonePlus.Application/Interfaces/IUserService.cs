@@ -11,4 +11,6 @@ public interface IUserService
 
     Task FollowUserAsync(int currentUserId, int targetUserId);
     Task UnfollowUserAsync(int currentUserId, int targetUserId);
+    Task<List<UserListResponseDto>> GetFollowersAsync(int userId);
+    Task<List<UserListResponseDto>> GetFollowingAsync(int userId);
 }

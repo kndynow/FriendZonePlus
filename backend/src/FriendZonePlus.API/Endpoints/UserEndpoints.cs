@@ -61,6 +61,26 @@ public static class UserEndpoints
 
       return TypedResults.Ok(new { message = "User unfollowed successfully" });
     });
+
+    //Get followers
+    group.MapGet("/me/followers", async (ClaimsPrincipal user, [FromServices] IUserService userService) =>
+    {
+      var currentUserId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+      var followers = await userService.GetFollowersAsync(currentUserId);
+
+      return TypedResults.Ok(followers);
+    });
+
+    //Get following
+    group.MapGet("/me/following", async (ClaimsPrincipal user, [FromServices] IUserService userService) =>
+    {
+      var currentUserId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+      var following = await userService.GetFollowingAsync(currentUserId);
+
+      return TypedResults.Ok(following);
+    });
   }
 
 }

@@ -246,4 +246,98 @@ public class UserServiceTests
 
   #endregion
 
+  #region GetFollowersAsync Tests
+
+  [Fact]
+  public async Task GetFollowersAsync_ShouldReturnListOfFollowers_WhenUsersExist()
+  {
+    //Arrange
+    var userId = 1;
+    var followers = new List<User>
+    {
+      new User { Id = 2, Username = "follower1", Email = "follower1@example.com" },
+      new User { Id = 3, Username = "follower2", Email = "follower2@example.com" }
+    };
+    _userRepoMock.Setup(repo => repo.GetFollowersAsync(userId)).ReturnsAsync(followers);
+
+    //Act
+    var result = await _sut.GetFollowersAsync(userId);
+
+    //Assert
+    Assert.NotNull(result);
+    Assert.Equal(2, result.Count);
+    Assert.Equal(2, result[0].Id);
+    Assert.Equal("follower1", result[0].Username);
+    Assert.Equal("follower1@example.com", result[0].Email);
+    Assert.Equal(3, result[1].Id);
+    Assert.Equal("follower2", result[1].Username);
+    Assert.Equal("follower2@example.com", result[1].Email);
+    _userRepoMock.Verify(repo => repo.GetFollowersAsync(userId), Times.Once);
+  }
+
+  [Fact]
+  public async Task GetFollowersAsync_ShouldReturnEmptyList_WhenNoFollowers()
+  {
+    //Arrange
+    var userId = 1;
+    _userRepoMock.Setup(repo => repo.GetFollowersAsync(userId)).ReturnsAsync(new List<User>());
+
+    //Act
+    var result = await _sut.GetFollowersAsync(userId);
+
+    //Assert
+    Assert.NotNull(result);
+    Assert.Empty(result);
+    _userRepoMock.Verify(repo => repo.GetFollowersAsync(userId), Times.Once);
+  }
+
+  #endregion
+
+  #region GetFollowingAsync Tests
+
+  [Fact]
+  public async Task GetFollowingAsync_ShouldReturnListOfFollowing_WhenUsersExist()
+  {
+    //Arrange
+    var userId = 1;
+    var following = new List<User>
+    {
+      new User { Id = 2, Username = "following1", Email = "following1@example.com" },
+      new User { Id = 3, Username = "following2", Email = "following2@example.com" }
+    };
+    _userRepoMock.Setup(repo => repo.GetFollowingAsync(userId)).ReturnsAsync(following);
+
+    //Act
+    var result = await _sut.GetFollowingAsync(userId);
+
+    //Assert
+    Assert.NotNull(result);
+    Assert.Equal(2, result.Count);
+    Assert.Equal(2, result[0].Id);
+    Assert.Equal("following1", result[0].Username);
+    Assert.Equal("following1@example.com", result[0].Email);
+    Assert.Equal(3, result[1].Id);
+    Assert.Equal("following2", result[1].Username);
+    Assert.Equal("following2@example.com", result[1].Email);
+    _userRepoMock.Verify(repo => repo.GetFollowingAsync(userId), Times.Once);
+  }
+
+  [Fact]
+  public async Task GetFollowingAsync_ShouldReturnEmptyList_WhenNotFollowingAnyone()
+  {
+    //Arrange
+    var userId = 1;
+    _userRepoMock.Setup(repo => repo.GetFollowingAsync(userId)).ReturnsAsync(new List<User>());
+
+    //Act
+    var result = await _sut.GetFollowingAsync(userId);
+
+    //Assert
+    Assert.NotNull(result);
+    Assert.Empty(result);
+    _userRepoMock.Verify(repo => repo.GetFollowingAsync(userId), Times.Once);
+  }
+
+  #endregion
+
 }

@@ -82,4 +82,22 @@ public class UserRepository : IUserRepository
     }
   }
 
+  public async Task<List<User>> GetFollowersAsync(int userId)
+  {
+    return await _context.Follows
+      .Where(f => f.FollowedUserId == userId)
+      .Include(f => f.Follower)
+      .Select(f => f.Follower)
+      .ToListAsync();
+  }
+
+  public async Task<List<User>> GetFollowingAsync(int userId)
+  {
+    return await _context.Follows
+      .Where(f => f.FollowerId == userId)
+      .Include(f => f.FollowedUser)
+      .Select(f => f.FollowedUser)
+      .ToListAsync();
+  }
+
 }

@@ -2,11 +2,11 @@
 using FluentValidation;
 using FriendZonePlus.Application.DTOs;
 using FriendZonePlus.Application.Interfaces;
-using FriendZonePlus.Application.Interfaces;
+using FriendZonePlus.Core.Interfaces;
 using FriendZonePlus.Application.Services.Messages;
 using FriendZonePlus.Application.Validators;
 using FriendZonePlus.Core.Entities;
-using FriendZonePlus.Core.Interfaces;
+using FriendZonePlus.Application.Interfaces;
 using Moq;
 using Xunit;
 namespace FriendZonePlus.UnitTests;
@@ -281,8 +281,8 @@ public class MessageServiceTests
         var senderId = 1;
         var dto = new SendMessageRequestDto(ReceiverId: 2, Content: "Hello!");
 
-        _userRepositoryMock.Setup(r => r.ExistsByIdAsync(senderId)).ReturnsAsync(true);
-        _userRepositoryMock.Setup(r => r.ExistsByIdAsync(dto.ReceiverId)).ReturnsAsync(true);
+        _userRepositoryMock.Setup(r => r.GetByIdAsync(senderId)).ReturnsAsync(new User { Id = senderId });
+        _userRepositoryMock.Setup(r => r.GetByIdAsync(dto.ReceiverId)).ReturnsAsync(new User { Id = dto.ReceiverId });
 
         _messageRepoMock.Setup(r => r.AddMessageAsync(It.IsAny<Message>()))
             .ReturnsAsync((Message m) => { m.Id = 1; return m; });
