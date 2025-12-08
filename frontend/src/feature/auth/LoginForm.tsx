@@ -15,6 +15,21 @@ export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
   const [form, setForm] = useState({ usernameOrEmail: "", password: "" });
   const [submitting, setSubmitting] = useState(false);
 
+  const fields = [
+    {
+      name: "usernameOrEmail",
+      label: "Username or Email",
+      type: "text",
+      placeholder: "Username or email",
+    },
+    {
+      name: "password",
+      label: "Password",
+      type: "password",
+      placeholder: "Enter password",
+    },
+  ] as const;
+
   function setProperty(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -41,22 +56,17 @@ export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
   return (
     <>
       <Form onSubmit={handleSubmit}>
-        <FormField
-          label="Username or Email"
-          placeholder="Username or email"
-          name="usernameOrEmail"
-          value={form.usernameOrEmail}
-          onChange={setProperty}
-        />
-
-        <FormField
-          label="Password"
-          placeholder="Enter password"
-          type="password"
-          name="password"
-          value={form.password}
-          onChange={setProperty}
-        />
+        {fields.map((field) => (
+          <FormField
+            key={field.name}
+            label={field.label}
+            name={field.name}
+            type={field.type}
+            placeholder={field.placeholder}
+            value={form[field.name]}
+            onChange={setProperty}
+          />
+        ))}
 
         <Button
           className="mt-2 w-100"

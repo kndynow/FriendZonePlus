@@ -31,6 +31,39 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
     Partial<Record<keyof RegisterRequest, string>>
   >({});
 
+  const fields = [
+    {
+      name: "firstName",
+      label: "First name",
+      type: "text",
+      placeholder: "Enter first name",
+    },
+    {
+      name: "lastName",
+      label: "Last name",
+      type: "text",
+      placeholder: "Enter last name",
+    },
+    {
+      name: "email",
+      label: "Email",
+      type: "email",
+      placeholder: "Enter email",
+    },
+    {
+      name: "username",
+      label: "Username",
+      type: "text",
+      placeholder: "Enter username",
+    },
+    {
+      name: "password",
+      label: "Password",
+      type: "password",
+      placeholder: "Password",
+    },
+  ] as const;
+
   function setProperty(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
 
@@ -44,13 +77,11 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
   async function handleRegister(event: React.FormEvent) {
     event.preventDefault();
 
-    setTouched({
-      username: true,
-      email: true,
-      password: true,
-      firstName: true,
-      lastName: true,
-    });
+    const allTouched = Object.fromEntries(
+      Object.keys(form).map((k) => [k, true])
+    ) as Record<keyof RegisterRequest, boolean>;
+
+    setTouched(allTouched);
 
     const frontendErrors = validateRegister(form);
     setErrors(frontendErrors);
@@ -61,78 +92,33 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
     try {
       setSubmitting(true);
       await register(form);
-
       toast.success("Account created successfully!");
     } catch (err: any) {
-      if (err?.errors?.username) {
-        toast.error(err.errors.username[0], { id: "register-error" });
-        return;
-      }
+      const userErr = err?.errors?.username?.[0];
+      const emailErr = err?.errors?.email?.[0];
 
-      if (err?.errors?.email) {
-        toast.error(err.errors.email[0], { id: "register-error" });
-        return;
-      }
-
-      toast.error("Unable to register account.", { id: "register-error" });
+      toast.error(userErr || emailErr || "Unable to register account.");
     } finally {
       setSubmitting(false);
     }
   }
+
   return (
     <>
       <Form onSubmit={handleRegister}>
-        <FormField
-          label="First name"
-          name="firstName"
-          placeholder="Enter first name"
-          value={form.firstName}
-          onChange={setProperty}
-          error={errors.firstName}
-          touched={touched.firstName}
-        />
-
-        <FormField
-          label="Last name"
-          name="lastName"
-          placeholder="Enter last name"
-          value={form.lastName}
-          onChange={setProperty}
-          error={errors.lastName}
-          touched={touched.lastName}
-        />
-
-        <FormField
-          label="Email"
-          type="email"
-          name="email"
-          placeholder="Enter email"
-          value={form.email}
-          onChange={setProperty}
-          error={errors.email}
-          touched={touched.email}
-        />
-
-        <FormField
-          label="Username"
-          name="username"
-          placeholder="Enter username"
-          value={form.username}
-          onChange={setProperty}
-          error={errors.username}
-          touched={touched.username}
-        />
-
-        <FormField
-          label="Password"
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={setProperty}
-          error={errors.password}
-          touched={touched.password}
-        />
+        {fields.map((field) => (
+          <FormField
+            key={field.name}
+            label={field.label}
+            name={field.name}
+            type={field.type}
+            placeholder={field.placeholder}
+            value={form[field.name]}
+            onChange={setProperty}
+            error={errors[field.name]}
+            touched={touched[field.name]}
+          />
+        ))}
 
         <Button
           className="mt-2 w-100"

@@ -12,7 +12,7 @@ export default function WelcomePage() {
     <>
       <Row className="w-100">
         <Col className="w-100">
-          <h2>{view === "login" ? "Logga in" : "Skapa konto"}</h2>
+          <h2 className="py-3">{view === "login" ? "Sign in" : "Sign up"}</h2>
 
           {view === "login" && (
             <LoginForm onSwitchToRegister={() => setView("register")} />
