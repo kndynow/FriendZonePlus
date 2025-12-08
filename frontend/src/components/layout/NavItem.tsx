@@ -7,7 +7,7 @@ type NavItemProps = {
 
 export function NavItem({ to, icon }: NavItemProps) {
   function getNavItemClass(isActive: boolean): string {
-    return isActive ? "nav-item active" : "nav-item";
+    return isActive ? "nav-item active bg-primary" : "nav-item";
   }
 
   function getIconClass(isActive: boolean): string {

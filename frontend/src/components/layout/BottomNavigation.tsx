@@ -12,7 +12,7 @@ const navItems = [
 
 export default function BottomNavigation() {
   return (
-    <Row className="bottom-nav f-shadow">
+    <Row className="bottom-nav f-shadow semi-transparent-bg">
       {navItems.map((navItem) => (
         <Col
           className="d-flex justify-content-center align-items-center"
