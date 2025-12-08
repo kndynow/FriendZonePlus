@@ -11,6 +11,12 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      "/hubs": {
+        target: "http://localhost:5034",
+        changeOrigin: true,
+        secure: false,
+        ws: true,
+      },
     },
   },
   // This is to silence Sass deprecation warnings from bootstrap. No long-term fix is in place yet: https://getbootstrap.com/docs/5.3/customize/sass/
