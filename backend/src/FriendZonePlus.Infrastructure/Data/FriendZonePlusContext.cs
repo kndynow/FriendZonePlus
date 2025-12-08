@@ -59,33 +59,6 @@ public class FriendZonePlusContext : DbContext
       .OnDelete(DeleteBehavior.Restrict);
     });
 
-    // // Configure Post -> Author relation
-    // modelBuilder.Entity<WallPost>()
-    // .HasOne(p => p.Author)
-    // .WithMany()
-    // .HasForeignKey(p => p.AuthorId)
-    // .OnDelete(DeleteBehavior.Restrict);
-
-    // // Configure Post -> TargetUser relation
-    // modelBuilder.Entity<WallPost>()
-    // .HasOne(p => p.TargetUser)
-    // .WithMany()
-    // .HasForeignKey(p => p.TargetUserId)
-    // .OnDelete(DeleteBehavior.Restrict);
-
-    // // Configure Follow -> FollowedUser relation
-    // modelBuilder.Entity<Follow>()
-    // .HasOne(f => f.FollowedUser)
-    // .WithMany()
-    // .HasForeignKey(f => f.FollowedUserId)
-    // .OnDelete(DeleteBehavior.Restrict);
-
-    // // Configure Follow -> Follower relation
-    // modelBuilder.Entity<Follow>()
-    // .HasOne(f => f.Follower)
-    // .WithMany()
-    // .HasForeignKey(f => f.FollowerId)
-    // .OnDelete(DeleteBehavior.Restrict);
   }
 
 }

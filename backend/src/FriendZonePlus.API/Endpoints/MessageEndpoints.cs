@@ -15,7 +15,7 @@ namespace FriendZonePlus.API.Endpoints
 
             group.MapPost("send", SendMessage);
             group.MapGet("conversation/{receiverId:int}", GetMessagesBetweenUsers);
-            group.MapGet("latest", GetLatestChats);            
+            group.MapGet("latest", GetLatestChats);
         }
 
         private static async Task<IResult> SendMessage(
@@ -57,7 +57,7 @@ namespace FriendZonePlus.API.Endpoints
                 {
                     return Results.Unauthorized();
                 }
-                
+
                 var response = await messageService.GetMessagesBetweenUsersAsync(senderId, receiverId);
 
                 return Results.Ok(response);
@@ -78,8 +78,8 @@ namespace FriendZonePlus.API.Endpoints
         {
             try
             {
-                 // Checks if the user is authenticated and retrieves senderId from claims
-                 var senderIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                // Checks if the user is authenticated and retrieves senderId from claims
+                var senderIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(senderIdClaim) || !int.TryParse(senderIdClaim, out int senderId))
                 {
                     return Results.Unauthorized();
