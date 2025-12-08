@@ -107,4 +107,20 @@ public class UserRepository : IUserRepository
       .Include(u => u.Following)
       .ToListAsync();
   }
+
+  public async Task<List<(User User, int FollowersCount, int FollowingCount, bool IsFollowing)>> GetAllUsersWithCountsAndFollowingStatusAsync(int currentUserId)
+  {
+    // Hämta alla users med counts beräknade direkt i databasen
+    var usersWithCounts = await _context.Users
+      .Select(u => new
+      {
+        User = u,
+        FollowersCount = _context.Follows.Count(f => f.FollowedUserId == u.Id),
+        FollowingCount = _context.Follows.Count(f => f.FollowerId == u.Id),
+        IsFollowing = _context.Follows.Any(f => f.FollowerId == currentUserId && f.FollowedUserId == u.Id)
+      })
+      .ToListAsync();
+
+    return usersWithCounts.Select(x => (x.User, x.FollowersCount, x.FollowingCount, x.IsFollowing)).ToList();
+  }
 }

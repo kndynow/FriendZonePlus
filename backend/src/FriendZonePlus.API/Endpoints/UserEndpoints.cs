@@ -23,6 +23,15 @@ public static class UserEndpoints
     .WithDescription("Gets a list of all users")
     .WithSummary("Get users");
 
+    group.MapGet("/with-following-status", async (ClaimsPrincipal user, [FromServices] IUserService userService) =>
+    {
+      var currentUserId = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+      var users = await userService.GetAllUsersWithFollowingStatusAsync(currentUserId);
+      return TypedResults.Ok(users);
+    })
+    .WithDescription("Gets all users with following status for the authenticated user")
+    .WithSummary("Get users with following status");
+
     //Get user profile
     group.MapGet("/{id}", async (int id, [FromServices] IUserService userservice) =>
     {

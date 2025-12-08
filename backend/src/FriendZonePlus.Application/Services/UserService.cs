@@ -83,4 +83,20 @@ public class UserService : IUserService
     var users = await _userRepository.GetAllUsersAsync();
     return users.Adapt<List<UserProfileDto>>();
   }
+
+  public async Task<List<UserProfileDto>> GetAllUsersWithFollowingStatusAsync(int currentUserId)
+  {
+    var usersWithData = await _userRepository.GetAllUsersWithCountsAndFollowingStatusAsync(currentUserId);
+
+    return usersWithData.Select(x =>
+    {
+      var dto = x.User.Adapt<UserProfileDto>();
+      return dto with
+      {
+        FollowersCount = x.FollowersCount,
+        FollowingCount = x.FollowingCount,
+        IsFollowing = x.IsFollowing
+      };
+    }).ToList();
+  }
 }

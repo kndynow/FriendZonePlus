@@ -19,5 +19,6 @@ public interface IUserRepository
     Task UnfollowUserAsync(int followerId, int followedUserId);
     Task<List<User>> GetFollowersAsync(int userId);
     Task<List<User>> GetFollowingAsync(int userId);
+    Task<List<(User User, int FollowersCount, int FollowingCount, bool IsFollowing)>> GetAllUsersWithCountsAndFollowingStatusAsync(int currentUserId);
 
 }
