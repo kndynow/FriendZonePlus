@@ -2,6 +2,7 @@
 using FluentValidation;
 using FriendZonePlus.Application.DTOs;
 using FriendZonePlus.Application.Interfaces;
+using FriendZonePlus.Application.Interfaces;
 using FriendZonePlus.Application.Services.Messages;
 using FriendZonePlus.Application.Validators;
 using FriendZonePlus.Core.Entities;
@@ -15,6 +16,7 @@ public class MessageServiceTests
 {
     private readonly Mock<IMessageRepository> _messageRepoMock;
     private readonly Mock<IUserRepository> _userRepositoryMock;
+    private readonly Mock<IMessageNotifier> _notifierMock;
     private readonly IValidator<SendMessageRequestDto> _validator;
     private readonly MessageService _messageService;
 
@@ -22,8 +24,9 @@ public class MessageServiceTests
     {
         _messageRepoMock = new Mock<IMessageRepository>();
         _userRepositoryMock = new Mock<IUserRepository>();
+        _notifierMock = new Mock<IMessageNotifier>();
         _validator = new SendMessageRequestDtoValidator();
-        _messageService = new MessageService(_messageRepoMock.Object, _userRepositoryMock.Object, _validator);
+        _messageService = new MessageService(_messageRepoMock.Object, _userRepositoryMock.Object, _validator, _notifierMock.Object);
     }
 
     [Fact]
@@ -269,5 +272,29 @@ public class MessageServiceTests
         Assert.Equal(2, result.Count());
         Assert.Contains(result, m => m.Id == 1 && m.Content == "Hi");
         Assert.Contains(result, m => m.Id == 2 && m.Content == "Hello");
+    }
+
+    [Fact]
+    public async Task SendMessageAsync_ShouldNotifyUsers_WhenMessageIsSaved()
+    {
+        // Arrange
+        var senderId = 1;
+        var dto = new SendMessageRequestDto(ReceiverId: 2, Content: "Hello!");
+
+        _userRepositoryMock.Setup(r => r.ExistsByIdAsync(senderId)).ReturnsAsync(true);
+        _userRepositoryMock.Setup(r => r.ExistsByIdAsync(dto.ReceiverId)).ReturnsAsync(true);
+
+        _messageRepoMock.Setup(r => r.AddMessageAsync(It.IsAny<Message>()))
+            .ReturnsAsync((Message m) => { m.Id = 1; return m; });
+
+        // Act
+        var result = await _messageService.SendMessageAsync(senderId, dto);
+
+        // Assert
+        _notifierMock.Verify(n => n.NotifyMessageSentAsync(
+            senderId,
+            dto.ReceiverId,
+            It.Is<MessageResponseDto>(msg => msg.Content == dto.Content)
+        ), Times.Once);
     }
 }

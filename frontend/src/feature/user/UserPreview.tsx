@@ -1,4 +1,5 @@
 import { Col, Row } from "react-bootstrap";
+import ProfileImage from "../../components/ui/ProfileImage";
 
 type UserPreviewProps = {
   imgPath?: string;
@@ -20,10 +21,7 @@ export default function UserPreview({
     <>
       <Row className="align-items-start p-2">
         <Col xs="auto">
-          <img
-            src={imgPath || "/images/profilePlaceholder.png"}
-            className="profile-img f-shadow"
-          />
+          <ProfileImage imgPath={imgPath} />
         </Col>
         <Col className="d-flex flex-column justify-content-center">
           <h5 className="m-0">{fullName}</h5>

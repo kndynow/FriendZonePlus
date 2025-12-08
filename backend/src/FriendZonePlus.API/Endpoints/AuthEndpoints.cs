@@ -40,7 +40,11 @@ public static class AuthEndpoints
 
             return TypedResults.Ok(new
             {
-                response
+                response.UserId,
+                response.FirstName,
+                response.LastName,
+                response.Username,
+                response.Email
             });
         }).AddEndpointFilter<ValidationFilter<LoginRequest>>();
 
@@ -50,6 +54,7 @@ public static class AuthEndpoints
             return TypedResults.Ok();
         });
 
+        // Validateas that the user has an active valid token
         group.MapGet("/me", (HttpContext httpContext) =>
         {
             var token = httpContext.Request.Cookies["auth"];

@@ -6,8 +6,9 @@ import NotFoundPage from "./pages/NotFoundPage";
 import UserPage from "./pages/UserPage";
 import SettingsPage from "./pages/SettingsPage";
 import FindFriendsPage from "./pages/FindFriendsPage";
-import MessagesPage from "./pages/MessagesPage";
+import MessagesPage from "./feature/messages/MessagesPage";
 import ProtectedLayout from "../utils/ProtectedLayout";
+import PrivateChat from "./feature/messages/PrivateChat";
 
 const routes: RouteObject[] = [
   { path: "login", element: <LoginPage />, handle: { title: "Login" } },
@@ -42,6 +43,11 @@ const routes: RouteObject[] = [
   },
 
   { path: "*", element: <NotFoundPage />, handle: { title: "Not Found" } },
+  {
+    path: "messages/:id",
+    element: <PrivateChat />,
+    handle: { type: "user" },
+  },
 ];
 
 export default routes;

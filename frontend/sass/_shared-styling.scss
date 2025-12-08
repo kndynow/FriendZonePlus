@@ -2,6 +2,10 @@
   box-shadow: 0 0 10px rgba(69, 0, 148, 0.123);
 }
 
+.f-shadow-inset {
+  box-shadow: inset 0 0 10px rgba(69, 0, 148, 0.123);
+}
+
 .f-border {
   border-radius: 16px;
 }
@@ -19,4 +23,8 @@
 .f-button:active {
   outline: none;
   box-shadow: none;
+}
+
+.semi-transparent-bg {
+  background-color: #ffffff8f;
 }

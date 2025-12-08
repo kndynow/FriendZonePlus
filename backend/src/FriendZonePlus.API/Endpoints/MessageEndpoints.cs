@@ -10,11 +10,12 @@ namespace FriendZonePlus.API.Endpoints
         public static void MapMessageEndpoints(this IEndpointRouteBuilder app)
         {
             var group = app.MapGroup("/api/Message")
-                .WithTags("Message");
+                .WithTags("Message")
+                .RequireAuthorization();
 
             group.MapPost("send", SendMessage);
             group.MapGet("conversation/{receiverId:int}", GetMessagesBetweenUsers);
-            group.MapGet("latest", GetLatestChats);
+            group.MapGet("latest", GetLatestChats);            
         }
 
         private static async Task<IResult> SendMessage(
@@ -24,26 +25,25 @@ namespace FriendZonePlus.API.Endpoints
         {
             try
             {
+                // Checks if the user is authenticated and retrieves senderId from claims
                 var senderIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(senderIdClaim) || !int.TryParse(senderIdClaim, out int senderId))
                 {
                     return Results.Unauthorized();
                 }
 
-                // Temporary until JWT is in place
-                //var senderId = 2;
-
                 var response = await messageService.SendMessageAsync(senderId, requestDto);
 
                 return Results.Created($"/api/Message/{response.Id}", response);
             }
+
             catch (ArgumentException ex)
             {
                 return Results.BadRequest(new { message = ex.Message });
             }
             catch (Exception)
             {
-                return Results.BadRequest( new { message = "Unable to send message." });
+                return Results.BadRequest(new { message = "Unable to send message." });
             }
         }
 
@@ -51,15 +51,13 @@ namespace FriendZonePlus.API.Endpoints
         {
             try
             {
+                // Checks if the user is authenticated and retrieves senderId from claims
                 var senderIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(senderIdClaim) || !int.TryParse(senderIdClaim, out int senderId))
                 {
                     return Results.Unauthorized();
                 }
-
-                // Temporary until JWT is in place
-                //var senderId = 1;
-
+                
                 var response = await messageService.GetMessagesBetweenUsersAsync(senderId, receiverId);
 
                 return Results.Ok(response);
@@ -80,14 +78,12 @@ namespace FriendZonePlus.API.Endpoints
         {
             try
             {
+                 // Checks if the user is authenticated and retrieves senderId from claims
                  var senderIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(senderIdClaim) || !int.TryParse(senderIdClaim, out int senderId))
                 {
                     return Results.Unauthorized();
                 }
-
-                // Temporary until JWT is in place
-                //var senderId = 5;
 
                 var response = await messageService.GetLatestChatsAsync(senderId);
 

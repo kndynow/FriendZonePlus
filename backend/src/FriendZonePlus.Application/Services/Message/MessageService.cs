@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using FriendZonePlus.Application.DTOs;
+using FriendZonePlus.Application.Interfaces;
 using FriendZonePlus.Core.Entities;
 using FriendZonePlus.Core.Interfaces;
 using FriendZonePlus.Application.Interfaces;
@@ -16,13 +17,15 @@ namespace FriendZonePlus.Application.Services.Messages
     {
         private readonly IMessageRepository _messageRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IMessageNotifier _notifier;
         private readonly IValidator<SendMessageRequestDto> _validator;
 
-        public MessageService(IMessageRepository messageRepository, IUserRepository userRepository, IValidator<SendMessageRequestDto> validator)
+        public MessageService(IMessageRepository messageRepository, IUserRepository userRepository, IValidator<SendMessageRequestDto> validator, IMessageNotifier notifier)
         {
             _messageRepository = messageRepository;
             _userRepository = userRepository;
             _validator = validator;
+            _notifier = notifier;
         }
 
         public async Task<MessageResponseDto> SendMessageAsync(int senderId, SendMessageRequestDto dto)
@@ -49,17 +52,23 @@ namespace FriendZonePlus.Application.Services.Messages
                 Content = dto.Content,
             };
 
-            var response = await _messageRepository.AddMessageAsync(message);
+            var savedMessage = await _messageRepository.AddMessageAsync(message);
 
-            return new MessageResponseDto(
-                response.Id,
-                response.SenderId,
-                response.ReceiverId,
-                response.Content,
-                response.SentAt,
-                response.IsRead
+            var responseDto = new MessageResponseDto(
+                savedMessage.Id,
+                savedMessage.SenderId,
+                savedMessage.ReceiverId,
+                savedMessage.Content,
+                savedMessage.SentAt,
+                savedMessage.IsRead
             );
+
+            // Notifies users via signalR
+            await _notifier.NotifyMessageSentAsync(senderId, dto.ReceiverId, responseDto);
+
+            return responseDto;
         }
+
         public async Task<IEnumerable<MessageResponseDto>> GetMessagesBetweenUsersAsync(int senderId, int receiverId)
         {
             if (await _userRepository.GetByIdAsync(receiverId) is null)
