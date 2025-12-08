@@ -4,13 +4,16 @@ import { Col, Row } from "react-bootstrap";
 import ChatInput from "./ChatInput";
 import { useMessages } from "./useMessages";
 import { useAuth } from "../../../context/AuthProvider";
+import { useParams } from "react-router-dom";
 
 export default function PrivateChat() {
   const { messages, getConversation, setMessages } = useMessages();
   const { user } = useAuth();
 
   const [input, setInput] = useState("");
-  const receiverId = 1;
+
+  const { id } = useParams();
+  const receiverId = Number(id);
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
