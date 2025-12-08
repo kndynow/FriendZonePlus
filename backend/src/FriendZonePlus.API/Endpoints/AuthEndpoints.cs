@@ -20,7 +20,10 @@ public static class AuthEndpoints
         {
             var response = await authService.RegisterAsync(request);
             return TypedResults.Created($"/api/Auth/{response.UserId}", response);
-        }).AddEndpointFilter<ValidationFilter<RegisterRequest>>();
+        })
+        .WithDescription("Registers a new user account with the provided information")
+        .WithSummary("Register new user")
+        .AddEndpointFilter<ValidationFilter<RegisterRequest>>();
 
         group.MapPost("/login", async (LoginRequest request, [FromServices] IAuthenticationService
         authenticationService,
@@ -46,13 +49,18 @@ public static class AuthEndpoints
                 response.Username,
                 response.Email
             });
-        }).AddEndpointFilter<ValidationFilter<LoginRequest>>();
+        })
+        .WithDescription("Authenticates a user with email and password. Returns user information and sets an authentication cookie")
+        .WithSummary("Login")
+        .AddEndpointFilter<ValidationFilter<LoginRequest>>();
 
         group.MapPost("/logout", (HttpContext httpContext) =>
         {
             httpContext.Response.Cookies.Delete("auth");
             return TypedResults.Ok();
-        });
+        })
+        .WithDescription("Logs out the current user by removing the authentication cookie")
+        .WithSummary("Logout");
 
         // Validateas that the user has an active valid token
         group.MapGet("/me", (HttpContext httpContext) =>
@@ -81,6 +89,8 @@ public static class AuthEndpoints
                      ?? principal.FindFirst("email")?.Value;
 
             return (IResult)TypedResults.Ok(new { UserId = userId, Username = username, Email = email });
-        });
+        })
+        .WithDescription("Validates the authentication token and returns the current authenticated user's information")
+        .WithSummary("Get current user");
     }
 }

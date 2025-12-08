@@ -20,7 +20,9 @@ public static class UserEndpoints
       var userProfile = await userservice.GetUserProfileAsync(id);
 
       return TypedResults.Ok(userProfile);
-    });
+    })
+    .WithDescription("Gets the user profile information for a specific user by their user ID")
+    .WithSummary("Get user profile");
 
     //Update user profile
     group.MapPut("/me", async (UpdateUserDto dto, ClaimsPrincipal user, [FromServices] IUserService userService) =>
@@ -30,7 +32,9 @@ public static class UserEndpoints
       await userService.UpdateUserProfileAsync(currentUserId, dto);
 
       return TypedResults.Ok(new { message = "User profile updated successfully" });
-    });
+    })
+    .WithDescription("Updates the profile information for the authenticated user")
+    .WithSummary("Update user profile");
 
     //Delete user
     group.MapDelete("/me", async (ClaimsPrincipal user, [FromServices] IUserService userService) =>
@@ -40,7 +44,9 @@ public static class UserEndpoints
       await userService.DeleteUserAsync(currentUserId);
 
       return TypedResults.NoContent();
-    });
+    })
+    .WithDescription("Deletes the authenticated user's account")
+    .WithSummary("Delete user account");
 
     //Follow user
     group.MapPost("/{id}/follow", async (int id, ClaimsPrincipal user, [FromServices] IUserService userService) =>
@@ -50,7 +56,9 @@ public static class UserEndpoints
       await userService.FollowUserAsync(currentUserId, id);
 
       return TypedResults.Ok(new { message = "User followed successfully" });
-    });
+    })
+    .WithDescription("Follows a user by their user ID. The authenticated user will start following the specified user")
+    .WithSummary("Follow user");
 
     //Unfollow user
     group.MapDelete("/{id}/unfollow", async (int id, ClaimsPrincipal user, [FromServices] IUserService userService) =>
@@ -60,7 +68,9 @@ public static class UserEndpoints
       await userService.UnfollowUserAsync(currentUserId, id);
 
       return TypedResults.Ok(new { message = "User unfollowed successfully" });
-    });
+    })
+    .WithDescription("Unfollows a user by their user ID. The authenticated user will stop following the specified user")
+    .WithSummary("Unfollow user");
 
     //Get followers
     group.MapGet("/me/followers", async (ClaimsPrincipal user, [FromServices] IUserService userService) =>
@@ -70,7 +80,9 @@ public static class UserEndpoints
       var followers = await userService.GetFollowersAsync(currentUserId);
 
       return TypedResults.Ok(followers);
-    });
+    })
+    .WithDescription("Gets a list of all users that are following the authenticated user")
+    .WithSummary("Get followers");
 
     //Get following
     group.MapGet("/me/following", async (ClaimsPrincipal user, [FromServices] IUserService userService) =>
@@ -80,7 +92,9 @@ public static class UserEndpoints
       var following = await userService.GetFollowingAsync(currentUserId);
 
       return TypedResults.Ok(following);
-    });
+    })
+    .WithDescription("Gets a list of all users that the authenticated user is following")
+    .WithSummary("Get following");
   }
 
 }

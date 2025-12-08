@@ -101,7 +101,6 @@ builder.Services.AddCors(options =>
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IWallPostRepository, WallPostRepository>();
-// builder.Services.AddScoped<IFollowRepository, FollowRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
 // Services

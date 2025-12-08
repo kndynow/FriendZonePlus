@@ -14,8 +14,6 @@ public record UpdateUserDto(string FirstName, string LastName, string ProfilePic
 
 public record DeleteUserDto(int id);
 
-
-// Old methods
 public record UserResponseDto(
     string Username,
     string Email
