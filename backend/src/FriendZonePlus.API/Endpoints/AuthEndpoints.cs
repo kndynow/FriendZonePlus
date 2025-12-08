@@ -4,9 +4,9 @@ using FriendZonePlus.Application.Services.Authentication;
 using FriendZonePlus.Infrastructure.Authentication;
 using FriendZonePlus.Application.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 public static class AuthEndpoints
 {
@@ -15,13 +15,17 @@ public static class AuthEndpoints
         var group = app.MapGroup("/api/Auth")
                         .WithTags("Authorization");
 
-        group.MapPost("/register", async (RegisterRequest request, IAuthenticationService authService) =>
+
+        group.MapPost("/register", async (RegisterRequest request, [FromServices] IAuthenticationService authService) =>
         {
             var response = await authService.RegisterAsync(request);
             return TypedResults.Created($"/api/Auth/{response.UserId}", response);
-        }).AddEndpointFilter<ValidationFilter<RegisterRequest>>();
+        })
+        .WithDescription("Registers a new user account with the provided information")
+        .WithSummary("Register new user")
+        .AddEndpointFilter<ValidationFilter<RegisterRequest>>();
 
-        group.MapPost("/login", async (LoginRequest request, IAuthenticationService
+        group.MapPost("/login", async (LoginRequest request, [FromServices] IAuthenticationService
         authenticationService,
         HttpContext httpContext,
         IOptions<JwtSettings> jwtOptions) =>
@@ -45,13 +49,18 @@ public static class AuthEndpoints
                 response.Username,
                 response.Email
             });
-        }).AddEndpointFilter<ValidationFilter<LoginRequest>>();
+        })
+        .WithDescription("Authenticates a user with email and password. Returns user information and sets an authentication cookie")
+        .WithSummary("Login")
+        .AddEndpointFilter<ValidationFilter<LoginRequest>>();
 
         group.MapPost("/logout", (HttpContext httpContext) =>
         {
             httpContext.Response.Cookies.Delete("auth");
             return TypedResults.Ok();
-        });
+        })
+        .WithDescription("Logs out the current user by removing the authentication cookie")
+        .WithSummary("Logout");
 
         // Validateas that the user has an active valid token
         group.MapGet("/me", (HttpContext httpContext) =>
@@ -68,7 +77,20 @@ public static class AuthEndpoints
             if (principal == null)
                 return TypedResults.Unauthorized();
 
-            return (IResult)TypedResults.Ok();
-        });
+            // Try multiple claim types to find the values
+            var userId = principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
+                      ?? principal.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                      ?? principal.FindFirst("sub")?.Value;
+
+            var username = principal.FindFirst("username")?.Value;
+
+            var email = principal.FindFirst(JwtRegisteredClaimNames.Email)?.Value
+                     ?? principal.FindFirst(ClaimTypes.Email)?.Value
+                     ?? principal.FindFirst("email")?.Value;
+
+            return (IResult)TypedResults.Ok(new { UserId = userId, Username = username, Email = email });
+        })
+        .WithDescription("Validates the authentication token and returns the current authenticated user's information")
+        .WithSummary("Get current user");
     }
 }

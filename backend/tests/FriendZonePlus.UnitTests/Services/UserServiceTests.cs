@@ -1,7 +1,8 @@
 using FriendZonePlus.Application.DTOs;
 using FriendZonePlus.Application.Services;
 using FriendZonePlus.Core.Entities;
-using FriendZonePlus.Core.Interfaces;
+using FriendZonePlus.Core.Exceptions;
+using FriendZonePlus.Application.Interfaces;
 using Moq;
 using Xunit;
 
@@ -19,22 +20,324 @@ public class UserServiceTests
     _sut = new UserService(_userRepoMock.Object);
   }
 
+  #region DeleteUserAsync Tests
+
   [Fact]
-  public async Task DeleteUser_ShouldReturnSuccess_WhenUserExists()
+  public async Task DeleteUserAsync_ShouldDeleteUser_WhenUserExists()
   {
     //Arrange
     var userId = 1;
-    //Simulate that database returns a user with the correct ID
-    _userRepoMock.Setup(repo => repo.GetByIdAsync(userId)).ReturnsAsync(new User { Id = userId });
+    var user = new User { Id = userId };
+    _userRepoMock.Setup(repo => repo.GetByIdAsync(userId)).ReturnsAsync(user);
 
     //Act
-    var success = await _sut.DeleteUserAsync(userId);
+    await _sut.DeleteUserAsync(userId);
 
     //Assert
-    Assert.True(success);
-
-    //Verify that DeleteAsync was called one time with the correct user data
+    _userRepoMock.Verify(repo => repo.GetByIdAsync(userId), Times.Once);
     _userRepoMock.Verify(repo => repo.DeleteAsync(It.Is<User>(u => u.Id == userId)), Times.Once);
   }
+
+  [Fact]
+  public async Task DeleteUserAsync_ShouldThrowUserNotFoundException_WhenUserDoesNotExist()
+  {
+    //Arrange
+    var userId = 1;
+    _userRepoMock.Setup(repo => repo.GetByIdAsync(userId)).ReturnsAsync((User?)null);
+
+    //Act & Assert
+    var exception = await Assert.ThrowsAsync<UserNotFoundException>(() =>
+      _sut.DeleteUserAsync(userId)
+    );
+
+    Assert.Equal($"User with ID {userId} not found", exception.Message);
+    _userRepoMock.Verify(repo => repo.DeleteAsync(It.IsAny<User>()), Times.Never);
+  }
+
+  #endregion
+
+  #region GetUserProfileAsync Tests
+
+  [Fact]
+  public async Task GetUserProfileAsync_ShouldReturnUserProfileDto_WhenUserExists()
+  {
+    //Arrange
+    var userId = 1;
+    var user = new User
+    {
+      Id = userId,
+      Username = "testuser",
+      FirstName = "Test",
+      LastName = "User",
+      ProfilePictureUrl = "http://example.com/pic.jpg",
+      Followers = new List<Follow> { new Follow(), new Follow() },
+      Following = new List<Follow> { new Follow() }
+    };
+    _userRepoMock.Setup(repo => repo.GetByIdWithRelationsAsync(userId)).ReturnsAsync(user);
+
+    //Act
+    var result = await _sut.GetUserProfileAsync(userId);
+
+    //Assert
+    Assert.NotNull(result);
+    Assert.Equal(userId, result.Id);
+    Assert.Equal("testuser", result.Username);
+    Assert.Equal("Test", result.FirstName);
+    Assert.Equal("User", result.LastName);
+    Assert.Equal("http://example.com/pic.jpg", result.ProfilePictureUrl);
+    Assert.Equal(2, result.FollowersCount);
+    Assert.Equal(1, result.FollowingCount);
+    _userRepoMock.Verify(repo => repo.GetByIdWithRelationsAsync(userId), Times.Once);
+  }
+
+  [Fact]
+  public async Task GetUserProfileAsync_ShouldThrowUserNotFoundException_WhenUserDoesNotExist()
+  {
+    //Arrange
+    var userId = 1;
+    _userRepoMock.Setup(repo => repo.GetByIdWithRelationsAsync(userId)).ReturnsAsync((User?)null);
+
+    //Act & Assert
+    var exception = await Assert.ThrowsAsync<UserNotFoundException>(() =>
+      _sut.GetUserProfileAsync(userId)
+    );
+
+    Assert.Equal($"User with ID {userId} not found", exception.Message);
+  }
+
+  #endregion
+
+  #region UpdateUserProfileAsync Tests
+
+  [Fact]
+  public async Task UpdateUserProfileAsync_ShouldUpdateUser_WhenUserExists()
+  {
+    //Arrange
+    var userId = 1;
+    var user = new User
+    {
+      Id = userId,
+      FirstName = "Old",
+      LastName = "Name",
+      ProfilePictureUrl = "http://example.com/old.jpg"
+    };
+    var updateDto = new UpdateUserDto("New", "Name", "http://example.com/new.jpg");
+    _userRepoMock.Setup(repo => repo.GetByIdAsync(userId)).ReturnsAsync(user);
+
+    //Act
+    await _sut.UpdateUserProfileAsync(userId, updateDto);
+
+    //Assert
+    Assert.Equal("New", user.FirstName);
+    Assert.Equal("Name", user.LastName);
+    Assert.Equal("http://example.com/new.jpg", user.ProfilePictureUrl);
+    _userRepoMock.Verify(repo => repo.GetByIdAsync(userId), Times.Once);
+    _userRepoMock.Verify(repo => repo.UpdateAsync(It.Is<User>(u => u.Id == userId)), Times.Once);
+  }
+
+  [Fact]
+  public async Task UpdateUserProfileAsync_ShouldThrowUserNotFoundException_WhenUserDoesNotExist()
+  {
+    //Arrange
+    var userId = 1;
+    var updateDto = new UpdateUserDto("New", "Name", "http://example.com/new.jpg");
+    _userRepoMock.Setup(repo => repo.GetByIdAsync(userId)).ReturnsAsync((User?)null);
+
+    //Act & Assert
+    var exception = await Assert.ThrowsAsync<UserNotFoundException>(() =>
+      _sut.UpdateUserProfileAsync(userId, updateDto)
+    );
+
+    Assert.Equal($"User with ID {userId} not found", exception.Message);
+    _userRepoMock.Verify(repo => repo.UpdateAsync(It.IsAny<User>()), Times.Never);
+  }
+
+  #endregion
+
+  #region FollowUserAsync Tests
+
+  [Fact]
+  public async Task FollowUserAsync_ShouldFollowUser_WhenUserExists()
+  {
+    //Arrange
+    var currentUserId = 1;
+    var targetUserId = 2;
+    var targetUser = new User { Id = targetUserId };
+    _userRepoMock.Setup(repo => repo.GetByIdAsync(targetUserId)).ReturnsAsync(targetUser);
+
+    //Act
+    await _sut.FollowUserAsync(currentUserId, targetUserId);
+
+    //Assert
+    _userRepoMock.Verify(repo => repo.GetByIdAsync(targetUserId), Times.Once);
+    _userRepoMock.Verify(repo => repo.FollowUserAsync(currentUserId, targetUserId), Times.Once);
+  }
+
+  [Fact]
+  public async Task FollowUserAsync_ShouldThrowCannotFollowSelfException_WhenTryingToFollowSelf()
+  {
+    //Arrange
+    var userId = 1;
+
+    //Act & Assert
+    var exception = await Assert.ThrowsAsync<CannotFollowSelfException>(() =>
+      _sut.FollowUserAsync(userId, userId)
+    );
+
+    Assert.Equal("You cannot follow yourself.", exception.Message);
+    _userRepoMock.Verify(repo => repo.GetByIdAsync(It.IsAny<int>()), Times.Never);
+    _userRepoMock.Verify(repo => repo.FollowUserAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Never);
+  }
+
+  [Fact]
+  public async Task FollowUserAsync_ShouldThrowUserNotFoundException_WhenTargetUserDoesNotExist()
+  {
+    //Arrange
+    var currentUserId = 1;
+    var targetUserId = 2;
+    _userRepoMock.Setup(repo => repo.GetByIdAsync(targetUserId)).ReturnsAsync((User?)null);
+
+    //Act & Assert
+    var exception = await Assert.ThrowsAsync<UserNotFoundException>(() =>
+      _sut.FollowUserAsync(currentUserId, targetUserId)
+    );
+
+    Assert.Equal($"User with ID {targetUserId} not found", exception.Message);
+    _userRepoMock.Verify(repo => repo.FollowUserAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Never);
+  }
+
+  #endregion
+
+  #region UnfollowUserAsync Tests
+
+  [Fact]
+  public async Task UnfollowUserAsync_ShouldUnfollowUser_WhenUserExists()
+  {
+    //Arrange
+    var currentUserId = 1;
+    var targetUserId = 2;
+    var targetUser = new User { Id = targetUserId };
+    _userRepoMock.Setup(repo => repo.GetByIdAsync(targetUserId)).ReturnsAsync(targetUser);
+
+    //Act
+    await _sut.UnfollowUserAsync(currentUserId, targetUserId);
+
+    //Assert
+    _userRepoMock.Verify(repo => repo.GetByIdAsync(targetUserId), Times.Once);
+    _userRepoMock.Verify(repo => repo.UnfollowUserAsync(currentUserId, targetUserId), Times.Once);
+  }
+
+  [Fact]
+  public async Task UnfollowUserAsync_ShouldThrowUserNotFoundException_WhenTargetUserDoesNotExist()
+  {
+    //Arrange
+    var currentUserId = 1;
+    var targetUserId = 2;
+    _userRepoMock.Setup(repo => repo.GetByIdAsync(targetUserId)).ReturnsAsync((User?)null);
+
+    //Act & Assert
+    var exception = await Assert.ThrowsAsync<UserNotFoundException>(() =>
+      _sut.UnfollowUserAsync(currentUserId, targetUserId)
+    );
+
+    Assert.Equal($"User with ID {targetUserId} not found", exception.Message);
+    _userRepoMock.Verify(repo => repo.UnfollowUserAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Never);
+  }
+
+  #endregion
+
+  #region GetFollowersAsync Tests
+
+  [Fact]
+  public async Task GetFollowersAsync_ShouldReturnListOfFollowers_WhenUsersExist()
+  {
+    //Arrange
+    var userId = 1;
+    var followers = new List<User>
+    {
+      new User { Id = 2, Username = "follower1", Email = "follower1@example.com" },
+      new User { Id = 3, Username = "follower2", Email = "follower2@example.com" }
+    };
+    _userRepoMock.Setup(repo => repo.GetFollowersAsync(userId)).ReturnsAsync(followers);
+
+    //Act
+    var result = await _sut.GetFollowersAsync(userId);
+
+    //Assert
+    Assert.NotNull(result);
+    Assert.Equal(2, result.Count);
+    Assert.Equal(2, result[0].Id);
+    Assert.Equal("follower1", result[0].Username);
+    Assert.Equal("follower1@example.com", result[0].Email);
+    Assert.Equal(3, result[1].Id);
+    Assert.Equal("follower2", result[1].Username);
+    Assert.Equal("follower2@example.com", result[1].Email);
+    _userRepoMock.Verify(repo => repo.GetFollowersAsync(userId), Times.Once);
+  }
+
+  [Fact]
+  public async Task GetFollowersAsync_ShouldReturnEmptyList_WhenNoFollowers()
+  {
+    //Arrange
+    var userId = 1;
+    _userRepoMock.Setup(repo => repo.GetFollowersAsync(userId)).ReturnsAsync(new List<User>());
+
+    //Act
+    var result = await _sut.GetFollowersAsync(userId);
+
+    //Assert
+    Assert.NotNull(result);
+    Assert.Empty(result);
+    _userRepoMock.Verify(repo => repo.GetFollowersAsync(userId), Times.Once);
+  }
+
+  #endregion
+
+  #region GetFollowingAsync Tests
+
+  [Fact]
+  public async Task GetFollowingAsync_ShouldReturnListOfFollowing_WhenUsersExist()
+  {
+    //Arrange
+    var userId = 1;
+    var following = new List<User>
+    {
+      new User { Id = 2, Username = "following1", Email = "following1@example.com" },
+      new User { Id = 3, Username = "following2", Email = "following2@example.com" }
+    };
+    _userRepoMock.Setup(repo => repo.GetFollowingAsync(userId)).ReturnsAsync(following);
+
+    //Act
+    var result = await _sut.GetFollowingAsync(userId);
+
+    //Assert
+    Assert.NotNull(result);
+    Assert.Equal(2, result.Count);
+    Assert.Equal(2, result[0].Id);
+    Assert.Equal("following1", result[0].Username);
+    Assert.Equal("following1@example.com", result[0].Email);
+    Assert.Equal(3, result[1].Id);
+    Assert.Equal("following2", result[1].Username);
+    Assert.Equal("following2@example.com", result[1].Email);
+    _userRepoMock.Verify(repo => repo.GetFollowingAsync(userId), Times.Once);
+  }
+
+  [Fact]
+  public async Task GetFollowingAsync_ShouldReturnEmptyList_WhenNotFollowingAnyone()
+  {
+    //Arrange
+    var userId = 1;
+    _userRepoMock.Setup(repo => repo.GetFollowingAsync(userId)).ReturnsAsync(new List<User>());
+
+    //Act
+    var result = await _sut.GetFollowingAsync(userId);
+
+    //Assert
+    Assert.NotNull(result);
+    Assert.Empty(result);
+    _userRepoMock.Verify(repo => repo.GetFollowingAsync(userId), Times.Once);
+  }
+
+  #endregion
 
 }

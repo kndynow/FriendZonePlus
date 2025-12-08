@@ -1,16 +1,9 @@
-﻿using FluentValidation;
-using FriendZonePlus.Application.DTOs;
-using FriendZonePlus.Application.Services;
-using FriendZonePlus.Application.Validators;
+﻿using FriendZonePlus.Application.DTOs;
 using FriendZonePlus.Core.Entities;
-using FriendZonePlus.Core.Interfaces;
+using FriendZonePlus.Application.Interfaces;
 using FriendZonePlus.Application.Helpers.PasswordHelpers;
 using FriendZonePlus.Application.Services.Authentication;
-using FriendZonePlus.Application.Interfaces;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace FriendZonePlus.UnitTests.Services
 {
@@ -67,11 +60,8 @@ namespace FriendZonePlus.UnitTests.Services
 
             // Repository returns user with ID assigned
             _userRepoMock.Setup(repo => repo.AddAsync(It.IsAny<User>()))
-                .ReturnsAsync((User u) =>
-                {
-                    u.Id = 1;
-                    return u;
-                });
+                .Callback((User u) => u.Id = 1)
+                .Returns(Task.CompletedTask);
 
             _jwtGeneratorMock
                 .Setup(j => j.GenerateToken(It.IsAny<User>()))
@@ -113,11 +103,8 @@ namespace FriendZonePlus.UnitTests.Services
                 .Returns((string pwd) => "hashed-" + pwd);
 
             _userRepoMock.Setup(repo => repo.AddAsync(It.IsAny<User>()))
-                .ReturnsAsync((User u) =>
-                {
-                    u.Id = 5;
-                    return u;
-                });
+                .Callback((User u) => u.Id = 5)
+                .Returns(Task.CompletedTask);
 
             _jwtGeneratorMock
                 .Setup(j => j.GenerateToken(It.IsAny<User>()))
@@ -135,6 +122,69 @@ namespace FriendZonePlus.UnitTests.Services
                 Times.Once);
         }
 
+        [Fact]
+        public async Task RegisterAsync_ShouldThrowException_WhenEmailAlreadyExists()
+        {
+            // Arrange
+            var registerRequest = new RegisterRequest(
+                "Snusmumriken1978",
+                "snusmumriken@hotmail.com",
+                "Erik",
+                "Eriksson",
+                "Secret123"
+            );
+
+            var existingUser = ValidUser();
+            existingUser.Id = 1;
+
+            _userRepoMock.Setup(r => r.GetByEmailAsync(registerRequest.Email))
+                .ReturnsAsync(existingUser);
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<FriendZonePlus.Core.Exceptions.UserAlreadyExistsException>(
+                async () => await _authenticationService.RegisterAsync(registerRequest));
+
+            Assert.Contains(registerRequest.Email, exception.Message);
+
+            _userRepoMock.Verify(r => r.GetByEmailAsync(registerRequest.Email), Times.Once);
+            _userRepoMock.Verify(r => r.GetByUsernameAsync(It.IsAny<string>()), Times.Never);
+            _userRepoMock.Verify(r => r.AddAsync(It.IsAny<User>()), Times.Never);
+            _passwordHelperMock.Verify(h => h.HashPassword(It.IsAny<string>()), Times.Never);
+            _jwtGeneratorMock.Verify(j => j.GenerateToken(It.IsAny<User>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task RegisterAsync_ShouldThrowException_WhenUsernameAlreadyExists()
+        {
+            // Arrange
+            var registerRequest = new RegisterRequest(
+                "Snusmumriken1978",
+                "newemail@hotmail.com",
+                "Erik",
+                "Eriksson",
+                "Secret123"
+            );
+
+            var existingUser = ValidUser();
+            existingUser.Id = 1;
+
+            _userRepoMock.Setup(r => r.GetByEmailAsync(registerRequest.Email))
+                .ReturnsAsync((User?)null);
+            _userRepoMock.Setup(r => r.GetByUsernameAsync(registerRequest.Username))
+                .ReturnsAsync(existingUser);
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<FriendZonePlus.Core.Exceptions.UserAlreadyExistsException>(
+                async () => await _authenticationService.RegisterAsync(registerRequest));
+
+            Assert.Contains(registerRequest.Username, exception.Message);
+
+            _userRepoMock.Verify(r => r.GetByEmailAsync(registerRequest.Email), Times.Once);
+            _userRepoMock.Verify(r => r.GetByUsernameAsync(registerRequest.Username), Times.Once);
+            _userRepoMock.Verify(r => r.AddAsync(It.IsAny<User>()), Times.Never);
+            _passwordHelperMock.Verify(h => h.HashPassword(It.IsAny<string>()), Times.Never);
+            _jwtGeneratorMock.Verify(j => j.GenerateToken(It.IsAny<User>()), Times.Never);
+        }
 
         #region Login Tests
         // === Login Tests ===
@@ -167,6 +217,9 @@ namespace FriendZonePlus.UnitTests.Services
             Assert.Equal(expectedToken, result.Token);
             Assert.Equal(user.Id, result.UserId);
             Assert.Equal(user.Username, result.Username);
+            Assert.Equal(user.Email, result.Email);
+            Assert.Equal(user.FirstName, result.FirstName);
+            Assert.Equal(user.LastName, result.LastName);
 
             _userRepoMock.Verify(r => r.GetByUsernameOrEmailAsync(loginRequest.UsernameOrEmail), Times.Once);
             _passwordHelperMock.Verify(h => h.VerifyPassword(loginRequest.Password, user.PasswordHash), Times.Once);
@@ -202,6 +255,9 @@ namespace FriendZonePlus.UnitTests.Services
             Assert.Equal(expectedToken, result.Token);
             Assert.Equal(user.Id, result.UserId);
             Assert.Equal(user.Username, result.Username);
+            Assert.Equal(user.Email, result.Email);
+            Assert.Equal(user.FirstName, result.FirstName);
+            Assert.Equal(user.LastName, result.LastName);
             _userRepoMock.Verify(r => r.GetByUsernameOrEmailAsync(loginRequest.UsernameOrEmail), Times.Once);
             _jwtGeneratorMock.Verify(j => j.GenerateToken(user), Times.Once);
         }
@@ -235,6 +291,9 @@ namespace FriendZonePlus.UnitTests.Services
             Assert.Equal(expectedToken, result.Token);
             Assert.Equal(user.Id, result.UserId);
             Assert.Equal(user.Username, result.Username);
+            Assert.Equal(user.Email, result.Email);
+            Assert.Equal(user.FirstName, result.FirstName);
+            Assert.Equal(user.LastName, result.LastName);
             _userRepoMock.Verify(r => r.GetByUsernameOrEmailAsync(loginRequest.UsernameOrEmail), Times.Once);
         }
 
@@ -277,9 +336,8 @@ namespace FriendZonePlus.UnitTests.Services
             _passwordHelperMock.Verify(h => h.VerifyPassword(loginRequest.Password, user.PasswordHash), Times.Once);
             _jwtGeneratorMock.Verify(j => j.GenerateToken(It.IsAny<User>()), Times.Never);
         }
-
+        #endregion
     }
-    #endregion
 }
 
 

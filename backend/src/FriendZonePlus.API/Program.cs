@@ -2,13 +2,13 @@ using FluentValidation;
 using FriendZonePlus.API.Endpoints;
 using FriendZonePlus.API.Hubs;
 using FriendZonePlus.API.Infrastructure;
-using FriendZonePlus.API.Mappings;
 using FriendZonePlus.Application.DTOs;
 using FriendZonePlus.Application.Helpers.PasswordHelpers;
 using FriendZonePlus.Application.Interfaces;
 using FriendZonePlus.Application.Services;
 using FriendZonePlus.Application.Services.Authentication;
 using FriendZonePlus.Application.Services.Messages;
+using FriendZonePlus.Application.Interfaces;
 using FriendZonePlus.Application.Validators;
 using FriendZonePlus.Core.Interfaces;
 using FriendZonePlus.Infrastructure.Authentication;
@@ -23,6 +23,10 @@ using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using System.Text;
 using System.Text.Json;
+using FriendZonePlus.Infrastructure.Authentication;
+using FriendZonePlus.API.Infrastructure;
+using FriendZonePlus.Application.Mappings;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -69,7 +73,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 Encoding.UTF8.GetBytes(jwtSettings?.SecretKey ?? throw new InvalidOperationException("JWT SecretKey is not configured"))
             )
         };
-        
+
         options.Events = new JwtBearerEvents
         {
             OnMessageReceived = context =>
@@ -78,7 +82,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 return Task.CompletedTask;
             }
         };
-        
+
     });
 
 // CORS
@@ -90,39 +94,36 @@ builder.Services.AddCors(options =>
             .WithOrigins("http://localhost:5173")
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials(); 
+            .AllowCredentials();
     });
 });
 
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IWallPostRepository, WallPostRepository>();
-builder.Services.AddScoped<IFollowRepository, FollowRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
 // Services
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<WallPostService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IWallPostService, WallPostService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-builder.Services.AddScoped<FollowService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IMessageNotifier, SignalRMessageNotifier>();
 
 // Helper
 builder.Services.AddScoped<IPasswordHelper, PasswordHelper>();
 //Validator
-builder.Services.AddScoped<IFollowValidator, FollowValidator>();
 builder.Services.AddScoped<IValidator<RegisterRequest>, RegisterRequestValidator>();
 builder.Services.AddScoped<IValidator<SendMessageRequestDto>, SendMessageRequestDtoValidator>();
 
 //SignalR
-builder.Services.AddSingleton<IUserIdProvider, SessionUserIdProvider>(); 
+builder.Services.AddSingleton<IUserIdProvider, SessionUserIdProvider>();
 builder.Services.AddSignalR();
 
 //Mapster Configuration
 var config = TypeAdapterConfig.GlobalSettings;
-FollowMappings.ConfigureFollowMappings();
-WallPostMappings.ConfigureWallPostMappings();
+config.Apply(new MappingConfig());
+
 builder.Services.AddSingleton(config);
 builder.Services.AddScoped<IMapper, Mapper>();
 
@@ -144,7 +145,6 @@ app.UseCors();
 
 app.MapAuthEndpoints();
 app.MapWallPostEndpoints();
-app.MapFollowEndpoints();
 app.MapUserEndpoints();
 app.MapMessageEndpoints();
 

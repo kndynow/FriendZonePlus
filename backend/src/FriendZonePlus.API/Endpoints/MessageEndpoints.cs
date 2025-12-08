@@ -13,9 +13,17 @@ namespace FriendZonePlus.API.Endpoints
                 .WithTags("Message")
                 .RequireAuthorization();
 
-            group.MapPost("send", SendMessage);
-            group.MapGet("conversation/{receiverId:int}", GetMessagesBetweenUsers);
-            group.MapGet("latest", GetLatestChats);            
+            group.MapPost("send", SendMessage)
+                .WithDescription("Sends a message to another user")
+                .WithSummary("Send message");
+
+            group.MapGet("conversation/{receiverId:int}", GetMessagesBetweenUsers)
+                .WithDescription("Gets all messages in a conversation between the authenticated user and a specific receiver")
+                .WithSummary("Get conversation");
+
+            group.MapGet("latest", GetLatestChats)
+                .WithDescription("Gets the latest chat conversations for the authenticated user, showing the most recent message from each conversation")
+                .WithSummary("Get latest chats");
         }
 
         private static async Task<IResult> SendMessage(
@@ -57,7 +65,7 @@ namespace FriendZonePlus.API.Endpoints
                 {
                     return Results.Unauthorized();
                 }
-                
+
                 var response = await messageService.GetMessagesBetweenUsersAsync(senderId, receiverId);
 
                 return Results.Ok(response);
@@ -78,8 +86,8 @@ namespace FriendZonePlus.API.Endpoints
         {
             try
             {
-                 // Checks if the user is authenticated and retrieves senderId from claims
-                 var senderIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                // Checks if the user is authenticated and retrieves senderId from claims
+                var senderIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(senderIdClaim) || !int.TryParse(senderIdClaim, out int senderId))
                 {
                     return Results.Unauthorized();

@@ -1,14 +1,14 @@
+using FriendZonePlus.Application.DTOs;
 using FriendZonePlus.Core.Entities;
 
 namespace FriendZonePlus.Application.Interfaces;
 
 public interface IWallPostService
 {
-    Task<WallPost> CreateWallPostAsync(WallPost wallPost);
-    Task<IEnumerable<WallPost>> GetWallPostsForTargetUserAsync(int targetUserId);
-    Task<IEnumerable<WallPost>> GetWallPostsForAuthorAsync(int authorId);
-    Task<IEnumerable<WallPost>> GetFeedForUserAsync(int userId);
-    Task<WallPost> UpdateWallPostAsync(WallPost wallPost);
-    Task<bool> DeleteWallPostAsync(int id);
+    Task<WallPostResponseDto> CreateAsync(int currentUserId, CreateWallPostDto dto);
+    Task UpdateWallPostAsync(int currentUserId, int wallPostId, UpdateWallPostDto dto);
+    Task DeleteWallPostAsync(int currentUserId, int wallPostId);
+    Task<List<WallPostResponseDto>> GetFeedAsync(int currentUserId);
+    Task<List<WallPostResponseDto>> GetWallPostsAsync(int userId);
 
 }

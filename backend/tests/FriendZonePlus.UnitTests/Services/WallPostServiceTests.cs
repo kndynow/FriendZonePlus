@@ -1,7 +1,11 @@
 using System;
 using FriendZonePlus.Application.Services;
+using FriendZonePlus.Application.DTOs;
+using FriendZonePlus.Application.Interfaces;
+using FriendZonePlus.Application.Mappings;
 using FriendZonePlus.Core.Entities;
-using FriendZonePlus.Core.Interfaces;
+using FriendZonePlus.Core.Exceptions;
+using Mapster;
 using Moq;
 
 namespace FriendZonePlus.UnitTests.Services;
@@ -11,306 +15,212 @@ public class WallPostServiceTests
   #region Setup
   private readonly Mock<IWallPostRepository> _WallPostRepoMock;
   private readonly Mock<IUserRepository> _userRepoMock;
-  private readonly Mock<IFollowRepository> _followRepoMock;
   private readonly WallPostService _sut;
 
 
   public WallPostServiceTests()
   {
+    // Configure Mapster for tests
+    var config = TypeAdapterConfig.GlobalSettings;
+    config.Apply(new MappingConfig());
+
     _WallPostRepoMock = new Mock<IWallPostRepository>();
     _userRepoMock = new Mock<IUserRepository>();
-    _followRepoMock = new Mock<IFollowRepository>();
-    _sut = new WallPostService(_WallPostRepoMock.Object, _userRepoMock.Object, _followRepoMock.Object);
+    _sut = new WallPostService(_WallPostRepoMock.Object, _userRepoMock.Object);
   }
 
   #endregion
 
-  #region CreateWallPostAsync
-
+  #region CreateAsync
 
   [Fact]
-  public async Task CreateWallPost_ShouldReturnWallPost_WhenDataIsValid()
+  public async Task CreateAsync_ShouldReturnWallPostResponseDto_WhenDataIsValid()
   {
     // Arrange
-    var wallPost = new WallPost
+    var currentUserId = 1;
+    var dto = new CreateWallPostDto(TargetUserId: 2, Content: "This is a post!");
+    var author = new User
     {
-      AuthorId = 1,
-      Content = "This is a post!",
-      TargetUserId = 1,
-      CreatedAt = DateTime.UtcNow
+      Id = currentUserId,
+      Username = "authoruser",
+      ProfilePictureUrl = "http://example.com/author.jpg"
     };
 
-    // Setup Users
-    _userRepoMock.Setup(x => x.GetByIdAsync(It.IsAny<int>())).ReturnsAsync(new User());
-
-    // Simulate that database returns an ID
-    _WallPostRepoMock.Setup(x => x.AddAsync(It.IsAny<WallPost>())).ReturnsAsync((WallPost p) =>
-    {
-      p.Id = 101;
-      return p;
-    });
+    // Simulate that database sets an ID and Author when adding
+    _WallPostRepoMock.Setup(x => x.AddAsync(It.IsAny<WallPost>()))
+                     .Callback<WallPost>((WallPost p) =>
+                     {
+                       p.Id = 101;
+                       p.AuthorId = currentUserId;
+                       p.Author = author;
+                       p.CreatedAt = DateTime.UtcNow;
+                     })
+                     .Returns(Task.CompletedTask);
 
     // Act
-    var result = await _sut.CreateWallPostAsync(wallPost);
+    var result = await _sut.CreateAsync(currentUserId, dto);
 
     // Assert
+    Assert.NotNull(result);
     Assert.Equal(101, result.Id);
-    Assert.Equal(wallPost.Content, result.Content);
-    Assert.Equal(wallPost.AuthorId, result.AuthorId);
+    Assert.Equal(dto.Content, result.Content);
+    Assert.Equal(currentUserId, result.AuthorId);
     Assert.True(result.CreatedAt > DateTime.MinValue);
+    Assert.Equal(author.Username, result.AuthorName);
+    Assert.Equal(author.ProfilePictureUrl, result.AuthorProfilePictureUrl);
 
-    _WallPostRepoMock.Verify(x => x.AddAsync(It.IsAny<WallPost>()), Times.Once);
-
-  }
-
-  [Theory]
-  [InlineData("")]
-  [InlineData("     ")]
-  public async Task CreateWallPost_ShouldThrowException_WhenContentIsInvalid(string invalidContent)
-  {
-    // Arrange & Act
-    var wallPost = new WallPost
-    {
-      AuthorId = 1,
-      Content = invalidContent,
-      TargetUserId = 1,
-      CreatedAt = DateTime.UtcNow
-    };
-
-    // Act & Assert
-    var ex = await Assert.ThrowsAsync<ArgumentException>(() => _sut.CreateWallPostAsync(wallPost));
-    Assert.Equal("Content cannot be empty", ex.Message);
-  }
-
-  [Fact]
-  public async Task CreateWallPost_ShouldThrowException_WhenContentIsTooLong()
-  {
-    // Arrange
-    var longContent = new string('x', 301);
-    var wallPost = new WallPost
-    {
-      AuthorId = 1,
-      Content = longContent,
-      TargetUserId = 1,
-      CreatedAt = DateTime.UtcNow
-    };
-
-    // Act & Assert
-    var ex = await Assert.ThrowsAsync<ArgumentException>(() => _sut.CreateWallPostAsync(wallPost));
-    Assert.Equal("Content too long", ex.Message);
-  }
-
-  [Fact]
-  public async Task CreateWallPost_ShouldThrowException_WhenAuthorDoesNotExist()
-  {
-    //Arrange
-    var wallPost = new WallPost
-    {
-      AuthorId = 99,
-      Content = "This is a post!",
-      TargetUserId = 2,
-      CreatedAt = DateTime.UtcNow
-    };
-
-    //Mock so that UserRepo returns null when we query for ID 99
-    _userRepoMock.Setup(x => x.GetByIdAsync(99)).ReturnsAsync((User?)null);
-
-    // Act & Assert
-    var ex = await Assert.ThrowsAsync<ArgumentException>(() => _sut.CreateWallPostAsync(wallPost));
-    Assert.Equal("Author does not exist", ex.Message);
-  }
-
-  [Fact]
-  public async Task CreateWallPost_ShouldThrowException_WhenTargetUserDoesNotExist()
-  {
-    // Arrange
-    var wallPost = new WallPost
-    {
-      AuthorId = 1,
-      Content = "This is a post!",
-      TargetUserId = 99,
-      CreatedAt = DateTime.UtcNow
-    };
-
-    // Author exists, target does not
-    _userRepoMock.Setup(x => x.GetByIdAsync(wallPost.AuthorId)).ReturnsAsync(new User { Id = wallPost.AuthorId });
-    _userRepoMock.Setup(x => x.GetByIdAsync(wallPost.TargetUserId)).ReturnsAsync((User?)null);
-
-    // Act & Assert
-    var ex = await Assert.ThrowsAsync<ArgumentException>(() => _sut.CreateWallPostAsync(wallPost));
-    Assert.Equal("Target user does not exist", ex.Message);
+    _WallPostRepoMock.Verify(x => x.AddAsync(It.Is<WallPost>(wp =>
+      wp.AuthorId == currentUserId &&
+      wp.TargetUserId == dto.TargetUserId &&
+      wp.Content == dto.Content)), Times.Once);
   }
 
   #endregion
 
-  #region GetFeedForUserAsync
+  #region GetFeedAsync
 
   [Fact]
-  public async Task GetFeedForUserAsync_ShouldThrowException_WhenUserDoesNotExist()
+  public async Task GetFeedAsync_ShouldReturnEmptyList_WhenNoPosts()
   {
     // Arrange
-    var userId = 99;
-    _userRepoMock.Setup(x => x.GetByIdAsync(userId))
-                 .ReturnsAsync((User?)null);
-
-    // Act & Assert
-    var ex = await Assert.ThrowsAsync<ArgumentException>(() => _sut.GetFeedForUserAsync(userId));
-    Assert.Equal("User does not exist", ex.Message);
-  }
-
-  [Fact]
-  public async Task GetFeedForUserAsync_ShouldReturnEmptyList_WhenUserFollowsButNoPosts()
-  {
-    // Arrange
-    var userId = 1;
-    _userRepoMock.Setup(x => x.GetByIdAsync(userId))
-                 .ReturnsAsync(new User { Id = userId });
-
-    _followRepoMock.Setup(x => x.GetFollowedUserIdsAsync(userId))
-                   .ReturnsAsync(new List<int> { 2, 3 });
-
-    //User follows id 2, 3
-    var followedUserIds = new List<int> { 2, 3 };
-
-    //No posts for followed users
-    _WallPostRepoMock.Setup(x => x.GetFeedForUserAsync(
-      It.Is<IEnumerable<int>>(ids => ids.SequenceEqual(followedUserIds))))
+    var currentUserId = 1;
+    _WallPostRepoMock.Setup(x => x.GetFeedAsync(currentUserId))
                      .ReturnsAsync(new List<WallPost>());
 
     // Act
-    var result = await _sut.GetFeedForUserAsync(userId);
+    var result = await _sut.GetFeedAsync(currentUserId);
 
     // Assert
     Assert.NotNull(result);
     Assert.Empty(result);
+    _WallPostRepoMock.Verify(x => x.GetFeedAsync(currentUserId), Times.Once);
   }
 
   [Fact]
-  public async Task GetFeedForUserAsync_ShouldReturnMappedPosts_WhenPostsExist()
+  public async Task GetFeedAsync_ShouldReturnMappedPosts_WhenPostsExist()
   {
     // Arrange
-    var userId = 1;
-
-    _userRepoMock.Setup(x => x.GetByIdAsync(userId))
-                 .ReturnsAsync(new User { Id = userId });
-
-    var followedUserIds = new List<int> { 2, 3 };
-
-    _followRepoMock.Setup(x => x.GetFollowedUserIdsAsync(userId))
-                   .ReturnsAsync(followedUserIds);
-
+    var currentUserId = 1;
     var now = DateTime.UtcNow;
+    var author1 = new User { Id = 2, Username = "user2", ProfilePictureUrl = "http://example.com/user2.jpg" };
+    var author2 = new User { Id = 3, Username = "user3", ProfilePictureUrl = "http://example.com/user3.jpg" };
+
     var posts = new List<WallPost>
     {
-        new WallPost { Id = 1, Content = "Post 1", AuthorId = 2, TargetUserId = 1, CreatedAt = now.AddMinutes(-5) },
-        new WallPost { Id = 2, Content = "Post 2", AuthorId = 3, TargetUserId = 1, CreatedAt = now }
+        new WallPost
+        {
+          Id = 1,
+          Content = "Post 1",
+          AuthorId = 2,
+          Author = author1,
+          TargetUserId = 1,
+          CreatedAt = now.AddMinutes(-5)
+        },
+        new WallPost
+        {
+          Id = 2,
+          Content = "Post 2",
+          AuthorId = 3,
+          Author = author2,
+          TargetUserId = 1,
+          CreatedAt = now
+        }
     };
 
-    _WallPostRepoMock.Setup(x => x.GetFeedForUserAsync(
-            It.Is<IEnumerable<int>>(ids => ids.SequenceEqual(followedUserIds))))
+    _WallPostRepoMock.Setup(x => x.GetFeedAsync(currentUserId))
                      .ReturnsAsync(posts);
 
     // Act
-    var result = (await _sut.GetFeedForUserAsync(userId)).ToList();
+    var result = await _sut.GetFeedAsync(currentUserId);
 
     // Assert
+    Assert.NotNull(result);
     Assert.Equal(2, result.Count);
     Assert.Equal(posts[0].Id, result[0].Id);
     Assert.Equal(posts[0].Content, result[0].Content);
+    Assert.Equal(posts[0].AuthorId, result[0].AuthorId);
+    Assert.Equal(author1.Username, result[0].AuthorName);
+    Assert.Equal(author1.ProfilePictureUrl, result[0].AuthorProfilePictureUrl);
     Assert.Equal(posts[1].Id, result[1].Id);
     Assert.Equal(posts[1].Content, result[1].Content);
+    Assert.Equal(posts[1].AuthorId, result[1].AuthorId);
+    Assert.Equal(author2.Username, result[1].AuthorName);
+    Assert.Equal(author2.ProfilePictureUrl, result[1].AuthorProfilePictureUrl);
+    _WallPostRepoMock.Verify(x => x.GetFeedAsync(currentUserId), Times.Once);
   }
 
   #endregion
 
-  #region GetWallPostsForAuthorAsync
+  #region GetWallPostsAsync
 
   [Fact]
-  public async Task GetWallPostsForAuthorAsync_ShouldThrowException_WhenAuthorDoesNotExist()
+  public async Task GetWallPostsAsync_ShouldReturnEmptyList_WhenNoPosts()
   {
     // Arrange
-    var authorId = 5;
-    _userRepoMock.Setup(x => x.GetByIdAsync(authorId))
-                 .ReturnsAsync((User?)null);
+    var userId = 7;
+    _WallPostRepoMock.Setup(x => x.GetWallPostsAsync(userId))
+                     .ReturnsAsync(new List<WallPost>());
 
-    // Act & Assert
-    var ex = await Assert.ThrowsAsync<ArgumentException>(() => _sut.GetWallPostsForAuthorAsync(authorId));
-    Assert.Equal("Author does not exist", ex.Message);
+    // Act
+    var result = await _sut.GetWallPostsAsync(userId);
+
+    // Assert
+    Assert.NotNull(result);
+    Assert.Empty(result);
+    _WallPostRepoMock.Verify(x => x.GetWallPostsAsync(userId), Times.Once);
   }
 
   [Fact]
-  public async Task GetWallPostsForAuthorAsync_ShouldReturnMappedPosts_WhenPostsExist()
+  public async Task GetWallPostsAsync_ShouldReturnMappedPosts_WhenPostsExist()
   {
     // Arrange
-    var authorId = 5;
-    _userRepoMock.Setup(x => x.GetByIdAsync(authorId))
-                 .ReturnsAsync(new User { Id = authorId });
-
+    var userId = 7;
     var now = DateTime.UtcNow;
+    var author1 = new User { Id = 1, Username = "user1", ProfilePictureUrl = "http://example.com/user1.jpg" };
+    var author2 = new User { Id = 2, Username = "user2", ProfilePictureUrl = "http://example.com/user2.jpg" };
+
     var posts = new List<WallPost>
     {
-      new WallPost { Id = 10, Content = "Author post 1", AuthorId = authorId, TargetUserId = 1, CreatedAt = now.AddMinutes(-10) },
-      new WallPost { Id = 11, Content = "Author post 2", AuthorId = authorId, TargetUserId = 2, CreatedAt = now }
+      new WallPost
+      {
+        Id = 20,
+        Content = "Target post 1",
+        AuthorId = 1,
+        Author = author1,
+        TargetUserId = userId,
+        CreatedAt = now.AddMinutes(-3)
+      },
+      new WallPost
+      {
+        Id = 21,
+        Content = "Target post 2",
+        AuthorId = 2,
+        Author = author2,
+        TargetUserId = userId,
+        CreatedAt = now
+      }
     };
 
-    _WallPostRepoMock.Setup(x => x.GetByAuthorIdAsync(authorId))
+    _WallPostRepoMock.Setup(x => x.GetWallPostsAsync(userId))
                      .ReturnsAsync(posts);
 
     // Act
-    var result = (await _sut.GetWallPostsForAuthorAsync(authorId)).ToList();
+    var result = await _sut.GetWallPostsAsync(userId);
 
     // Assert
+    Assert.NotNull(result);
     Assert.Equal(2, result.Count);
     Assert.Equal(posts[0].Id, result[0].Id);
     Assert.Equal(posts[0].Content, result[0].Content);
+    Assert.Equal(posts[0].AuthorId, result[0].AuthorId);
+    Assert.Equal(author1.Username, result[0].AuthorName);
+    Assert.Equal(author1.ProfilePictureUrl, result[0].AuthorProfilePictureUrl);
     Assert.Equal(posts[1].Id, result[1].Id);
     Assert.Equal(posts[1].Content, result[1].Content);
-  }
-
-  #endregion
-
-  #region GetWallPostsForTargetUserAsync
-
-  [Fact]
-  public async Task GetWallPostsForTargetUserAsync_ShouldThrowException_WhenTargetUserDoesNotExist()
-  {
-    // Arrange
-    var targetUserId = 7;
-    _userRepoMock.Setup(x => x.GetByIdAsync(targetUserId))
-                 .ReturnsAsync((User?)null);
-
-    // Act & Assert
-    var ex = await Assert.ThrowsAsync<ArgumentException>(() => _sut.GetWallPostsForTargetUserAsync(targetUserId));
-    Assert.Equal("Target user does not exist", ex.Message);
-  }
-
-  [Fact]
-  public async Task GetWallPostsForTargetUserAsync_ShouldReturnMappedPosts_WhenPostsExist()
-  {
-    // Arrange
-    var targetUserId = 7;
-    _userRepoMock.Setup(x => x.GetByIdAsync(targetUserId))
-                 .ReturnsAsync(new User { Id = targetUserId });
-
-    var now = DateTime.UtcNow;
-    var posts = new List<WallPost>
-    {
-      new WallPost { Id = 20, Content = "Target post 1", AuthorId = 1, TargetUserId = targetUserId, CreatedAt = now.AddMinutes(-3) },
-      new WallPost { Id = 21, Content = "Target post 2", AuthorId = 2, TargetUserId = targetUserId, CreatedAt = now }
-    };
-
-    _WallPostRepoMock.Setup(x => x.GetByTargetUserIdAsync(targetUserId))
-                     .ReturnsAsync(posts);
-
-    // Act
-    var result = (await _sut.GetWallPostsForTargetUserAsync(targetUserId)).ToList();
-
-    // Assert
-    Assert.Equal(2, result.Count);
-    Assert.Equal(posts[0].Id, result[0].Id);
-    Assert.Equal(posts[0].Content, result[0].Content);
-    Assert.Equal(posts[1].Id, result[1].Id);
-    Assert.Equal(posts[1].Content, result[1].Content);
+    Assert.Equal(posts[1].AuthorId, result[1].AuthorId);
+    Assert.Equal(author2.Username, result[1].AuthorName);
+    Assert.Equal(author2.ProfilePictureUrl, result[1].AuthorProfilePictureUrl);
+    _WallPostRepoMock.Verify(x => x.GetWallPostsAsync(userId), Times.Once);
   }
 
   #endregion
@@ -318,62 +228,88 @@ public class WallPostServiceTests
   #region UpdateWallPostAsync
 
   [Fact]
-  public async Task UpdateWallPostAsync_ShouldReturnUpdatedWallPost_WhenDataIsValid()
+  public async Task UpdateWallPostAsync_ShouldUpdateWallPost_WhenDataIsValid()
   {
     // Arrange
+    var currentUserId = 5;
     var wallPostId = 1;
-    var authorId = 5;
     var updatedContent = "Updated content";
     var originalCreatedAt = DateTime.UtcNow.AddDays(-1);
 
-    var wallPost = new WallPost
+    var existingWallPost = new WallPost
     {
       Id = wallPostId,
-      AuthorId = authorId,
-      Content = updatedContent,
+      AuthorId = currentUserId,
+      Content = "Original content",
       TargetUserId = 10,
       CreatedAt = originalCreatedAt
     };
+
+    var dto = new UpdateWallPostDto(updatedContent);
+
+    _WallPostRepoMock.Setup(x => x.GetByIdAsync(wallPostId))
+                     .ReturnsAsync(existingWallPost);
+
+    _WallPostRepoMock.Setup(x => x.UpdateAsync(It.IsAny<WallPost>()))
+                     .Returns(Task.CompletedTask);
+
+    // Act
+    await _sut.UpdateWallPostAsync(currentUserId, wallPostId, dto);
+
+    // Assert
+    _WallPostRepoMock.Verify(x => x.GetByIdAsync(wallPostId), Times.Once);
+    _WallPostRepoMock.Verify(x => x.UpdateAsync(It.Is<WallPost>(wp =>
+      wp.Id == wallPostId &&
+      wp.Content == updatedContent &&
+      wp.AuthorId == currentUserId)), Times.Once);
+  }
+
+  [Fact]
+  public async Task UpdateWallPostAsync_ShouldThrowPostNotFoundException_WhenPostDoesNotExist()
+  {
+    // Arrange
+    var currentUserId = 5;
+    var wallPostId = 99;
+    var dto = new UpdateWallPostDto("Updated content");
+
+    _WallPostRepoMock.Setup(x => x.GetByIdAsync(wallPostId))
+                     .ReturnsAsync((WallPost?)null);
+
+    // Act & Assert
+    var ex = await Assert.ThrowsAsync<PostNotFoundException>(() =>
+      _sut.UpdateWallPostAsync(currentUserId, wallPostId, dto));
+
+    Assert.Equal($"Post with id {wallPostId} was not found.", ex.Message);
+    _WallPostRepoMock.Verify(x => x.UpdateAsync(It.IsAny<WallPost>()), Times.Never);
+  }
+
+  [Fact]
+  public async Task UpdateWallPostAsync_ShouldThrowUnauthorizedPostAccessException_WhenUserIsNotAuthor()
+  {
+    // Arrange
+    var currentUserId = 5;
+    var authorId = 10;
+    var wallPostId = 1;
+    var dto = new UpdateWallPostDto("Updated content");
 
     var existingWallPost = new WallPost
     {
       Id = wallPostId,
       AuthorId = authorId,
       Content = "Original content",
-      TargetUserId = 10,
-      CreatedAt = originalCreatedAt
-    };
-
-    var updatedWallPost = new WallPost
-    {
-      Id = wallPostId,
-      AuthorId = authorId,
-      Content = updatedContent,
-      TargetUserId = 10,
-      CreatedAt = originalCreatedAt
+      TargetUserId = 20,
+      CreatedAt = DateTime.UtcNow.AddDays(-1)
     };
 
     _WallPostRepoMock.Setup(x => x.GetByIdAsync(wallPostId))
                      .ReturnsAsync(existingWallPost);
 
-    _WallPostRepoMock.Setup(x => x.UpdateAsync(It.IsAny<WallPost>()))
-                     .ReturnsAsync(updatedWallPost);
+    // Act & Assert
+    var ex = await Assert.ThrowsAsync<UnauthorizedPostAccessException>(() =>
+      _sut.UpdateWallPostAsync(currentUserId, wallPostId, dto));
 
-    // Act
-    var result = await _sut.UpdateWallPostAsync(wallPost);
-
-    // Assert
-    Assert.NotNull(result);
-    Assert.Equal(wallPostId, result.Id);
-    Assert.Equal(authorId, result.AuthorId);
-    Assert.Equal(updatedContent, result.Content);
-    Assert.Equal(originalCreatedAt, result.CreatedAt);
-
-    _WallPostRepoMock.Verify(x => x.GetByIdAsync(wallPostId), Times.Once);
-    _WallPostRepoMock.Verify(x => x.UpdateAsync(It.Is<WallPost>(wp =>
-      wp.Id == wallPostId &&
-      wp.Content == updatedContent &&
-      wp.AuthorId == authorId)), Times.Once);
+    Assert.Equal("You are not authorized to perform this action on the post.", ex.Message);
+    _WallPostRepoMock.Verify(x => x.UpdateAsync(It.IsAny<WallPost>()), Times.Never);
   }
 
   #endregion
@@ -381,16 +317,16 @@ public class WallPostServiceTests
   #region DeleteWallPostAsync
 
   [Fact]
-  public async Task DeleteWallPostAsync_ShouldDeleteWallPost_WhenWallPostExists()
+  public async Task DeleteWallPostAsync_ShouldDeleteWallPost_WhenUserIsAuthor()
   {
     // Arrange
+    var currentUserId = 5;
     var wallPostId = 1;
-    var authorId = 5;
 
     var existingWallPost = new WallPost
     {
       Id = wallPostId,
-      AuthorId = authorId,
+      AuthorId = currentUserId,
       Content = "Content to delete",
       TargetUserId = 10,
       CreatedAt = DateTime.UtcNow.AddDays(-1)
@@ -399,15 +335,93 @@ public class WallPostServiceTests
     _WallPostRepoMock.Setup(x => x.GetByIdAsync(wallPostId))
                      .ReturnsAsync(existingWallPost);
 
-    _WallPostRepoMock.Setup(x => x.DeleteAsync(wallPostId))
+    _WallPostRepoMock.Setup(x => x.DeleteAsync(It.IsAny<WallPost>()))
                      .Returns(Task.CompletedTask);
 
     // Act
-    await _sut.DeleteWallPostAsync(wallPostId);
+    await _sut.DeleteWallPostAsync(currentUserId, wallPostId);
 
     // Assert
     _WallPostRepoMock.Verify(x => x.GetByIdAsync(wallPostId), Times.Once);
-    _WallPostRepoMock.Verify(x => x.DeleteAsync(wallPostId), Times.Once);
+    _WallPostRepoMock.Verify(x => x.DeleteAsync(It.Is<WallPost>(wp => wp.Id == wallPostId)), Times.Once);
+  }
+
+  [Fact]
+  public async Task DeleteWallPostAsync_ShouldDeleteWallPost_WhenUserIsTargetUser()
+  {
+    // Arrange
+    var currentUserId = 10;
+    var wallPostId = 1;
+    var authorId = 5;
+
+    var existingWallPost = new WallPost
+    {
+      Id = wallPostId,
+      AuthorId = authorId,
+      Content = "Content to delete",
+      TargetUserId = currentUserId,
+      CreatedAt = DateTime.UtcNow.AddDays(-1)
+    };
+
+    _WallPostRepoMock.Setup(x => x.GetByIdAsync(wallPostId))
+                     .ReturnsAsync(existingWallPost);
+
+    _WallPostRepoMock.Setup(x => x.DeleteAsync(It.IsAny<WallPost>()))
+                     .Returns(Task.CompletedTask);
+
+    // Act
+    await _sut.DeleteWallPostAsync(currentUserId, wallPostId);
+
+    // Assert
+    _WallPostRepoMock.Verify(x => x.GetByIdAsync(wallPostId), Times.Once);
+    _WallPostRepoMock.Verify(x => x.DeleteAsync(It.Is<WallPost>(wp => wp.Id == wallPostId)), Times.Once);
+  }
+
+  [Fact]
+  public async Task DeleteWallPostAsync_ShouldThrowPostNotFoundException_WhenPostDoesNotExist()
+  {
+    // Arrange
+    var currentUserId = 5;
+    var wallPostId = 99;
+
+    _WallPostRepoMock.Setup(x => x.GetByIdAsync(wallPostId))
+                     .ReturnsAsync((WallPost?)null);
+
+    // Act & Assert
+    var ex = await Assert.ThrowsAsync<PostNotFoundException>(() =>
+      _sut.DeleteWallPostAsync(currentUserId, wallPostId));
+
+    Assert.Equal($"Post with id {wallPostId} was not found.", ex.Message);
+    _WallPostRepoMock.Verify(x => x.DeleteAsync(It.IsAny<WallPost>()), Times.Never);
+  }
+
+  [Fact]
+  public async Task DeleteWallPostAsync_ShouldThrowUnauthorizedPostAccessException_WhenUserIsNeitherAuthorNorTarget()
+  {
+    // Arrange
+    var currentUserId = 15;
+    var authorId = 5;
+    var targetUserId = 10;
+    var wallPostId = 1;
+
+    var existingWallPost = new WallPost
+    {
+      Id = wallPostId,
+      AuthorId = authorId,
+      Content = "Content to delete",
+      TargetUserId = targetUserId,
+      CreatedAt = DateTime.UtcNow.AddDays(-1)
+    };
+
+    _WallPostRepoMock.Setup(x => x.GetByIdAsync(wallPostId))
+                     .ReturnsAsync(existingWallPost);
+
+    // Act & Assert
+    var ex = await Assert.ThrowsAsync<UnauthorizedPostAccessException>(() =>
+      _sut.DeleteWallPostAsync(currentUserId, wallPostId));
+
+    Assert.Equal("You are not authorized to perform this action on the post.", ex.Message);
+    _WallPostRepoMock.Verify(x => x.DeleteAsync(It.IsAny<WallPost>()), Times.Never);
   }
 
   #endregion

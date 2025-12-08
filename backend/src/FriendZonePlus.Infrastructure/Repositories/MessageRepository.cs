@@ -33,9 +33,9 @@ namespace FriendZonePlus.Infrastructure.Repositories
                     (m.SenderId == senderId && m.ReceiverId == receiverId) ||
                     (m.SenderId == receiverId && m.ReceiverId == senderId))
                 .OrderBy(m => m.SentAt)
-                .ToListAsync();                
+                .ToListAsync();
         }
-                
+
         public async Task<IEnumerable<Message>> GetLatestMessagesForUserAsync(int userId)
         {
             var messages = await _context.Messages
@@ -47,7 +47,7 @@ namespace FriendZonePlus.Infrastructure.Repositories
               .GroupBy(m => m.SenderId == userId ? m.ReceiverId : m.SenderId)
               .Select(g => g.Take(1).First())
               .OrderByDescending(m => m.SentAt);
-            
+
             return latestChats;
         }
     }

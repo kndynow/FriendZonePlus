@@ -1,9 +1,12 @@
 using FriendZonePlus.Core.Entities;
-using FriendZonePlus.Core.Interfaces;
+using FriendZonePlus.Application.Interfaces;
+using FriendZonePlus.Application.DTOs;
+using FriendZonePlus.Core.Exceptions;
+using Mapster;
 
 namespace FriendZonePlus.Application.Services;
 
-public class UserService
+public class UserService : IUserService
 {
   private readonly IUserRepository _userRepository;
 
@@ -12,20 +15,67 @@ public class UserService
     _userRepository = userRepository;
   }
 
-  //Get User by Id
-  public async Task<User?> GetUserByIdAsync(int id)
+  public async Task<UserProfileDto?> GetUserProfileAsync(int userId)
   {
-    return await _userRepository.GetByIdAsync(id);
+    var user = await _userRepository.GetByIdWithRelationsAsync(userId);
+    if (user is null)
+    {
+      throw new UserNotFoundException($"User with ID {userId} not found");
+    }
+
+    return user.Adapt<UserProfileDto>();
+  }
+  public async Task UpdateUserProfileAsync(int userId, UpdateUserDto updateUserDto)
+  {
+    var user = await _userRepository.GetByIdAsync(userId);
+    if (user is null) throw new UserNotFoundException($"User with ID {userId} not found");
+
+    user.FirstName = updateUserDto.FirstName;
+    user.LastName = updateUserDto.LastName;
+    user.ProfilePictureUrl = updateUserDto.ProfilePictureUrl;
+
+    await _userRepository.UpdateAsync(user);
   }
 
-  //Delete
-  public async Task<bool> DeleteUserAsync(int id)
+  public async Task DeleteUserAsync(int userId)
   {
-    var user = await _userRepository.GetByIdAsync(id);
-    if (user == null) return false;
+    var user = await _userRepository.GetByIdAsync(userId);
+    if (user is null) throw new UserNotFoundException($"User with ID {userId} not found");
 
     await _userRepository.DeleteAsync(user);
-    return true;
+  }
+
+  public async Task FollowUserAsync(int currentUserId, int targetUserId)
+  {
+    if (currentUserId == targetUserId)
+      throw new CannotFollowSelfException();
+
+    var targetUser = await _userRepository.GetByIdAsync(targetUserId);
+    if (targetUser is null)
+      throw new UserNotFoundException($"User with ID {targetUserId} not found");
+
+    await _userRepository.FollowUserAsync(currentUserId, targetUserId);
+  }
+
+  public async Task UnfollowUserAsync(int currentUserId, int targetUserId)
+  {
+    var targetUser = await _userRepository.GetByIdAsync(targetUserId);
+    if (targetUser is null)
+      throw new UserNotFoundException($"User with ID {targetUserId} not found");
+
+    await _userRepository.UnfollowUserAsync(currentUserId, targetUserId);
+  }
+
+  public async Task<List<UserListResponseDto>> GetFollowersAsync(int userId)
+  {
+    var followers = await _userRepository.GetFollowersAsync(userId);
+    return followers.Adapt<List<UserListResponseDto>>();
+  }
+
+  public async Task<List<UserListResponseDto>> GetFollowingAsync(int userId)
+  {
+    var following = await _userRepository.GetFollowingAsync(userId);
+    return following.Adapt<List<UserListResponseDto>>();
   }
 
 }

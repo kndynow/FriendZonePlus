@@ -38,10 +38,10 @@ namespace FriendZonePlus.Application.Services.Messages
             if (senderId == dto.ReceiverId)
                 throw new ArgumentException("User cannot send message to itself");
 
-            if (!await _userRepository.ExistsByIdAsync(dto.ReceiverId))
+            if (await _userRepository.GetByIdAsync(dto.ReceiverId) is null)
                 throw new ArgumentException("Receiver does not exist");
 
-            if (!await _userRepository.ExistsByIdAsync(senderId))
+            if (await _userRepository.GetByIdAsync(senderId) is null)
                 throw new ArgumentException("Sender does not exist");
 
             var message = new Message
@@ -70,16 +70,16 @@ namespace FriendZonePlus.Application.Services.Messages
 
         public async Task<IEnumerable<MessageResponseDto>> GetMessagesBetweenUsersAsync(int senderId, int receiverId)
         {
-            if (!await _userRepository.ExistsByIdAsync(receiverId))
+            if (await _userRepository.GetByIdAsync(receiverId) is null)
                 throw new ArgumentException("Receiver does not exist");
 
-            if (!await _userRepository.ExistsByIdAsync(senderId))
+            if (await _userRepository.GetByIdAsync(senderId) is null)
                 throw new ArgumentException("Cannot retrieve messages for the same user");
 
             var messages = await _messageRepository.GetMessagesBetweenUsersAsync(senderId, receiverId);
 
             var responseDtos = messages
-              .OrderBy(m => m.SentAt) 
+              .OrderBy(m => m.SentAt)
               .Select(m => new MessageResponseDto(
                   m.Id,
                   m.SenderId,

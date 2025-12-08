@@ -1,6 +1,6 @@
 using System;
 using FriendZonePlus.Core.Entities;
-using FriendZonePlus.Core.Interfaces;
+using FriendZonePlus.Application.Interfaces;
 using FriendZonePlus.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,55 +15,38 @@ public class WallPostRepository : IWallPostRepository
     _context = context;
   }
 
-  public async Task<WallPost> AddAsync(WallPost wallPost)
+  public async Task AddAsync(WallPost post)
   {
-    _context.Add(wallPost);
+    _context.WallPosts.Add(post);
     await _context.SaveChangesAsync();
-    return wallPost;
+  }
+
+  public async Task UpdateAsync(WallPost post)
+  {
+    _context.WallPosts.Update(post);
+    await _context.SaveChangesAsync();
+  }
+
+  public async Task DeleteAsync(WallPost post)
+  {
+    _context.WallPosts.Remove(post);
+    await _context.SaveChangesAsync();
   }
 
   public async Task<WallPost?> GetByIdAsync(int id)
   {
     return await _context.WallPosts.FindAsync(id);
   }
-
-  public async Task<IEnumerable<WallPost>> GetByTargetUserIdAsync(int targetUserId)
+  public async Task<List<WallPost>> GetWallPostsAsync(int targetUserId)
   {
-    return await _context.WallPosts.Where(p => p.TargetUserId == targetUserId)
-    .OrderByDescending(p => p.CreatedAt)
-    .ToListAsync();
+    return await _context.WallPosts.Where(wp => wp.TargetUserId == targetUserId).Include(wp => wp.Author).OrderByDescending(wp => wp.CreatedAt).ToListAsync();
   }
 
-  public async Task<IEnumerable<WallPost>> GetByAuthorIdAsync(int authorId)
+  public async Task<List<WallPost>> GetFeedAsync(int currentUserId)
   {
-    return await _context.WallPosts.Where(p => p.AuthorId == authorId)
-    .OrderByDescending(p => p.CreatedAt)
-    .ToListAsync();
-  }
-  public async Task<IEnumerable<WallPost>> GetFeedForUserAsync(IEnumerable<int> authorIds)
-  {
-    return await _context.WallPosts
-        .Where(wp => authorIds.Contains(wp.AuthorId))
-        .OrderByDescending(wp => wp.CreatedAt)
-        .ToListAsync();
+    var followedUserId = _context.Follows.Where(f => f.FollowerId == currentUserId).Select(f => f.FollowedUserId).ToList();
+    return await _context.WallPosts.Where(wp => followedUserId.Contains(wp.AuthorId)).Include(wp => wp.Author).OrderByDescending(wp => wp.CreatedAt).ToListAsync();
   }
 
-  public async Task<WallPost> UpdateAsync(WallPost post)
-  {
-    _context.Update(post);
-    await _context.SaveChangesAsync();
-    return post;
-  }
-
-  public async Task DeleteAsync(int id)
-  {
-    var wallPost = await GetByIdAsync(id);
-    if (wallPost == null)
-    {
-      throw new ArgumentException("Wall post does not exist");
-    }
-    _context.Remove(wallPost);
-    await _context.SaveChangesAsync();
-  }
 
 }
