@@ -7,7 +7,7 @@ using FriendZonePlus.Application.DTOs;
 using FriendZonePlus.Application.Helpers.PasswordHelpers;
 using FriendZonePlus.Application.Services;
 using FriendZonePlus.Application.Services.Messages;
-using FriendZonePlus.Core.Interfaces;
+using FriendZonePlus.Application.Interfaces;
 using FriendZonePlus.Infrastructure.Data;
 using FriendZonePlus.Infrastructure.Repositories;
 using Mapster;
@@ -20,7 +20,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json;
 using FriendZonePlus.Infrastructure.Authentication;
-using FriendZonePlus.Application.Interfaces;
 using FriendZonePlus.API.Infrastructure;
 
 
@@ -68,7 +67,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 Encoding.UTF8.GetBytes(jwtSettings?.SecretKey ?? throw new InvalidOperationException("JWT SecretKey is not configured"))
             )
         };
-        
+
         options.Events = new JwtBearerEvents
         {
             OnMessageReceived = context =>
@@ -77,7 +76,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 return Task.CompletedTask;
             }
         };
-        
+
     });
 
 // CORS
@@ -89,14 +88,14 @@ builder.Services.AddCors(options =>
             .WithOrigins("http://localhost:5173")
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials(); 
+            .AllowCredentials();
     });
 });
 
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IWallPostRepository, WallPostRepository>();
-builder.Services.AddScoped<IFollowRepository, FollowRepository>();
+// builder.Services.AddScoped<IFollowRepository, FollowRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
 // Services

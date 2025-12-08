@@ -13,6 +13,18 @@ public class MappingConfig : IRegister
         .Map(dest => dest.FollowersCount, src => src.Followers.Count)
         .Map(dest => dest.FollowingCount, src => src.Following.Count);
 
+        config.NewConfig<UpdateUserDto, User>()
+        .IgnoreNullValues(true);
+
+
+        config.NewConfig<WallPost, WallPostResponseDto>()
+        .Map(dest => dest.AuthorName, src => src.Author.Username)
+        .Map(dest => dest.AuthorProfilePictureUrl, src => src.Author.ProfilePictureUrl);
+
+        config.NewConfig<CreateWallPostDto, WallPost>();
+
+        config.NewConfig<RegisterRequest, User>()
+        .Ignore(dest => dest.PasswordHash);
 
     }
 }

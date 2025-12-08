@@ -57,8 +57,6 @@ public class UserService : IUserService
     await _userRepository.FollowUserAsync(currentUserId, targetUserId);
   }
 
-
-
   public async Task UnfollowUserAsync(int currentUserId, int targetUserId)
   {
     var targetUser = await _userRepository.GetByIdAsync(targetUserId);
