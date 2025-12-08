@@ -10,8 +10,8 @@ export default function WelcomePage() {
 
   return (
     <>
-      <Row className="w-100">
-        <Col className="w-100">
+      <Row>
+        <Col>
           <h2 className="py-3">{view === "login" ? "Sign in" : "Sign up"}</h2>
 
           {view === "login" && (

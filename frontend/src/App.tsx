@@ -8,17 +8,13 @@ function App() {
   useLocation();
   const { user } = useAuth();
 
-  // Hides Header and NavBar for login & register pages if the user is logged out
-  const isAuthPage =
-    location.pathname === "/login" || location.pathname === "/register";
-
-  const hideLayout = !user && isAuthPage;
+  const hideLayout = !user;
 
   window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   return (
     <>
       <div className="pastel-bg"></div>
-      <div className="layout-wrapper">
+      <div className="layout-wrapper container-fluid">
         {!hideLayout && <Header />}
         <main className="page-content">
           <Toaster
