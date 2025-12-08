@@ -78,9 +78,6 @@ namespace FriendZonePlus.Application.Services.Messages
 
             var messages = await _messageRepository.GetMessagesBetweenUsersAsync(senderId, receiverId);
 
-            if (!messages.Any())
-                throw new UnauthorizedAccessException("No conversation exists.");
-
             var responseDtos = messages
               .OrderBy(m => m.SentAt)
               .Select(m => new MessageResponseDto(

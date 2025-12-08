@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import type { BackendMessage, MappedMessage } from "../../../types/message";
+import { useNavigate } from "react-router-dom";
 
 export function useMessages() {
+  const navigate = useNavigate();
   const [messages, setMessages] = useState<MappedMessage[]>([]);
 
   const mapMessage = (
@@ -26,6 +28,7 @@ export function useMessages() {
 
       if (!res.ok) {
         toast.error("Could not load messages");
+        navigate("/messages");
         return;
       }
 

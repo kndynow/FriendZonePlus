@@ -35,6 +35,7 @@ export default function MessagesPage() {
 
         const messagesMap: any = {};
         messagesData.forEach((msg: any) => {
+          // Checks who sent the latest message
           const otherUserId =
             msg.senderId === user.id ? msg.receiverId : msg.senderId;
 
