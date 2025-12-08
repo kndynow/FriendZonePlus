@@ -39,15 +39,15 @@ const routes: RouteObject[] = [
         element: <MessagesPage />,
         handle: { title: "Messages" },
       },
+      {
+        path: "messages/:id",
+        element: <PrivateChat />,
+        handle: { type: "user" },
+      },
     ],
   },
 
   { path: "*", element: <NotFoundPage />, handle: { title: "Not Found" } },
-  {
-    path: "messages/:id",
-    element: <PrivateChat />,
-    handle: { type: "user" },
-  },
 ];
 
 export default routes;
