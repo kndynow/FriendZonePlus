@@ -105,36 +105,38 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 
   return (
     <>
-      <Form onSubmit={handleRegister}>
-        {fields.map((field) => (
-          <FormField
-            key={field.name}
-            label={field.label}
-            name={field.name}
-            type={field.type}
-            placeholder={field.placeholder}
-            value={form[field.name]}
-            onChange={setProperty}
-            error={errors[field.name]}
-            touched={touched[field.name]}
-          />
-        ))}
+      <div className="semi-transparent-bg p-3 mb-2 f-border">
+        <Form onSubmit={handleRegister}>
+          {fields.map((field) => (
+            <FormField
+              key={field.name}
+              label={field.label}
+              name={field.name}
+              type={field.type}
+              placeholder={field.placeholder}
+              value={form[field.name]}
+              onChange={setProperty}
+              error={errors[field.name]}
+              touched={touched[field.name]}
+            />
+          ))}
 
-        <Button
-          className="mt-2 w-100"
-          variant="primary"
-          disabled={submitting || Object.keys(errors).length > 0}
-          type="submit"
-        >
-          {submitting ? "Registering..." : "Register"}
-        </Button>
-      </Form>
-      <p className="text-center mt-3">
-        Already have an account?
-        <span className="text-primary px-2" onClick={onSwitchToLogin}>
-          Sign in here!
-        </span>
-      </p>
+          <Button
+            className="mt-2 w-100"
+            variant="primary"
+            disabled={submitting || Object.keys(errors).length > 0}
+            type="submit"
+          >
+            {submitting ? "Registering..." : "Register"}
+          </Button>
+        </Form>
+        <p className="text-center mt-3">
+          Already have an account?
+          <span className="text-primary px-2" onClick={onSwitchToLogin}>
+            Sign in here!
+          </span>
+        </p>
+      </div>
     </>
   );
 }

@@ -16,7 +16,7 @@ function App() {
       <div className="pastel-bg"></div>
       <div className="layout-wrapper container-fluid">
         {!hideLayout && <Header />}
-        <main className="page-content">
+        <main className={`page-content ${!user ? "no-margins" : ""}`}>
           <Toaster
             position="top-center"
             toastOptions={{ duration: 4000, removeDelay: 0 }}

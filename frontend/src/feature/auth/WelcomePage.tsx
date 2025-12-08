@@ -2,6 +2,7 @@ import { useState } from "react";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 import { Col, Row } from "react-bootstrap";
+import WelcomeHeader from "./WelcomeHeader";
 
 type View = "login" | "register";
 
@@ -10,10 +11,11 @@ export default function WelcomePage() {
 
   return (
     <>
-      <Row>
+      <Row className="flex-grow-1 px-1">
+        <Col xs={12}>
+          <WelcomeHeader />
+        </Col>
         <Col>
-          <h2 className="py-3">{view === "login" ? "Sign in" : "Sign up"}</h2>
-
           {view === "login" && (
             <LoginForm onSwitchToRegister={() => setView("register")} />
           )}
