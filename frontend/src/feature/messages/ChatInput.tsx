@@ -24,26 +24,27 @@ export default function ChatInput({
 
   return (
     <>
-      <Row className="justify-content-end align-items-center mt-2">
-        <Col className="pe-1 mb-0 pb-0">
+      <Row className="justify-content-end align-items-start mt-2">
+        <Col className="pe-1 mb-0 pb-2">
           <FormField
+            rows={2}
             placeholder="Write something..."
             value={input}
             onChange={handleChange}
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
           ></FormField>
+          {maxLength && (
+            <Col className="text-start small text-muted mb-1 ps-3">
+              {input.length}/{maxLength}
+            </Col>
+          )}
         </Col>
 
-        <Col xs="auto" className="ps-0">
-          <Button onClick={sendMessage}>Send</Button>
+        <Col xs="auto" className="ps-0 mt-2">
+          <Button onClick={sendMessage} className="py-2 mt-1">
+            Send
+          </Button>
         </Col>
-      </Row>
-      <Row>
-        {maxLength && (
-          <Col className="text-start small text-muted mb-1 ps-3">
-            {input.length}/{maxLength}
-          </Col>
-        )}
       </Row>
     </>
   );
