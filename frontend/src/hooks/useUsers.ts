@@ -13,10 +13,9 @@ export function useUsers() {
       setError(null);
       const data = await userService.getAllUsers();
       setUsers(data);
-
-    }catch(err){
-      setError(err instanceof Error ? err.message : 'Failed to load users');
-    }finally{
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load users");
+    } finally {
       setLoading(false);
     }
   };
@@ -26,19 +25,23 @@ export function useUsers() {
   }, []);
 
   const incrementFollowersCount = (userId: number) => {
-    setUsers(prev => prev.map(user =>
-      user.id === userId
-        ? { ...user, followersCount: user.followersCount + 1 }
-        : user
-    ));
+    setUsers((prev) =>
+      prev.map((user) =>
+        user.id === userId
+          ? { ...user, followersCount: user.followersCount + 1 }
+          : user
+      )
+    );
   };
 
   const decrementFollowersCount = (userId: number) => {
-    setUsers(prev => prev.map(user =>
-      user.id === userId
-        ? { ...user, followersCount: Math.max(0, user.followersCount - 1) }
-        : user
-    ));
+    setUsers((prev) =>
+      prev.map((user) =>
+        user.id === userId
+          ? { ...user, followersCount: Math.max(0, user.followersCount - 1) }
+          : user
+      )
+    );
   };
 
   return {

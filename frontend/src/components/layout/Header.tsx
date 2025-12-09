@@ -22,7 +22,7 @@ export default function Header() {
           <BackButton />
         </Col>
 
-        <Col>
+        <Col className="p-0">
           <UserPreview fullName={fakeUser.fullName} />
         </Col>
       </Row>
