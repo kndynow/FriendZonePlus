@@ -5,7 +5,7 @@ import FormField from "../../components/ui/FormField";
 import { useUserProfile } from "../../hooks/useUserProfile";
 
 export default function SettingsPage() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   const { profile, setProfile, loading, updateProfile } = useUserProfile(
     user?.id ?? null
@@ -26,7 +26,7 @@ export default function SettingsPage() {
         </div>
 
         <FormField
-          label="Profile picture URL"
+          label="Profile picture"
           placeholder="Enter image URL"
           value={profile.profilePictureUrl}
           onChange={(e) => handleChange("profilePictureUrl", e.target.value)}
@@ -47,11 +47,19 @@ export default function SettingsPage() {
         />
 
         <Button
-          className="w-100 mt-3 mb-4"
+          className="w-100 my-1"
           onClick={updateProfile}
           disabled={loading}
         >
           Save changes
+        </Button>
+        <Button
+          className="w-100 mt-3"
+          variant="danger"
+          onClick={logout}
+          disabled={loading}
+        >
+          Sign out
         </Button>
       </Col>
     </Row>
