@@ -28,13 +28,13 @@ export default function FormField({
   return (
     <>
       <FormGroup className="mt-2 mb-1">
-        {label && <FormLabel className="mb-2">{label}</FormLabel>}
+        {label && <FormLabel className="mb-2 fs-6">{label}</FormLabel>}
 
         <FormControl
           type={type}
           name={name}
           value={value}
-          className="f-shadow-inset"
+          className="f-shadow-inset fs-6"
           placeholder={placeholder}
           onChange={onChange}
           onKeyDown={onKeyDown}
