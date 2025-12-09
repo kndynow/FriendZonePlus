@@ -47,7 +47,7 @@ export default function UserPreview({
               fullName
             )}
           </h5>
-          <p className="mb-2 fs-6">{truncatedSubtitle}</p>
+          <p className="mb-2 fs-6 fst-italic">{truncatedSubtitle}</p>
         </Col>
         {button?.buttonIcon && (
           <Col

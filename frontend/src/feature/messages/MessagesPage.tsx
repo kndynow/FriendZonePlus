@@ -95,7 +95,7 @@ export default function MessagesPage() {
                     ? `${latestMessages[follower.id].senderName}: ${
                         latestMessages[follower.id].content
                       }`
-                    : "No messages yet"
+                    : "Start a conversation..."
                 }
                 truncate={true}
                 truncateLength={31}
