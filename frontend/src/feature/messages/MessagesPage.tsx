@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import UserPreview from "../user/UserPreview";
 import { useAuth } from "../../../context/AuthProvider";
-import { Row, Col, Stack } from "react-bootstrap";
+import { Row, Col, Stack, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import type { Follower } from "../../../types/followers";
 
 export default function MessagesPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
   const [followers, setFollowers] = useState<Follower[]>([]);
-
   const [latestMessages, setLatestMessages] = useState<{
     [key: string]: { senderName: string; content: string };
   }>({});
@@ -35,7 +35,6 @@ export default function MessagesPage() {
 
         const messagesMap: any = {};
         messagesData.forEach((msg: any) => {
-          // Checks who sent the latest message
           const otherUserId =
             msg.senderId === user.id ? msg.receiverId : msg.senderId;
 
@@ -53,39 +52,46 @@ export default function MessagesPage() {
 
         setLatestMessages(messagesMap);
       } catch (error) {
-        console.error("Failed to fetch messages");
+        console.error("Failed to fetch messages", error);
+      } finally {
+        setLoading(false);
       }
     }
 
     fetchAll();
   }, [user]);
 
+  if (loading) {
+    return (
+      <Spinner animation="border" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </Spinner>
+    );
+  }
+
   return (
-    <>
-      <Stack gap={1}>
-        {followers.map((follower: any) => (
-          <Row
-            key={follower.id}
-            className="f-border f-shadow semi-transparent-bg pt-2 mb-2 "
-          >
-            <Col>
-              <div onClick={() => navigate(`/messages/${follower.id}`)}>
-                <UserPreview
-                  fullName={`${follower.firstName} ${follower.lastName}`}
-                  imgPath={follower.imgPath}
-                  subtitle={
-                    latestMessages[follower.id]
-                      ? `${latestMessages[follower.id].senderName}: ${
-                          latestMessages[follower.id].content
-                        }`
-                      : "No messages yet"
-                  }
-                />
-              </div>
-            </Col>
-          </Row>
-        ))}
-      </Stack>
-    </>
+    <Stack gap={1}>
+      {followers.map((follower) => (
+        <Row
+          key={follower.id}
+          className="f-border f-shadow semi-transparent-bg pt-2 mb-2"
+        >
+          <Col>
+            <div onClick={() => navigate(`/messages/${follower.id}`)}>
+              <UserPreview
+                fullName={`${follower.firstName} ${follower.lastName}`}
+                subtitle={
+                  latestMessages[follower.id]
+                    ? `${latestMessages[follower.id].senderName}: ${
+                        latestMessages[follower.id].content
+                      }`
+                    : "No messages yet"
+                }
+              />
+            </div>
+          </Col>
+        </Row>
+      ))}
+    </Stack>
   );
 }
