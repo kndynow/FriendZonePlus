@@ -10,8 +10,8 @@ export default function EmptyContent({ header, content }: EmptyContentProps) {
     <>
       <Row className=" flex-grow-1 align-items-center text-center">
         <Col>
-          <h5 className="">{header}</h5>
-          <p>{content}</p>
+          <p className="m-0 fw-light">{header}</p>
+          <p className="fst-italic fs-5 fw-semibold">{content}</p>
         </Col>
       </Row>
     </>
