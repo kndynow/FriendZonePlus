@@ -76,35 +76,38 @@ export default function WallPostList({ userId, showCreateForm }: WallPostListPro
     if (error) {
         return (
             <p className="text-danger">Error: {error}</p>
+            <p className="text-danger">Error: {error}</p>
         );
     }
 
     return (
         <div className="py-4 w-100">
-            {shouldShowCreateForm && (
-                <CreateWallPostForm
-                    onSubmit={handleCreatePost}
-                    isLoading={actionsLoading === CREATE_POST_LOADING_ID}
-                />
-            )}
+            <div className="py-4 w-100">
+                {shouldShowCreateForm && (
+                    <CreateWallPostForm
+                        onSubmit={handleCreatePost}
+                        isLoading={actionsLoading === CREATE_POST_LOADING_ID}
+                    />
+                )}
 
-            {wallPosts.length === 0 ? (
-                <p className="text-muted">No posts yet.</p>
-            ) : (
-                <div>
-                    {wallPosts.map((post) => (
-                        <WallPostItem
-                            key={post.id}
-                            post={post}
-                            authorProfilePictureUrl={getProfilePictureUrl(post.authorId)}
-                            onUpdate={handleUpdatePost}
-                            onDelete={handleDeletePost}
-                            isUpdating={actionsLoading === post.id}
-                            isDeleting={actionsLoading === post.id}
-                        />
-                    ))}
-                </div>
-            )}
+                {wallPosts.length === 0 ? (
+                    <p className="text-muted">No posts yet.</p>
+                ) : (
+                    <div>
+                        {wallPosts.map((post) => (
+                            <WallPostItem
+                                key={post.id}
+                                post={post}
+                                authorProfilePictureUrl={getProfilePictureUrl(post.authorId)}
+                                onUpdate={handleUpdatePost}
+                                onDelete={handleDeletePost}
+                                isUpdating={actionsLoading === post.id}
+                                isDeleting={actionsLoading === post.id}
+                            />
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
