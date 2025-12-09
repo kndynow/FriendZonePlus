@@ -52,9 +52,7 @@ export default function FindFriendsPage() {
   }
 
   if (error) {
-    return (
-      toast.error(error as string)
-    );
+    return toast.error(error as string);
   }
 
   return (
@@ -81,8 +79,8 @@ export default function FindFriendsPage() {
                         followLoading === user.id
                           ? "..."
                           : userIsFollowing
-                            ? "–"
-                            : "+",
+                          ? "–"
+                          : "+",
                       onClick: () => handleToggleFollow(user.id),
                     }}
                   />

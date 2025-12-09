@@ -114,17 +114,6 @@ public static class UserEndpoints
     })
     .WithDescription("Gets a list of all users that the authenticated user is following")
     .WithSummary("Get following");
-
-
-    group.MapGet("/{id}/wall", async (int id, [FromServices] IWallPostService wallpostService) =>
-    {
-      var wallPosts = await wallpostService.GetWallPostsAsync(id);
-      return TypedResults.Ok(wallPosts);
-    })
-    .WithDescription("Gets all wall posts for a specific user by their user ID")
-    .WithSummary("Get user wall posts");
   }
-
-
 
 }

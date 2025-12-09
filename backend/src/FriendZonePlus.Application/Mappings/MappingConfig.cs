@@ -19,7 +19,7 @@ public class MappingConfig : IRegister
 
         config.NewConfig<WallPost, WallPostResponseDto>()
         .Map(dest => dest.AuthorName, src => src.Author.Username)
-        .Map(dest => dest.TargetUserName, src => src.TargetUser.Username);
+        .Map(dest => dest.AuthorProfilePictureUrl, src => src.Author.ProfilePictureUrl);
 
         config.NewConfig<CreateWallPostDto, WallPost>();
 
