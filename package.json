@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "private": true,
     "scripts": {
-        "start": "concurrently -k \"npm run frontend\" \"npm run backend\"",
+        "start": "concurrently -k \"npm run backend\" \"npm run frontend\" ",
         "dev": "npm start",
         "frontend": "cd frontend && npm run dev",
         "backend": "dotnet watch --project backend/src/FriendZonePlus.API/FriendZonePlus.API.csproj",
