@@ -4,6 +4,7 @@ import { useAuth } from "../../../context/AuthProvider";
 import { Row, Col, Stack, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import type { Follower } from "../../../types/followers";
+import EmptyContent from "../../components/ui/EmptyContent";
 
 export default function MessagesPage() {
   const navigate = useNavigate();
@@ -65,6 +66,15 @@ export default function MessagesPage() {
       <Spinner animation="border" role="status">
         <span className="visually-hidden">Loading...</span>
       </Spinner>
+    );
+  }
+
+  if (followers.length === 0) {
+    return (
+      <EmptyContent
+        header="AHHHH! No friends yet?"
+        content="Follow someone to send them message!"
+      />
     );
   }
 
