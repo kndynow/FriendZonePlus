@@ -6,7 +6,7 @@ using FriendZonePlus.Core.Interfaces;
 using FriendZonePlus.Application.Services.Messages;
 using FriendZonePlus.Application.Validators;
 using FriendZonePlus.Core.Entities;
-using FriendZonePlus.Application.Interfaces;
+
 using Moq;
 using Xunit;
 namespace FriendZonePlus.UnitTests;
