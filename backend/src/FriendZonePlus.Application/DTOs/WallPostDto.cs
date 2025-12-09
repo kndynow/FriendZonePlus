@@ -13,7 +13,8 @@ public record WallPostResponseDto(
     DateTime CreatedAt,
     int AuthorId,
     string AuthorName,
-    string AuthorProfilePictureUrl
+    int TargetUserId,
+    string TargetUserName
     );
 
 public record UpdateWallPostDto(string Content);
