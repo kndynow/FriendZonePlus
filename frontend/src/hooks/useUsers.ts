@@ -7,25 +7,6 @@ export function useUsers() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchUserProfile = async (userId: number) => {
-    try {
-      const res = await fetch(`/api/users/${userId}`, {
-        credentials: "include",
-      });
-
-      if (!res.ok) return null;
-
-      const data = await res.json();
-      return {
-        firstName: data.firstName ?? "",
-        lastName: data.lastName ?? "",
-        profilePictureUrl: data.profilePictureUrl ?? "",
-      };
-    } catch {
-      return null;
-    }
-  };
-
   const fetchUsers = async () => {
     try {
       setLoading(true);
@@ -68,7 +49,6 @@ export function useUsers() {
     loading,
     error,
     refetch: fetchUsers,
-    fetchUserProfile,
     incrementFollowersCount,
     decrementFollowersCount,
   };

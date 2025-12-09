@@ -1,16 +1,18 @@
 import { Col, Row } from "react-bootstrap";
 import { NavItem } from "./NavItem";
-
-//TODO: change to real pages
-const navItems = [
-  { to: "/findFriends", icon: "search-heart" },
-  { to: "/messages", icon: "chat-heart" },
-  { to: "/", icon: "house-door" },
-  { to: "/user/2", icon: "person" },
-  { to: "/settings", icon: "gear" },
-];
+import { useAuth } from "../../../context/AuthProvider";
 
 export default function BottomNavigation() {
+  const { user } = useAuth();
+  const userId = user?.id ?? "";
+
+  const navItems = [
+    { to: "/findFriends", icon: "search-heart" },
+    { to: "/messages", icon: "chat-heart" },
+    { to: "/", icon: "house-door" },
+    { to: `/user/${userId}`, icon: "person" },
+    { to: "/settings", icon: "gear" },
+  ];
   return (
     <Row className="bottom-nav f-shadow semi-transparent-bg">
       {navItems.map((navItem) => (
