@@ -1,7 +1,9 @@
 import { Col, Row } from "react-bootstrap";
 import ProfileImage from "../../components/ui/ProfileImage";
+import { Link } from "react-router-dom";
 
 type UserPreviewProps = {
+  userId?: number;
   imgPath?: string;
   fullName: string;
   subtitle?: string;
@@ -13,6 +15,7 @@ type UserPreviewProps = {
 };
 
 export default function UserPreview({
+  userId,
   imgPath,
   fullName,
   subtitle,
@@ -26,8 +29,16 @@ export default function UserPreview({
           <ProfileImage imgPath={imgPath} />
         </Col>
         <Col className="d-flex flex-column justify-content-center mx-1">
-          <h5 className="fs-5 mb-1">{fullName}</h5>
-          <p className="mb-2">{subtitle}</p>
+          <h5 className="fs-5 mb-1">
+            {userId ? (
+              <Link className="clean-link" to={`/user/${userId}`}>
+                {fullName}
+              </Link>
+            ) : (
+              fullName
+            )}
+          </h5>
+          <p className="mb-2 fs-6">{subtitle}</p>
         </Col>
         {button?.buttonIcon && (
           <Col
@@ -35,7 +46,7 @@ export default function UserPreview({
             className="d-flex flex-column align-items-end justify-content-start mb-4 pb-2"
           >
             {button.buttonIcon && (
-              <button onClick={button.onClick} className="f-button fs-s">
+              <button onClick={button.onClick} className="f-button fs-4">
                 {button.buttonIcon}
               </button>
             )}
