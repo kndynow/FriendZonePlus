@@ -23,7 +23,15 @@ public class WallPostService : IWallPostService
     post.AuthorId = currentUserId;
 
     await _wallPostRepository.AddAsync(post);
-    return post.Adapt<WallPostResponseDto>();
+
+    // Hämta posten igen med Author inkluderad för korrekt mappning
+    var createdPost = await _wallPostRepository.GetByIdAsync(post.Id);
+    if (createdPost is null)
+    {
+      throw new InvalidOperationException("Failed to retrieve created post");
+    }
+
+    return createdPost.Adapt<WallPostResponseDto>();
   }
   public async Task UpdateWallPostAsync(int currentUserId, int wallPostId, UpdateWallPostDto dto)
   {
