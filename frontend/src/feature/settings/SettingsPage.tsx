@@ -6,14 +6,30 @@ import { useUserProfile } from "../../hooks/useUserProfile";
 
 export default function SettingsPage() {
   const { user, logout } = useAuth();
-
   const { profile, setProfile, loading, updateProfile } = useUserProfile(
     user?.id ?? null
   );
 
-  const handleChange = (field: string, value: string) => {
+  const handleChange = (field: string, value: string) =>
     setProfile((prev) => ({ ...prev, [field]: value }));
-  };
+
+  const fields = [
+    {
+      name: "profilePictureUrl",
+      label: "Profile picture",
+      placeholder: "Enter image URL",
+    },
+    {
+      name: "firstName",
+      label: "First name",
+      placeholder: "Enter first name",
+    },
+    {
+      name: "lastName",
+      label: "Last name",
+      placeholder: "Enter last name",
+    },
+  ] as const;
 
   return (
     <Row className="flex-grow-1 mb-5 pb-5">
@@ -25,34 +41,24 @@ export default function SettingsPage() {
           />
         </div>
 
-        <FormField
-          label="Profile picture"
-          placeholder="Enter image URL"
-          value={profile.profilePictureUrl}
-          onChange={(e) => handleChange("profilePictureUrl", e.target.value)}
-        />
-
-        <FormField
-          label="First name"
-          placeholder="Enter first name"
-          value={profile.firstName}
-          onChange={(e) => handleChange("firstName", e.target.value)}
-        />
-
-        <FormField
-          label="Last name"
-          placeholder="Enter last name"
-          value={profile.lastName}
-          onChange={(e) => handleChange("lastName", e.target.value)}
-        />
+        {fields.map((field) => (
+          <FormField
+            key={field.name}
+            label={field.label}
+            placeholder={field.placeholder}
+            value={profile[field.name]}
+            onChange={(e) => handleChange(field.name, e.target.value)}
+          />
+        ))}
 
         <Button
           className="w-100 my-1"
           onClick={updateProfile}
           disabled={loading}
         >
-          Save changes
+          {loading ? "Saving..." : "Save changes"}
         </Button>
+
         <Button
           className="w-100 mt-3"
           variant="danger"
