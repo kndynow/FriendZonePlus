@@ -157,7 +157,12 @@ public class WallPostRepositoryTests : RepositoryTestBase
         {
             await SeedUsers(seedContext);
             await SeedFollows(seedContext);
-            await SeedWallPostsForFeed(seedContext);
+            // Only seed posts from User2 (who User1 follows)
+            seedContext.WallPosts.AddRange(
+                new WallPost { Content = "Post 1 from User2", AuthorId = 2, TargetUserId = 2, CreatedAt = DateTime.UtcNow.AddMinutes(-10) },
+                new WallPost { Content = "Post 2 from User2", AuthorId = 2, TargetUserId = 2, CreatedAt = DateTime.UtcNow.AddMinutes(-5) }
+            );
+            await seedContext.SaveChangesAsync();
         }
 
         //Act
@@ -184,7 +189,12 @@ public class WallPostRepositoryTests : RepositoryTestBase
         using (var seedContext = CreateContext())
         {
             await SeedUsers(seedContext);
-            await SeedWallPostsForFeed(seedContext);
+            // Only seed posts from User2 (User1 doesn't follow anyone and has no own posts)
+            seedContext.WallPosts.AddRange(
+                new WallPost { Content = "Post 1 from User2", AuthorId = 2, TargetUserId = 2, CreatedAt = DateTime.UtcNow.AddMinutes(-10) },
+                new WallPost { Content = "Post 2 from User2", AuthorId = 2, TargetUserId = 2, CreatedAt = DateTime.UtcNow.AddMinutes(-5) }
+            );
+            await seedContext.SaveChangesAsync();
         }
 
         //Act

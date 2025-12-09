@@ -12,7 +12,8 @@ public static class UserEndpoints
   public static void MapUserEndpoints(this IEndpointRouteBuilder app)
   {
     var group = app.MapGroup("/api/users")
-                    .WithTags("Users");
+                    .WithTags("Users")
+                    .RequireAuthorization();
 
     //Get users
     group.MapGet("/", async ([FromServices] IUserService userService) =>
@@ -21,7 +22,8 @@ public static class UserEndpoints
       return TypedResults.Ok(users);
     })
     .WithDescription("Gets a list of all users")
-    .WithSummary("Get users");
+    .WithSummary("Get users")
+    .AllowAnonymous();
 
     group.MapGet("/with-following-status", async (ClaimsPrincipal user, [FromServices] IUserService userService) =>
     {
@@ -40,7 +42,8 @@ public static class UserEndpoints
       return TypedResults.Ok(userProfile);
     })
     .WithDescription("Gets the user profile information for a specific user by their user ID")
-    .WithSummary("Get user profile");
+    .WithSummary("Get user profile")
+    .AllowAnonymous();
 
     //Update user profile
     group.MapPut("/me", async (UpdateUserDto dto, ClaimsPrincipal user, [FromServices] IUserService userService) =>
@@ -122,7 +125,8 @@ public static class UserEndpoints
       return TypedResults.Ok(wallPosts);
     })
     .WithDescription("Gets all wall posts for a specific user by their user ID")
-    .WithSummary("Get user wall posts");
+    .WithSummary("Get user wall posts")
+    .AllowAnonymous();
   }
 
 

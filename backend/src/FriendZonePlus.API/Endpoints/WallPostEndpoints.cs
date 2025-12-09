@@ -15,7 +15,9 @@ public static class WallPostEndpoints
 {
   public static void MapWallPostEndpoints(this IEndpointRouteBuilder app)
   {
-    var group = app.MapGroup("/api/wallposts").WithTags("WallPost");
+    var group = app.MapGroup("/api/wallposts")
+                    .WithTags("WallPost")
+                    .RequireAuthorization();
 
     // Create wall post
     group.MapPost("/", async (
@@ -80,7 +82,8 @@ public static class WallPostEndpoints
     })
     .WithDescription("Gets all wall posts for a specific user by their user ID")
     .WithSummary("Get user wall posts")
-    .WithTags("WallPost");
+    .WithTags("WallPost")
+    .AllowAnonymous();
 
   }
 }
