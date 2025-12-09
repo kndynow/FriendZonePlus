@@ -5,12 +5,7 @@ import {
   useState,
   useEffect,
 } from "react";
-import type {
-  RegisterRequest,
-  User,
-  LoginRequest,
-  AuthResponse,
-} from "../types/auth.ts";
+import type { RegisterRequest, User, LoginRequest } from "../types/auth.ts";
 
 interface AuthContextType {
   user: User | null;
@@ -112,7 +107,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           lastName: result.lastName ?? "",
         });
       }
-      return result as AuthResponse;
     } finally {
       setLoading(false);
     }

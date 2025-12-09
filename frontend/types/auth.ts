@@ -9,13 +9,6 @@ export interface LoginRequest {
   usernameOrEmail: string;
   password: string;
 }
-
-export interface AuthResponse {
-  token: string;
-  userId: string;
-  username: string;
-}
-
 export interface User {
   id: number;
   username: string;

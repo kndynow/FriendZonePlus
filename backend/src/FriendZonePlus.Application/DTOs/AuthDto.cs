@@ -14,7 +14,6 @@ string Password
 );
 
 public record AuthResponse(
-    string Token,
     int UserId,
     string Username
 );

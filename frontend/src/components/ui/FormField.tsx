@@ -27,8 +27,8 @@ export default function FormField({
 
   return (
     <>
-      <FormGroup className="mb-3">
-        {label && <FormLabel className="mb-1">{label}</FormLabel>}
+      <FormGroup className="mt-2 mb-1">
+        {label && <FormLabel className="mb-2">{label}</FormLabel>}
 
         <FormControl
           type={type}
