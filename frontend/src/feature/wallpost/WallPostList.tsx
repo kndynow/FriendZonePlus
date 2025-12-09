@@ -5,7 +5,6 @@ import { useWallPostActions, CREATE_POST_LOADING_ID } from "../../hooks/useWallP
 import { useUserProfiles } from "../../hooks/useUserProfiles";
 import { useFollowing } from "../../hooks/useFollowing";
 import { wallPostService } from "../../api/services/wallPostService";
-import { Container } from "react-bootstrap";
 import WallPostItem from "./WallPostItem";
 import CreateWallPostForm from "./CreateWallPostForm";
 
@@ -33,29 +32,24 @@ export default function WallPostList({ userId, showCreateForm }: WallPostListPro
     const targetUserId = userId ?? currentUser?.id;
 
     const handleCreatePost = async (content: string) => {
-        // Kontrollera om targetUserId är ett giltigt nummer (inte NaN, undefined eller null)
         if (!targetUserId || isNaN(targetUserId)) {
             toast.error('Unable to create post: Missing target user information');
-            console.error('targetUserId:', targetUserId, 'userId:', userId, 'currentUser?.id:', currentUser?.id);
             return;
         }
 
-        try {
-            const createdPost = await createWallPost({
-                targetUserId,
-                content,
-            });
-            if (createdPost) {
-                addWallPost(createdPost);
-            }
-        } catch (err) {
-            console.error('Failed to create post:', err);
+        const createdPost = await createWallPost({
+            targetUserId,
+            content,
+        });
+        if (createdPost) {
+            addWallPost(createdPost);
         }
     };
 
     const handleUpdatePost = async (postId: number, newContent: string) => {
         try {
             await updatePost(postId, { content: newContent });
+            // Refresh posts after successful update
             const updatedPosts = await (userId
                 ? wallPostService.getWallPostsForUser(userId)
                 : wallPostService.getWallPostFeed());
@@ -63,40 +57,30 @@ export default function WallPostList({ userId, showCreateForm }: WallPostListPro
             if (updatedPost) {
                 updateWallPost(postId, updatedPost);
             }
-        } catch (err) {
-            console.error('Failed to update post:', err);
+        } catch {
+            // Error already handled by hook/interceptors
         }
     };
 
     const handleDeletePost = async (postId: number) => {
-        try {
-            await deleteWallPost(postId);
-            removeWallPost(postId);
-        } catch (err) {
-            console.error('Failed to delete post:', err);
-        }
+        await deleteWallPost(postId);
+        removeWallPost(postId);
     };
-
-
 
     if (loading) {
         return (
-            <Container className="py-4">
-                <p>Loading posts...</p>
-            </Container>
+            <p>Loading posts...</p>
         );
     }
 
     if (error) {
         return (
-            <Container className="py-4">
-                <p className="text-danger">Error: {error}</p>
-            </Container>
+            <p className="text-danger">Error: {error}</p>
         );
     }
 
     return (
-        <Container className="py-4">
+        <div className="py-4 w-100">
             {shouldShowCreateForm && (
                 <CreateWallPostForm
                     onSubmit={handleCreatePost}
@@ -121,8 +105,6 @@ export default function WallPostList({ userId, showCreateForm }: WallPostListPro
                     ))}
                 </div>
             )}
-        </Container>
+        </div>
     );
-
-
 }
