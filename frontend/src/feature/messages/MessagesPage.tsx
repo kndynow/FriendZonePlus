@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import UserPreview from "../user/UserPreview";
 import { useAuth } from "../../../context/AuthProvider";
-import { Row, Col, Container } from "react-bootstrap";
+import { Row, Col, Stack } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import type { Follower } from "../../../types/followers";
 
@@ -62,11 +62,11 @@ export default function MessagesPage() {
 
   return (
     <>
-      <Container>
+      <Stack gap={1}>
         {followers.map((follower: any) => (
           <Row
             key={follower.id}
-            className="f-border f-shadow semi-transparent-bg pt-2 mb-2"
+            className="f-border f-shadow semi-transparent-bg pt-2 mb-2 "
           >
             <Col>
               <div onClick={() => navigate(`/messages/${follower.id}`)}>
@@ -85,7 +85,7 @@ export default function MessagesPage() {
             </Col>
           </Row>
         ))}
-      </Container>
+      </Stack>
     </>
   );
 }

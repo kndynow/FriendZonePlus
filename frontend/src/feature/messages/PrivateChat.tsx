@@ -29,7 +29,7 @@ export default function PrivateChat() {
   const handleSend = () => {
     if (!input.trim() || !user) return;
 
-    sendMessage(receiverId, input, user.id);
+    sendMessage(receiverId, input);
     setInput("");
   };
 
