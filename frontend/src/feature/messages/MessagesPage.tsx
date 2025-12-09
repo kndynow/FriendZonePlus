@@ -4,6 +4,7 @@ import { useAuth } from "../../../context/AuthProvider";
 import { Row, Col, Stack, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import type { Follower } from "../../../types/followers";
+import EmptyContent from "../../components/ui/EmptyContent";
 
 export default function MessagesPage() {
   const navigate = useNavigate();
@@ -68,16 +69,23 @@ export default function MessagesPage() {
     );
   }
 
+  if (followers.length === 0) {
+    return (
+      <EmptyContent
+        header="AHHHH! No friends yet?"
+        content="Follow someone to send them message!"
+      />
+    );
+  }
+
   return (
-    <Stack gap={1}>
-      {followers.map((follower) => (
-        <Row
-          key={follower.id}
-          className="f-border f-shadow semi-transparent-bg pt-2 mb-2"
-        >
-          <Col>
+    <>
+      <Row className="flex-grow-1">
+        <Col>
+          {followers.map((follower) => (
             <div onClick={() => navigate(`/messages/${follower.id}`)}>
               <UserPreview
+                key={follower.id}
                 fullName={`${follower.firstName} ${follower.lastName}`}
                 imgPath={`${follower.profilePictureUrl}`}
                 subtitle={
@@ -85,15 +93,17 @@ export default function MessagesPage() {
                     ? `${latestMessages[follower.id].senderName}: ${
                         latestMessages[follower.id].content
                       }`
-                    : "No messages yet"
+                    : "Start a conversation..."
                 }
+                className="f-border f-shadow semi-transparent-bg mb-2 align-items-center p-3"
                 truncate={true}
                 truncateLength={31}
               />
             </div>
-          </Col>
-        </Row>
-      ))}
-    </Stack>
+          ))}
+        </Col>
+      </Row>
+      <br />
+    </>
   );
 }

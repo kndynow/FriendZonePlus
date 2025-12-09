@@ -5,6 +5,7 @@ import ChatInput from "./ChatInput";
 import { useMessages } from "./useMessages";
 import { useAuth } from "../../../context/AuthProvider";
 import { useParams } from "react-router-dom";
+import EmptyContent from "../../components/ui/EmptyContent";
 
 export default function PrivateChat() {
   const { messages, getConversation, sendMessage } = useMessages();
@@ -40,17 +41,24 @@ export default function PrivateChat() {
           ref={scrollRef}
           className="flex-grow-1 overflow-auto f-border f-shadow-inset py-3"
         >
-          <Col className="d-flex flex-column gap-2">
-            {messages.map((message) => (
-              <SingleMessage
-                key={message.id}
-                from={message.from}
-                content={message.content}
-              />
-            ))}
-          </Col>
+          {messages.length === 0 ? (
+            <EmptyContent
+              header="Get out of the friendzone..."
+              content="Say hi!"
+            />
+          ) : (
+            <Col className="d-flex flex-column gap-2">
+              {messages.map((message) => (
+                <SingleMessage
+                  key={message.id}
+                  from={message.from}
+                  content={message.content}
+                />
+              ))}
+            </Col>
+          )}
         </Row>
-        <Row>
+        <Row className="mb-2">
           <Col>
             <ChatInput
               input={input}
