@@ -88,7 +88,7 @@ export default function MessagesPage() {
                     : "No messages yet"
                 }
                 truncate={true}
-                truncateLength={22}
+                truncateLength={31}
               />
             </div>
           </Col>
