@@ -1,7 +1,7 @@
 import { useFollowUser } from "../hooks/useFollowUser";
 import { useAuth } from "../../context/AuthProvider";
 import UserPreview from "../feature/user/UserPreview";
-import { Col, Container, Row } from "react-bootstrap";
+import { Col, Row } from "react-bootstrap";
 import { useFindFriends } from "../hooks/useFindFriends";
 import toast from "react-hot-toast";
 
@@ -71,10 +71,11 @@ export default function FindFriendsPage() {
                 return (
                   <UserPreview
                     key={user.id}
+                    userId={user.id}
                     imgPath={user.profilePictureUrl}
                     fullName={`@${user.username}`}
-                    subtitle={`${user.followersCount} followers • ${user.followingCount} follows`}
-                    className="f-border f-shadow semi-transparent-bg mb-2 align-items-center"
+                    subtitle={`${user.followersCount} followers • follows ${user.followingCount} `}
+                    className="f-border f-shadow semi-transparent-bg mb-2 align-items-center ps-3"
                     button={{
                       buttonIcon:
                         followLoading === user.id
