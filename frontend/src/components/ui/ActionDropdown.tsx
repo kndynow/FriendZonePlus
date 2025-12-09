@@ -19,9 +19,7 @@ export default function ActionDropdown({ actions }: ActionDropdownProps) {
         variant="link"
         className="f-button fs-4 text-decoration-none p-0 border-0"
         style={{ boxShadow: "none" }}
-      >
-        <i className="bi bi-three-dots-vertical"></i>
-      </Dropdown.Toggle>
+      ></Dropdown.Toggle>
       <Dropdown.Menu align="end">
         {actions.map((action, index) => (
           <Dropdown.Item
@@ -37,4 +35,3 @@ export default function ActionDropdown({ actions }: ActionDropdownProps) {
     </Dropdown>
   );
 }
-
