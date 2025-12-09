@@ -5,6 +5,7 @@ type UserPreviewProps = {
   imgPath?: string;
   fullName: string;
   subtitle?: string;
+  className?: string;
   button?: {
     buttonIcon: string;
     onClick: () => void;
@@ -15,25 +16,26 @@ export default function UserPreview({
   imgPath,
   fullName,
   subtitle,
+  className,
   button,
 }: UserPreviewProps) {
   return (
     <>
-      <Row className="align-items-start p-2">
-        <Col xs="auto">
+      <Row className={`align-items-start p-2 ps-3 m-0 ${className}`}>
+        <Col xs="auto" className="p-0">
           <ProfileImage imgPath={imgPath} />
         </Col>
         <Col className="d-flex flex-column justify-content-center">
-          <h5 className="m-0">{fullName}</h5>
-          <p>{subtitle}</p>
+          <h5 className="fs-5 mb-1">{fullName}</h5>
+          <p className="mb-2">{subtitle}</p>
         </Col>
         {button?.buttonIcon && (
           <Col
             xs="auto"
-            className="d-flex flex-column align-items-end justify-content-start"
+            className="d-flex flex-column align-items-end justify-content-start mb-4 pb-2"
           >
             {button.buttonIcon && (
-              <button onClick={button.onClick} className="f-button">
+              <button onClick={button.onClick} className="f-button fs-4">
                 {button.buttonIcon}
               </button>
             )}
