@@ -27,7 +27,7 @@ export default function UserPreview({
         </Col>
         <Col className="d-flex flex-column justify-content-center">
           <h5 className="fs-5 mb-1">{fullName}</h5>
-          <p className="mb-2">{subtitle}</p>
+          <p className="mb-2 wrap-text truncate-text">{subtitle}</p>
         </Col>
         {button?.buttonIcon && (
           <Col
