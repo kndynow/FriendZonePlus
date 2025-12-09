@@ -29,7 +29,7 @@ export default function PrivateChat() {
   const handleSend = () => {
     if (!input.trim() || !user) return;
 
-    sendMessage(receiverId, input, user.id);
+    sendMessage(receiverId, input);
     setInput("");
   };
 
@@ -56,6 +56,7 @@ export default function PrivateChat() {
               input={input}
               setInput={setInput}
               sendMessage={handleSend}
+              maxLength={300}
             />
           </Col>
         </Row>

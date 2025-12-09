@@ -8,7 +8,6 @@ using FriendZonePlus.Application.Interfaces;
 using FriendZonePlus.Application.Services;
 using FriendZonePlus.Application.Services.Authentication;
 using FriendZonePlus.Application.Services.Messages;
-using FriendZonePlus.Application.Interfaces;
 using FriendZonePlus.Application.Validators;
 using FriendZonePlus.Core.Interfaces;
 using FriendZonePlus.Infrastructure.Authentication;
@@ -23,8 +22,6 @@ using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using System.Text;
 using System.Text.Json;
-using FriendZonePlus.Infrastructure.Authentication;
-using FriendZonePlus.API.Infrastructure;
 using FriendZonePlus.Application.Mappings;
 
 

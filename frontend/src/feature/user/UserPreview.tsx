@@ -8,6 +8,8 @@ type UserPreviewProps = {
   fullName: string;
   subtitle?: string;
   className?: string;
+  truncate?: boolean;
+  truncateLength?: number;
   button?: {
     buttonIcon: string;
     onClick: () => void;
@@ -20,11 +22,18 @@ export default function UserPreview({
   fullName,
   subtitle,
   className,
+  truncate,
+  truncateLength = 40,
   button,
 }: UserPreviewProps) {
+  const truncatedSubtitle =
+    truncate && subtitle && subtitle.length > truncateLength
+      ? subtitle.slice(0, truncateLength) + "…"
+      : subtitle;
+
   return (
     <>
-      <Row className={`align-items-start p-2 m-0 ${className}`}>
+      <Row className={`align-items-start p-2 m-0 ${className} `}>
         <Col xs="auto" className="p-0">
           <ProfileImage imgPath={imgPath} />
         </Col>
@@ -38,7 +47,7 @@ export default function UserPreview({
               fullName
             )}
           </h5>
-          <p className="mb-2 fs-6">{subtitle}</p>
+          <p className="mb-2 fs-6">{truncatedSubtitle}</p>
         </Col>
         {button?.buttonIcon && (
           <Col
