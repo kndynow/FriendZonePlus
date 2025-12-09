@@ -7,7 +7,8 @@ public record UserProfileDto(
     string LastName,
     string ProfilePictureUrl,
     int FollowersCount,
-    int FollowingCount
+    int FollowingCount,
+    bool IsFollowing = false
 );
 
 public record UpdateUserDto(string FirstName, string LastName, string ProfilePictureUrl);
