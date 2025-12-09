@@ -69,9 +69,10 @@ export default function FindFriendsPage() {
                 return (
                   <UserPreview
                     key={user.id}
+                    userId={user.id}
                     imgPath={user.profilePictureUrl}
                     fullName={`@${user.username}`}
-                    subtitle={`${user.followersCount} followers • ${user.followingCount} follows`}
+                    subtitle={`${user.followersCount} followers • follows ${user.followingCount} `}
                     className="f-border f-shadow semi-transparent-bg mb-2 align-items-center ps-3"
                     button={{
                       buttonIcon:

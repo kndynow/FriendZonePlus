@@ -1,12 +1,12 @@
 import { Col, Row } from "react-bootstrap";
 import BackButton from "../ui/BackButton";
-import { useMatches } from "react-router-dom";
+import { useMatches, useParams } from "react-router-dom";
 import UserPreview from "../../feature/user/UserPreview";
+import { useUserProfile } from "../../hooks/useUserProfile";
 
 export default function Header() {
-  const fakeUser = {
-    fullName: "Anna Andersson",
-  };
+  const { id } = useParams();
+  const { profile } = useUserProfile(Number(id));
 
   const matches = useMatches();
   const match = matches[matches.length - 1];
@@ -23,21 +23,24 @@ export default function Header() {
         </Col>
 
         <Col className="p-0">
-          <UserPreview fullName={fakeUser.fullName} />
+          <UserPreview
+            userId={Number(id)}
+            imgPath={profile.profilePictureUrl}
+            fullName={`${profile.firstName} ${profile.lastName}`}
+          />
         </Col>
       </Row>
     );
   }
+
   return (
-    <>
-      <Row className="top-nav f-shadow align-items-center semi-transparent-bg">
-        <Col xs="auto">
-          <BackButton />
-        </Col>
-        <Col>
-          <h1>{title}</h1>
-        </Col>
-      </Row>
-    </>
+    <Row className="top-nav f-shadow align-items-center semi-transparent-bg">
+      <Col xs="auto">
+        <BackButton />
+      </Col>
+      <Col>
+        <h1>{title}</h1>
+      </Col>
+    </Row>
   );
 }
