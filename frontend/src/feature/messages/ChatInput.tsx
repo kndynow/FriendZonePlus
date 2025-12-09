@@ -14,7 +14,7 @@ export default function ChatInput({
 }: ChatInputProps) {
   return (
     <>
-      <Row className="justify-content-end align-items-end pt-4">
+      <Row className="justify-content-end align-items-top pt-2">
         <Col className="pe-0">
           <FormField
             placeholder="Write something..."

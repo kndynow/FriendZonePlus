@@ -5,6 +5,9 @@ interface FormFieldProps {
   type?: string;
   name?: string;
   value?: string;
+  error?: string | null;
+  touched?: boolean;
+  required?: boolean;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
@@ -14,23 +17,34 @@ export default function FormField({
   type = "text",
   name,
   value,
+  error,
+  touched,
+  required = true,
   onChange,
   onKeyDown,
 }: FormFieldProps) {
+  const isInvalid = Boolean(error && touched);
+
   return (
     <>
-      <FormGroup>
-        {label && <FormLabel>{label}</FormLabel>}
+      <FormGroup className="mb-3">
+        {label && <FormLabel className="mb-1">{label}</FormLabel>}
+
         <FormControl
           type={type}
           name={name}
           value={value}
-          onChange={onChange}
           className="f-shadow-inset"
           placeholder={placeholder}
+          onChange={onChange}
           onKeyDown={onKeyDown}
-          required
+          required={required}
+          isInvalid={isInvalid}
         />
+
+        {isInvalid && (
+          <FormControl.Feedback type="invalid">{error}</FormControl.Feedback>
+        )}
       </FormGroup>
     </>
   );

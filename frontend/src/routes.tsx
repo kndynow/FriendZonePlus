@@ -1,7 +1,5 @@
 import type { RouteObject } from "react-router-dom";
 import HomePage from "./pages/HomePage";
-import RegisterPage from "./pages/RegisterPage";
-import LoginPage from "./pages/LoginPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import UserPage from "./pages/UserPage";
 import SettingsPage from "./pages/SettingsPage";
@@ -11,13 +9,6 @@ import ProtectedLayout from "../utils/ProtectedLayout";
 import PrivateChat from "./feature/messages/PrivateChat";
 
 const routes: RouteObject[] = [
-  { path: "login", element: <LoginPage />, handle: { title: "Login" } },
-  {
-    path: "register",
-    element: <RegisterPage />,
-    handle: { title: "Register" },
-  },
-
   {
     path: "/",
     element: <ProtectedLayout />,
