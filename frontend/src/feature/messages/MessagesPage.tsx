@@ -79,6 +79,7 @@ export default function MessagesPage() {
             <div onClick={() => navigate(`/messages/${follower.id}`)}>
               <UserPreview
                 fullName={`${follower.firstName} ${follower.lastName}`}
+                imgPath={`${follower.profilePictureUrl}`}
                 subtitle={
                   latestMessages[follower.id]
                     ? `${latestMessages[follower.id].senderName}: ${
