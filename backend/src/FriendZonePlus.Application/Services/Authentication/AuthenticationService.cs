@@ -48,11 +48,11 @@ public class AuthenticationService : IAuthenticationService
 
         if (user is null)
         {
-            throw new InvalidCredentialsException($"Invalid username or email: {request.UsernameOrEmail}");
+            throw new InvalidCredentialsException($"Invalid credentials.");
         }
         if (!_passwordHelper.VerifyPassword(request.Password, user.PasswordHash))
         {
-            throw new InvalidCredentialsException($"Invalid password for user: {user.Username}");
+            throw new InvalidCredentialsException($"Invalid password for user.");
         }
 
         var token = _jwtGenerator.GenerateToken(user);
