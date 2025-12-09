@@ -56,6 +56,7 @@ export default function PrivateChat() {
               input={input}
               setInput={setInput}
               sendMessage={handleSend}
+              maxLength={300}
             />
           </Col>
         </Row>

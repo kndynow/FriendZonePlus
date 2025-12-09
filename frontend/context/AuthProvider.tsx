@@ -5,11 +5,7 @@ import {
   useState,
   useEffect,
 } from "react";
-import type {
-  RegisterRequest,
-  User,
-  LoginRequest,
-} from "../types/auth.ts";
+import type { RegisterRequest, User, LoginRequest } from "../types/auth.ts";
 
 interface AuthContextType {
   user: User | null;
