@@ -4,6 +4,7 @@ import UserPreview from "../feature/user/UserPreview";
 import { Col, Row } from "react-bootstrap";
 import { useFindFriends } from "../hooks/useFindFriends";
 import toast from "react-hot-toast";
+import EmptyContent from "../components/ui/EmptyContent";
 
 export default function FindFriendsPage() {
   const { user: currentUser } = useAuth();
@@ -52,45 +53,48 @@ export default function FindFriendsPage() {
   }
 
   if (error) {
+    return toast.error(error as string);
+  }
+
+  if (users.length === 1) {
     return (
-      toast.error(error as string)
+      <EmptyContent
+        header="No other users yet"
+        content="Hang along and maybe they'll come!"
+      />
     );
   }
 
   return (
     <>
-      {users.length === 0 ? (
-        <p>No users found</p>
-      ) : (
-        <Row className="flex-grow-1">
-          <Col>
-            {users
-              .filter((user) => user.id !== currentUser?.id)
-              .map((user) => {
-                const userIsFollowing = isFollowing(user.id);
-                return (
-                  <UserPreview
-                    key={user.id}
-                    userId={user.id}
-                    imgPath={user.profilePictureUrl}
-                    fullName={`@${user.username}`}
-                    subtitle={`${user.followersCount} followers • follows ${user.followingCount} `}
-                    className="f-border f-shadow semi-transparent-bg mb-2 align-items-center ps-3"
-                    button={{
-                      buttonIcon:
-                        followLoading === user.id
-                          ? "..."
-                          : userIsFollowing
-                            ? "–"
-                            : "+",
-                      onClick: () => handleToggleFollow(user.id),
-                    }}
-                  />
-                );
-              })}
-          </Col>
-        </Row>
-      )}
+      <Row className="flex-grow-1">
+        <Col>
+          {users
+            .filter((user) => user.id !== currentUser?.id)
+            .map((user) => {
+              const userIsFollowing = isFollowing(user.id);
+              return (
+                <UserPreview
+                  key={user.id}
+                  userId={user.id}
+                  imgPath={user.profilePictureUrl}
+                  fullName={`@${user.username}`}
+                  subtitle={`${user.followersCount} followers • follows ${user.followingCount} `}
+                  className="f-border f-shadow semi-transparent-bg mb-2 align-items-center ps-3"
+                  button={{
+                    buttonIcon:
+                      followLoading === user.id
+                        ? "..."
+                        : userIsFollowing
+                        ? "–"
+                        : "+",
+                    onClick: () => handleToggleFollow(user.id),
+                  }}
+                />
+              );
+            })}
+        </Col>
+      </Row>
     </>
   );
 }
