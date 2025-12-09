@@ -1,11 +1,10 @@
 import { Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
 import { Spinner } from "react-bootstrap";
-import { Navigate, useLocation } from "react-router-dom";
+import WelcomePage from "../src/feature/auth/WelcomePage";
 
 export default function ProtectedLayout() {
   const { user, loading } = useAuth();
-  const location = useLocation();
 
   if (loading) {
     return (
@@ -16,7 +15,7 @@ export default function ProtectedLayout() {
   }
 
   if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <WelcomePage />;
   }
 
   return <Outlet />;
