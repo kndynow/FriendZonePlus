@@ -3,6 +3,7 @@ import { useAuth } from "../../../context/AuthProvider";
 import { useWallPost } from "../../hooks/useWallPost";
 import { useWallPostActions, CREATE_POST_LOADING_ID } from "../../hooks/useWallPostActions";
 import { useUserProfiles } from "../../hooks/useUserProfiles";
+import { useFollowing } from "../../hooks/useFollowing";
 import { wallPostService } from "../../api/services/wallPostService";
 import { Container } from "react-bootstrap";
 import WallPostItem from "./WallPostItem";
@@ -17,19 +18,25 @@ export default function WallPostList({ userId, showCreateForm }: WallPostListPro
     const { user: currentUser } = useAuth();
     const { wallPosts, loading, error, addWallPost, removeWallPost, updateWallPost } = useWallPost(userId);
     const { createWallPost, updateWallPost: updatePost, deleteWallPost, loading: actionsLoading } = useWallPostActions();
+    const { isFollowing } = useFollowing();
 
     const authorIds = wallPosts.map(post => post.authorId);
     const { getProfilePictureUrl } = useUserProfiles(authorIds);
 
     const shouldShowCreateForm = showCreateForm !== undefined
         ? showCreateForm
-        : userId === undefined || userId === currentUser?.id;
+        : userId === undefined
+            ? true
+            : userId === currentUser?.id || isFollowing(userId);
 
-    const targetUserId = (userId ?? currentUser?.id) || 0;
+
+    const targetUserId = userId ?? currentUser?.id;
 
     const handleCreatePost = async (content: string) => {
-        if (!targetUserId) {
-            toast.error('Unable to create post');
+        // Kontrollera om targetUserId är ett giltigt nummer (inte NaN, undefined eller null)
+        if (!targetUserId || isNaN(targetUserId)) {
+            toast.error('Unable to create post: Missing target user information');
+            console.error('targetUserId:', targetUserId, 'userId:', userId, 'currentUser?.id:', currentUser?.id);
             return;
         }
 
