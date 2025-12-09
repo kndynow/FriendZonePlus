@@ -3,6 +3,7 @@ import { useAuth } from "../../context/AuthProvider";
 import UserPreview from "../feature/user/UserPreview";
 import { Col, Container, Row } from "react-bootstrap";
 import { useFindFriends } from "../hooks/useFindFriends";
+import toast from "react-hot-toast";
 
 export default function FindFriendsPage() {
   const { user: currentUser } = useAuth();
@@ -48,19 +49,14 @@ export default function FindFriendsPage() {
 
   if (loading) {
     return (
-      <Container className="py-4">
-        <p>Loading users...</p>
-      </Container>
+      <p>Loading users...</p>
     );
   }
 
   if (error) {
     return (
-      <Container className="py-4">
-        <p className="text-danger">
-          {error as string}
-        </p>
-      </Container>
+      toast.error(error as string)
+
     );
   }
 
