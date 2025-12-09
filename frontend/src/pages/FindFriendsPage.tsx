@@ -49,7 +49,6 @@ export default function FindFriendsPage() {
   if (loading) {
     return (
       <Container className="py-4">
-        <h1>Find Friends</h1>
         <p>Loading users...</p>
       </Container>
     );
@@ -58,7 +57,6 @@ export default function FindFriendsPage() {
   if (error) {
     return (
       <Container className="py-4">
-        <h1>Find Friends</h1>
         <p className="text-danger">
           {error as string}
         </p>
@@ -68,13 +66,12 @@ export default function FindFriendsPage() {
 
   return (
     <Container className="py-4">
-      <h1>Find Friends</h1>
       {users.length === 0 ? (
         <p>No users found</p>
       ) : (
         <Container>
           <Row>
-            <Col className="f-border f-shadow semi-transparent-bg pt-2 mb-2 gap-2 d-flex flex-column">
+            <Col >
               {users
                 .filter(user => user.id !== currentUser?.id)
                 .map((user) => {
@@ -85,6 +82,7 @@ export default function FindFriendsPage() {
                       imgPath={user.profilePictureUrl}
                       fullName={`${user.firstName} ${user.lastName}`}
                       subtitle={`@${user.username} • ${user.followersCount} followers`}
+                      className="f-border f-shadow semi-transparent-bg pt-2 mb-2 gap-2"
                       button={{
                         buttonIcon: followLoading === user.id ? "..." : userIsFollowing ? "Unfollow" : "Follow",
                         onClick: () => handleToggleFollow(user.id),
