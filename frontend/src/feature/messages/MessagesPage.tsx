@@ -52,7 +52,6 @@ export default function MessagesPage() {
 
         setLatestMessages(messagesMap);
       } catch (error) {
-        console.error("Failed to fetch messages", error);
       } finally {
         setLoading(false);
       }
