@@ -11,6 +11,7 @@ type WallPostProps = {
   content: string | ReactNode;
   actions?: ActionButton[];
   subtitle?: string;
+  userId?: number;
 };
 
 export default function WallPost({
@@ -18,13 +19,14 @@ export default function WallPost({
   content,
   actions,
   subtitle,
+  userId,
 }: WallPostProps) {
   return (
     <Row className="f-border f-shadow py-2 pb-3 m-1 my-4 semi-transparent-bg">
       <Col>
         <div>
-          <PostHeader user={user} subtitle={subtitle} actions={actions} />
-
+          <PostHeader user={user} subtitle={subtitle} actions={actions} userId={userId} />
+          <div className="divider"></div>
           <div className="p-2">
             {typeof content === 'string' ? <p>{content}</p> : content}
           </div>

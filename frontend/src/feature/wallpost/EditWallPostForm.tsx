@@ -54,6 +54,7 @@ export default function EditWallPostForm({
                 </div>
             }
             subtitle={formatPostSubtitle(post)}
+            userId={post.authorId}
         />
     );
 }

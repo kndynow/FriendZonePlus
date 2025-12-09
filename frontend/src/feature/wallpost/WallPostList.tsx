@@ -5,7 +5,6 @@ import { useWallPostActions, CREATE_POST_LOADING_ID } from "../../hooks/useWallP
 import { useUserProfiles } from "../../hooks/useUserProfiles";
 import { useFollowing } from "../../hooks/useFollowing";
 import { wallPostService } from "../../api/services/wallPostService";
-import { Container } from "react-bootstrap";
 import WallPostItem from "./WallPostItem";
 import CreateWallPostForm from "./CreateWallPostForm";
 
@@ -33,7 +32,6 @@ export default function WallPostList({ userId, showCreateForm }: WallPostListPro
     const targetUserId = userId ?? currentUser?.id;
 
     const handleCreatePost = async (content: string) => {
-        // Kontrollera om targetUserId är ett giltigt nummer (inte NaN, undefined eller null)
         if (!targetUserId || isNaN(targetUserId)) {
             toast.error('Unable to create post: Missing target user information');
             console.error('targetUserId:', targetUserId, 'userId:', userId, 'currentUser?.id:', currentUser?.id);
@@ -81,22 +79,19 @@ export default function WallPostList({ userId, showCreateForm }: WallPostListPro
 
     if (loading) {
         return (
-            <Container className="py-4">
-                <p>Loading posts...</p>
-            </Container>
+            <p>Loading posts...</p>
+
         );
     }
 
     if (error) {
         return (
-            <Container className="py-4">
-                <p className="text-danger">Error: {error}</p>
-            </Container>
+            <p className="text-danger">Error: {error}</p>
         );
     }
 
     return (
-        <Container className="py-4">
+        <div className="py-4 w-100">
             {shouldShowCreateForm && (
                 <CreateWallPostForm
                     onSubmit={handleCreatePost}
@@ -121,7 +116,7 @@ export default function WallPostList({ userId, showCreateForm }: WallPostListPro
                     ))}
                 </div>
             )}
-        </Container>
+        </div>
     );
 
 

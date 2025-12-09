@@ -91,6 +91,7 @@ export default function WallPostItem({
                 content={post.content}
                 subtitle={formatPostSubtitle(post)}
                 actions={actions.length > 0 ? actions : undefined}
+                userId={post.authorId}
             />
 
             <DeletePostModal
