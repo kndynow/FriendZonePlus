@@ -56,7 +56,6 @@ export default function FindFriendsPage() {
   if (error) {
     return (
       toast.error(error as string)
-
     );
   }
 
