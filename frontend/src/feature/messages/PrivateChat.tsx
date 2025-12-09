@@ -58,7 +58,7 @@ export default function PrivateChat() {
             </Col>
           )}
         </Row>
-        <Row>
+        <Row className="mb-2">
           <Col>
             <ChatInput
               input={input}

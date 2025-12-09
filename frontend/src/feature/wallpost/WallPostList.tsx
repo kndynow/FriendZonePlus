@@ -95,8 +95,8 @@ export default function WallPostList({
   }
 
   return (
-    <div className="py-4 w-100">
-      <div className="py-4 w-100">
+    <div className="w-100">
+      <div className="w-100">
         {shouldShowCreateForm && (
           <CreateWallPostForm
             onSubmit={handleCreatePost}
@@ -125,6 +125,7 @@ export default function WallPostList({
           </div>
         )}
       </div>
+      <br />
     </div>
   );
 }

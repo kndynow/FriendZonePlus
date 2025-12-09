@@ -79,15 +79,13 @@ export default function MessagesPage() {
   }
 
   return (
-    <Stack gap={1}>
-      {followers.map((follower) => (
-        <Row
-          key={follower.id}
-          className="f-border f-shadow semi-transparent-bg pt-2 mb-2"
-        >
-          <Col>
+    <>
+      <Row className="flex-grow-1">
+        <Col>
+          {followers.map((follower) => (
             <div onClick={() => navigate(`/messages/${follower.id}`)}>
               <UserPreview
+                key={follower.id}
                 fullName={`${follower.firstName} ${follower.lastName}`}
                 imgPath={`${follower.profilePictureUrl}`}
                 subtitle={
@@ -97,13 +95,15 @@ export default function MessagesPage() {
                       }`
                     : "Start a conversation..."
                 }
+                className="f-border f-shadow semi-transparent-bg mb-2 align-items-center p-3"
                 truncate={true}
                 truncateLength={31}
               />
             </div>
-          </Col>
-        </Row>
-      ))}
-    </Stack>
+          ))}
+        </Col>
+      </Row>
+      <br />
+    </>
   );
 }

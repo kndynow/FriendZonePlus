@@ -14,6 +14,7 @@ type UserPreviewProps = {
     buttonIcon: string;
     onClick: () => void;
   };
+  children?: React.ReactNode;
 };
 
 export default function UserPreview({
@@ -25,6 +26,7 @@ export default function UserPreview({
   truncate,
   truncateLength = 40,
   button,
+  children,
 }: UserPreviewProps) {
   const truncatedSubtitle =
     truncate && subtitle && subtitle.length > truncateLength
@@ -49,16 +51,17 @@ export default function UserPreview({
           </h5>
           <p className="mb-2 fs-6 fst-italic">{truncatedSubtitle}</p>
         </Col>
-        {button?.buttonIcon && (
+        {(button || children) && (
           <Col
             xs="auto"
             className="d-flex flex-column align-items-end justify-content-start mb-4 pb-2"
           >
-            {button.buttonIcon && (
+            {button && (
               <button onClick={button.onClick} className="f-button fs-4">
                 {button.buttonIcon}
               </button>
             )}
+            {children}
           </Col>
         )}
       </Row>
