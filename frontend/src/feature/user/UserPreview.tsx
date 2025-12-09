@@ -21,11 +21,11 @@ export default function UserPreview({
 }: UserPreviewProps) {
   return (
     <>
-      <Row className={`align-items-start p-2 ps-3 m-0 ${className}`}>
+      <Row className={`align-items-start p-2 m-0 ${className}`}>
         <Col xs="auto" className="p-0">
           <ProfileImage imgPath={imgPath} />
         </Col>
-        <Col className="d-flex flex-column justify-content-center">
+        <Col className="d-flex flex-column justify-content-center mx-1">
           <h5 className="fs-5 mb-1">{fullName}</h5>
           <p className="mb-2">{subtitle}</p>
         </Col>
@@ -35,7 +35,7 @@ export default function UserPreview({
             className="d-flex flex-column align-items-end justify-content-start mb-4 pb-2"
           >
             {button.buttonIcon && (
-              <button onClick={button.onClick} className="f-button fs-4">
+              <button onClick={button.onClick} className="f-button fs-s">
                 {button.buttonIcon}
               </button>
             )}
