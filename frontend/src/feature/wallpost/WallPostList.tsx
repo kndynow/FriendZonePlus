@@ -76,6 +76,7 @@ export default function WallPostList({ userId, showCreateForm }: WallPostListPro
     if (error) {
         return (
             <p className="text-danger">Error: {error}</p>
+            <p className="text-danger">Error: {error}</p>
         );
     }
 
