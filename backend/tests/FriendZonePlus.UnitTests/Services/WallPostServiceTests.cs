@@ -45,34 +45,74 @@ public class WallPostServiceTests
       Username = "authoruser",
       ProfilePictureUrl = "http://example.com/author.jpg"
     };
+    var createdAt = DateTime.UtcNow;
+    var postId = 101;
 
-    // Simulate that database sets an ID and Author when adding
+    // Simulate that database sets an ID when adding
     _WallPostRepoMock.Setup(x => x.AddAsync(It.IsAny<WallPost>()))
                      .Callback<WallPost>((WallPost p) =>
                      {
-                       p.Id = 101;
-                       p.AuthorId = currentUserId;
-                       p.Author = author;
-                       p.CreatedAt = DateTime.UtcNow;
+                       p.Id = postId;
                      })
                      .Returns(Task.CompletedTask);
+
+    // Mock GetByIdAsync to return the created post with Author included
+    var createdPost = new WallPost
+    {
+      Id = postId,
+      AuthorId = currentUserId,
+      Author = author,
+      Content = dto.Content,
+      TargetUserId = dto.TargetUserId,
+      CreatedAt = createdAt
+    };
+
+    _WallPostRepoMock.Setup(x => x.GetByIdAsync(postId))
+                     .ReturnsAsync(createdPost);
 
     // Act
     var result = await _sut.CreateAsync(currentUserId, dto);
 
     // Assert
     Assert.NotNull(result);
-    Assert.Equal(101, result.Id);
+    Assert.Equal(postId, result.Id);
     Assert.Equal(dto.Content, result.Content);
     Assert.Equal(currentUserId, result.AuthorId);
     Assert.True(result.CreatedAt > DateTime.MinValue);
     Assert.Equal(author.Username, result.AuthorName);
-    Assert.Equal(author.ProfilePictureUrl, result.AuthorProfilePictureUrl);
 
     _WallPostRepoMock.Verify(x => x.AddAsync(It.Is<WallPost>(wp =>
       wp.AuthorId == currentUserId &&
       wp.TargetUserId == dto.TargetUserId &&
       wp.Content == dto.Content)), Times.Once);
+    _WallPostRepoMock.Verify(x => x.GetByIdAsync(postId), Times.Once);
+  }
+
+  [Fact]
+  public async Task CreateAsync_ShouldThrowInvalidOperationException_WhenGetByIdAsyncReturnsNull()
+  {
+    // Arrange
+    var currentUserId = 1;
+    var dto = new CreateWallPostDto(TargetUserId: 2, Content: "This is a post!");
+    var postId = 101;
+
+    _WallPostRepoMock.Setup(x => x.AddAsync(It.IsAny<WallPost>()))
+                     .Callback<WallPost>((WallPost p) =>
+                     {
+                       p.Id = postId;
+                     })
+                     .Returns(Task.CompletedTask);
+
+    _WallPostRepoMock.Setup(x => x.GetByIdAsync(postId))
+                     .ReturnsAsync((WallPost?)null);
+
+    // Act & Assert
+    var ex = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+      _sut.CreateAsync(currentUserId, dto));
+
+    Assert.Equal("Failed to retrieve created post", ex.Message);
+    _WallPostRepoMock.Verify(x => x.AddAsync(It.IsAny<WallPost>()), Times.Once);
+    _WallPostRepoMock.Verify(x => x.GetByIdAsync(postId), Times.Once);
   }
 
   #endregion
@@ -140,12 +180,10 @@ public class WallPostServiceTests
     Assert.Equal(posts[0].Content, result[0].Content);
     Assert.Equal(posts[0].AuthorId, result[0].AuthorId);
     Assert.Equal(author1.Username, result[0].AuthorName);
-    Assert.Equal(author1.ProfilePictureUrl, result[0].AuthorProfilePictureUrl);
     Assert.Equal(posts[1].Id, result[1].Id);
     Assert.Equal(posts[1].Content, result[1].Content);
     Assert.Equal(posts[1].AuthorId, result[1].AuthorId);
     Assert.Equal(author2.Username, result[1].AuthorName);
-    Assert.Equal(author2.ProfilePictureUrl, result[1].AuthorProfilePictureUrl);
     _WallPostRepoMock.Verify(x => x.GetFeedAsync(currentUserId), Times.Once);
   }
 
@@ -214,12 +252,10 @@ public class WallPostServiceTests
     Assert.Equal(posts[0].Content, result[0].Content);
     Assert.Equal(posts[0].AuthorId, result[0].AuthorId);
     Assert.Equal(author1.Username, result[0].AuthorName);
-    Assert.Equal(author1.ProfilePictureUrl, result[0].AuthorProfilePictureUrl);
     Assert.Equal(posts[1].Id, result[1].Id);
     Assert.Equal(posts[1].Content, result[1].Content);
     Assert.Equal(posts[1].AuthorId, result[1].AuthorId);
     Assert.Equal(author2.Username, result[1].AuthorName);
-    Assert.Equal(author2.ProfilePictureUrl, result[1].AuthorProfilePictureUrl);
     _WallPostRepoMock.Verify(x => x.GetWallPostsAsync(userId), Times.Once);
   }
 

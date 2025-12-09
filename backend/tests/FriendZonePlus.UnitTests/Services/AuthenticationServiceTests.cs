@@ -74,7 +74,6 @@ namespace FriendZonePlus.UnitTests.Services
             Assert.NotNull(result);
             Assert.Equal(1, result.UserId);
             Assert.Equal("Snusmumriken1978", result.Username);
-            Assert.Equal("fake-jwt-token", result.Token);
 
             _passwordHelperMock.Verify(h => h.HashPassword("Secret123"), Times.Once);
             _userRepoMock.Verify(r => r.AddAsync(It.IsAny<User>()), Times.Once);
@@ -263,7 +262,7 @@ namespace FriendZonePlus.UnitTests.Services
         }
 
         [Fact]
-        public async Task LoginAsync_ShouldReturnAuthResponse_WhenUsernameIsFound()
+        public async Task LoginAsync_ShouldReturnLoginResponse_WhenUsernameIsFound()
         {
             // Arrange
             var user = ValidUser();
