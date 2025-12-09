@@ -35,18 +35,17 @@ public class WallPostRepository : IWallPostRepository
 
   public async Task<WallPost?> GetByIdAsync(int id)
   {
-    return await _context.WallPosts.Include(wp => wp.Author).Include(wp => wp.TargetUser).FirstOrDefaultAsync(wp => wp.Id == id);
+    return await _context.WallPosts.FindAsync(id);
   }
   public async Task<List<WallPost>> GetWallPostsAsync(int targetUserId)
   {
-    return await _context.WallPosts.Where(wp => wp.TargetUserId == targetUserId).Include(wp => wp.Author).Include(wp => wp.TargetUser).OrderByDescending(wp => wp.CreatedAt).ToListAsync();
+    return await _context.WallPosts.Where(wp => wp.TargetUserId == targetUserId).Include(wp => wp.Author).OrderByDescending(wp => wp.CreatedAt).ToListAsync();
   }
 
   public async Task<List<WallPost>> GetFeedAsync(int currentUserId)
   {
-    var followedUserIds = _context.Follows.Where(f => f.FollowerId == currentUserId).Select(f => f.FollowedUserId).ToList();
-    followedUserIds.Add(currentUserId);
-    return await _context.WallPosts.Where(wp => followedUserIds.Contains(wp.AuthorId)).Include(wp => wp.Author).Include(wp => wp.TargetUser).OrderByDescending(wp => wp.CreatedAt).ToListAsync();
+    var followedUserId = _context.Follows.Where(f => f.FollowerId == currentUserId).Select(f => f.FollowedUserId).ToList();
+    return await _context.WallPosts.Where(wp => followedUserId.Contains(wp.AuthorId)).Include(wp => wp.Author).OrderByDescending(wp => wp.CreatedAt).ToListAsync();
   }
 
 
