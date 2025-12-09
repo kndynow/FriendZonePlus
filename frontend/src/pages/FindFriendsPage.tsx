@@ -14,7 +14,7 @@ export default function FindFriendsPage() {
     isFollowing,
     setFollowingStatus,
     incrementFollowersCount,
-    decrementFollowersCount
+    decrementFollowersCount,
   } = useFindFriends();
   const { toggleFollow, loading: followLoading } = useFollowUser();
 
@@ -48,48 +48,46 @@ export default function FindFriendsPage() {
   };
 
   if (loading) {
-    return (
-      <p>Loading users...</p>
-    );
+    return <p>Loading users...</p>;
   }
 
   if (error) {
-    return (
-      toast.error(error as string)
-
-    );
+    return toast.error(error as string);
   }
 
   return (
-    <Container className="py-4">
+    <>
       {users.length === 0 ? (
         <p>No users found</p>
       ) : (
-        <Container>
-          <Row>
-            <Col >
-              {users
-                .filter(user => user.id !== currentUser?.id)
-                .map((user) => {
-                  const userIsFollowing = isFollowing(user.id);
-                  return (
-                    <UserPreview
-                      key={user.id}
-                      imgPath={user.profilePictureUrl}
-                      fullName={`${user.firstName} ${user.lastName}`}
-                      subtitle={`@${user.username} • ${user.followersCount} followers`}
-                      className="f-border f-shadow semi-transparent-bg pt-2 mb-2 gap-2"
-                      button={{
-                        buttonIcon: followLoading === user.id ? "..." : userIsFollowing ? "Unfollow" : "Follow",
-                        onClick: () => handleToggleFollow(user.id),
-                      }}
-                    />
-                  );
-                })}
-            </Col>
-          </Row>
-        </Container>
+        <Row className="flex-grow-1">
+          <Col>
+            {users
+              .filter((user) => user.id !== currentUser?.id)
+              .map((user) => {
+                const userIsFollowing = isFollowing(user.id);
+                return (
+                  <UserPreview
+                    key={user.id}
+                    imgPath={user.profilePictureUrl}
+                    fullName={`@${user.username}`}
+                    subtitle={`${user.followersCount} followers • ${user.followingCount} follows`}
+                    className="f-border f-shadow semi-transparent-bg mb-2 align-items-center"
+                    button={{
+                      buttonIcon:
+                        followLoading === user.id
+                          ? "..."
+                          : userIsFollowing
+                          ? "–"
+                          : "+",
+                      onClick: () => handleToggleFollow(user.id),
+                    }}
+                  />
+                );
+              })}
+          </Col>
+        </Row>
       )}
-    </Container>
+    </>
   );
 }
