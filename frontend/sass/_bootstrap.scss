@@ -1,0 +1,12 @@
+$primary: #5f4a72;
+$danger: #724a4a;
+$font-sizes: (
+  1: 4.5rem,
+  2: 2.5rem,
+  3: 2rem,
+  4: 1.5rem,
+  5: 1.15rem,
+  6: 0.8rem
+);
+
+@import "../node_modules/bootstrap/scss/bootstrap.scss";

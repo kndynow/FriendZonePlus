@@ -17,6 +17,54 @@ namespace FriendZonePlus.Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.0");
 
+            modelBuilder.Entity("FriendZonePlus.Core.Entities.Follow", b =>
+                {
+                    b.Property<int>("FollowerId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("FollowedUserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("FollowerId", "FollowedUserId");
+
+                    b.HasIndex("FollowedUserId");
+
+                    b.ToTable("Follow", (string)null);
+                });
+
+            modelBuilder.Entity("FriendZonePlus.Core.Entities.Message", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ReceiverId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SenderId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Message", (string)null);
+                });
+
             modelBuilder.Entity("FriendZonePlus.Core.Entities.User", b =>
                 {
                     b.Property<int>("Id")
@@ -30,13 +78,106 @@ namespace FriendZonePlus.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ProfilePictureUrl")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("User", (string)null);
+                });
+
+            modelBuilder.Entity("FriendZonePlus.Core.Entities.WallPost", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("AuthorId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TargetUserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("TargetUserId");
+
+                    b.ToTable("WallPost", (string)null);
+                });
+
+            modelBuilder.Entity("FriendZonePlus.Core.Entities.Follow", b =>
+                {
+                    b.HasOne("FriendZonePlus.Core.Entities.User", "FollowedUser")
+                        .WithMany("Following")
+                        .HasForeignKey("FollowedUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FriendZonePlus.Core.Entities.User", "Follower")
+                        .WithMany("Followers")
+                        .HasForeignKey("FollowerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("FollowedUser");
+
+                    b.Navigation("Follower");
+                });
+
+            modelBuilder.Entity("FriendZonePlus.Core.Entities.WallPost", b =>
+                {
+                    b.HasOne("FriendZonePlus.Core.Entities.User", "Author")
+                        .WithMany("AuthoredPosts")
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FriendZonePlus.Core.Entities.User", "TargetUser")
+                        .WithMany("WallPosts")
+                        .HasForeignKey("TargetUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+
+                    b.Navigation("TargetUser");
+                });
+
+            modelBuilder.Entity("FriendZonePlus.Core.Entities.User", b =>
+                {
+                    b.Navigation("AuthoredPosts");
+
+                    b.Navigation("Followers");
+
+                    b.Navigation("Following");
+
+                    b.Navigation("WallPosts");
                 });
 #pragma warning restore 612, 618
         }
